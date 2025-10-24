@@ -13,6 +13,9 @@ namespace TukiGestor
             var settings = new FriendlyUrlSettings();
             settings.AutoRedirectMode = RedirectMode.Permanent;
             routes.EnableFriendlyUrls(settings);
+
+            // Ruta por defecto - página inicial
+            routes.MapPageRoute("Default", "", "~/Home.aspx");
         }
     }
 }

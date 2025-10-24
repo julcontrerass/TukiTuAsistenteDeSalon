@@ -9,6 +9,8 @@ namespace TukiGestor
 {
     public partial class SiteMaster : MasterPage
     {
+        protected bool log = false;
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
