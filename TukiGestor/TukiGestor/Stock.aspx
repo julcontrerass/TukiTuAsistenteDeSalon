@@ -65,8 +65,6 @@
             transform: scale(1.2);
             transition: 0.2s ease;
         }
-
-
     </style>
 
     <div class="stock-container">
@@ -141,7 +139,7 @@
         </div>
     </div>
 
-    <!-- 🌟 VENTANA EMERGENTE NUEVO PRODUCTO -->
+    <!-- VENTANA EMERGENTE NUEVO PRODUCTO -->
     <div class="modal fade" id="nuevoProductoModal" tabindex="-1" aria-labelledby="nuevoProductoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg rounded-4">
@@ -151,6 +149,11 @@
                 </div>
 
                 <div class="modal-body bg-light">
+                    <div class="mb-3">
+                        <label for="txtCategoria" class="form-label">Categoría</label>
+                        <asp:TextBox ID="txtCategoria" runat="server" CssClass="form-control" placeholder="Ej: Comida, Bebida, Postre"></asp:TextBox>
+                    </div>
+
                     <div class="mb-3">
                         <label for="txtNombre" class="form-label">Nombre del producto</label>
                         <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control" placeholder="Ej: Pizza Napolitana"></asp:TextBox>
@@ -164,6 +167,11 @@
                     <div class="mb-3">
                         <label for="txtCantidad" class="form-label">Cantidad</label>
                         <asp:TextBox ID="txtCantidad" runat="server" CssClass="form-control" TextMode="Number" placeholder="Ej: 50"></asp:TextBox>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txtPrecio" class="form-label">Precio</label>
+                        <asp:TextBox ID="txtPrecio" runat="server" CssClass="form-control" TextMode="Number" placeholder="Ej: 1200"></asp:TextBox>
                     </div>
                 </div>
 
