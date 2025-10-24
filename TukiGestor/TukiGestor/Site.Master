@@ -41,6 +41,7 @@
             flex-direction: column;
             overflow: hidden;
             z-index: 1000;
+            transition: width 0.3s ease;
         }
 
         .sidebar.collapsed {
@@ -59,6 +60,7 @@
         .sidebar-logo {
             text-align: center;
             flex: 1;
+            transition: opacity 0.2s ease;
         }
 
         .sidebar.collapsed .sidebar-logo {
@@ -78,6 +80,7 @@
             font-size: 1.5em;
             cursor: pointer;
             padding: 5px;
+            transition: all 0.3s ease;
         }
 
         .toggle-btn:hover {
@@ -85,18 +88,30 @@
         }
 
         .sidebar.collapsed .toggle-btn {
-            margin: 0 auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+            position: relative;
         }
 
         .sidebar-nav {
             list-style: none;
-            padding: 20px 15px;
+            padding: 20px 0;
             margin: 0;
             flex-grow: 1;
         }
 
         .sidebar-nav li {
-            margin-bottom: 8px;
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        .sidebar-nav li:has(a.active) {
+            background-color: #F6EFE0;
         }
 
         .sidebar-nav a {
@@ -106,9 +121,9 @@
             color: #333;
             text-decoration: none;
             font-size: 0.9em;
-            border-radius: 8px;
             font-weight: 500;
             white-space: nowrap;
+            position: relative;
         }
 
         .sidebar-nav a i {
@@ -120,11 +135,12 @@
         }
 
         .sidebar-nav a span {
+            transition: opacity 0.2s ease;
         }
 
         .sidebar.collapsed .sidebar-nav a {
             justify-content: center;
-            padding: 12px 0;
+            padding: 12px 16px;
         }
 
         .sidebar.collapsed .sidebar-nav a i {
@@ -136,13 +152,19 @@
             display: none;
         }
 
-        .sidebar-nav a:hover {
+        .sidebar-nav li:hover {
             background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-nav li:has(a.active):hover {
+            background-color: #F6EFE0;
+        }
+
+        .sidebar-nav a:hover {
             color: #000;
         }
 
         .sidebar-nav a.active {
-            background-color: #F6EFDF;
             color: #333;
             font-weight: 600;
         }
@@ -153,6 +175,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
         .sidebar.collapsed ~ .main-wrapper {
@@ -182,7 +205,11 @@
             margin: 0;
             color: #333;
             margin-left: 300px;
+            transition: margin-left 0.3s ease;
+        }
 
+        body.sidebar-collapsed footer p {
+            margin-left: 100px;
         }
 
         @media (max-width: 768px) {
@@ -227,13 +254,16 @@
                         <img src="Assets/LogoTransparente.png" alt="TUKI Logo" />
                     </a>
                 </div>
+                <button class="toggle-btn" id="toggleSidebar" type="button">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
             <ul class="sidebar-nav">
-                <li><a runat="server" href="~/Home" class="active"><i class="bi bi-house-door"></i><span> Inicio</span></a></li>
-                <li><a runat="server" href="~/Mesas"><i class="bi bi-grid-3x3"></i><span> Mesas</span></a></li>
-                <li><a runat="server" href="~/Stock.aspx"><i class="bi bi-box-seam"></i><span> Stock</span></a></li>
-                <li><a runat="server" href="~/Reporte"><i class="bi bi-graph-up"></i><span> Reporte</span></a></li>
-                <li><a runat="server" href="~/Configuracion"><i class="bi bi-gear"></i><span> Configuración</span></a></li>
+                <li><a runat="server" id="linkInicio" href="~/Home.aspx"><i class="bi bi-house-door"></i><span> Inicio</span></a></li>
+                <li><a runat="server" id="linkMesas" href="~/Mesas.aspx"><i class="bi bi-grid-3x3"></i><span> Mesas</span></a></li>
+                <li><a runat="server" id="linkStock" href="~/Stock.aspx"><i class="bi bi-box-seam"></i><span> Stock</span></a></li>
+                <li><a runat="server" id="linkReporte" href="~/Reporte.aspx"><i class="bi bi-graph-up"></i><span> Reporte</span></a></li>
+                <li><a runat="server" id="linkConfiguracion" href="~/Configuracion.aspx"><i class="bi bi-gear"></i><span> Configuración</span></a></li>
             </ul>
         </div>
 
@@ -252,6 +282,27 @@
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
     </asp:PlaceHolder>
 
-   
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = toggleBtn.querySelector('i');
+
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    document.body.classList.toggle('sidebar-collapsed');
+
+                    if (sidebar.classList.contains('collapsed')) {
+                        toggleIcon.classList.remove('bi-x');
+                        toggleIcon.classList.add('bi-list');
+                    } else {
+                        toggleIcon.classList.remove('bi-list');
+                        toggleIcon.classList.add('bi-x');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

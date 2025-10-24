@@ -1,7 +1,35 @@
 ﻿<%@ Page Title="Stock" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Stock.aspx.cs" Inherits="TukiGestor.Stock" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-    <div class="container mt-5">
+    <style>
+        .container.body-content {
+            padding: 0 !important;
+            margin: 0 !important;
+            margin-bottom: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            flex: 1 !important;
+            overflow: visible !important;
+        }
+
+        .stock-container {
+            position: fixed;
+            left: calc(50vw + 140px);
+            top: 40px;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 90%;
+            max-width: 1200px;
+            padding: 20px;
+            padding-bottom: 120px;
+        }
+
+        .sidebar.collapsed ~ .main-wrapper .stock-container {
+            left: calc(50vw + 40px);
+        }
+    </style>
+
+    <div class="stock-container">
         <h2 class="text-center mb-4">Gestión de Stock</h2>
 
         <table class="table table-striped table-hover text-center shadow-lg">
