@@ -1078,7 +1078,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>//mostrador
 
     <script>
         // Datos de las mesas
