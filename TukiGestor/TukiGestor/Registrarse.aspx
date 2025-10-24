@@ -78,7 +78,7 @@
  /* Borde colorido por defecto */
  .form-control {
      border-radius: 0.5rem;
-     border: 2px solid #90caf9; /* azul suave */
+     border: 2px solid #90caf9;
      background-color: #ffffff;
      transition: all 0.25s ease-in-out;
  }
