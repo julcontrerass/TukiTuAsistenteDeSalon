@@ -11,7 +11,7 @@ namespace TukiGestor
 {
 
 
-    public partial class Contact
+    public partial class Registrarse
     {
 
         /// <summary>
@@ -33,13 +33,22 @@ namespace TukiGestor
         protected global::System.Web.UI.WebControls.TextBox txtContrasena;
 
         /// <summary>
-        /// Control btnIniciarSesion.
+        /// Control TextRepetirContrasena.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnIniciarSesion;
+        protected global::System.Web.UI.WebControls.TextBox TextRepetirContrasena;
+
+        /// <summary>
+        /// Control btnRegistrarse.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRegistrarse;
 
         /// <summary>
         /// Control lblMensaje.
