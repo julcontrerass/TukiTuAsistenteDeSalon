@@ -15,7 +15,7 @@ namespace TukiGestor
             routes.EnableFriendlyUrls(settings);
 
             // Ruta por defecto - página inicial
-            routes.MapPageRoute("Default", "", "~/Home.aspx");
+            routes.MapPageRoute("Default", "", "~/Login.aspx");
         }
     }
 }

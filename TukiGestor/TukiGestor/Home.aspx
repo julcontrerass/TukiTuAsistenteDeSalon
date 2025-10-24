@@ -11,6 +11,7 @@
             text-align: center;
             padding: 40px 20px;
             width: 100%;
+            margin-left: 250px;
         }
 
         .welcome-section {

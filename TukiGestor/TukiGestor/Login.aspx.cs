@@ -16,14 +16,19 @@ namespace TukiGestor
 
         protected void btnIniciarSesion_Click(object sender, EventArgs e)
         {
-            
+
             string usuario = txtUsuario.Text;
             string contrasena = txtContrasena.Text;
 
-           
+
             if (usuario == "admin" && contrasena == "1234")
             {
-                Response.Redirect("About.aspx"); 
+                Response.Redirect("Home.aspx");
+            }
+            else
+            {
+                lblError.Text = "Usuario o contraseña incorrecta";
+                lblError.Visible = true;
             }
         }
 
