@@ -18,7 +18,7 @@ namespace TukiGestor
         {
             string usuario = txtUsuario.Text.Trim();
             string contrasena = txtContrasena.Text;
-            string confirmar = TextRepetirContrasena.Text; // <-- aquí el ID correcto
+            string confirmar = TextRepetirContrasena.Text;
 
             if (string.IsNullOrEmpty(usuario) || string.IsNullOrEmpty(contrasena) || string.IsNullOrEmpty(confirmar))
             {
@@ -34,7 +34,7 @@ namespace TukiGestor
                 return;
             }
 
-            // Acá podrías guardar el usuario en base de datos o archivo
+            
             lblMensaje.Text = "¡Registro exitoso! Ahora podés iniciar sesión.";
             lblMensaje.CssClass = "text-success";
             Response.Redirect("About.aspx");

@@ -231,7 +231,7 @@
             <ul class="sidebar-nav">
                 <li><a runat="server" href="~/Home" class="active"><i class="bi bi-house-door"></i><span> Inicio</span></a></li>
                 <li><a runat="server" href="~/Mesas"><i class="bi bi-grid-3x3"></i><span> Mesas</span></a></li>
-                <li><a runat="server" href="~/Stock"><i class="bi bi-box-seam"></i><span> Stock</span></a></li>
+                <li><a runat="server" href="~/Stock.aspx"><i class="bi bi-box-seam"></i><span> Stock</span></a></li>
                 <li><a runat="server" href="~/Reporte"><i class="bi bi-graph-up"></i><span> Reporte</span></a></li>
                 <li><a runat="server" href="~/Configuracion"><i class="bi bi-gear"></i><span> Configuración</span></a></li>
             </ul>
