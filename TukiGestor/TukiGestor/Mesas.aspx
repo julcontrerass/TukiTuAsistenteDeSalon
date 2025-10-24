@@ -85,6 +85,9 @@
             transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .mesa-card:hover {
@@ -93,9 +96,9 @@
         }
 
         .mesa-card .mesa-icon {
-            font-size: 50px;
-            margin-bottom: 10px;
+            font-size: 80px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .mesa-card.libre .mesa-icon {
@@ -107,15 +110,12 @@
         }
 
         .mesa-card .mesa-number {
-            font-size: 18px;
+            position: absolute;
+            font-size: 28px;
             font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .mesa-card .mesa-status {
-            font-size: 14px;
-            color: #666;
+            color: #fff;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+            z-index: 1;
         }
 
         .mesa-card .delete-btn {
@@ -147,12 +147,13 @@
 
         .add-mesa-card {
             background: #F6EFE0;
-            border: 2px dashed #E7D9C2;
+            border: 2px solid #E7D9C2;
             border-radius: 12px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -161,20 +162,14 @@
         }
 
         .add-mesa-card:hover {
-            background: #E7D9C2;
-            border-color: #d4c5ae;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
 
         .add-mesa-card i {
-            font-size: 40px;
-            color: #666;
+            font-size: 50px;
+            color: #28a745;
             margin-bottom: 10px;
-        }
-
-        .add-mesa-card span {
-            font-size: 14px;
-            color: #666;
-            font-weight: 600;
         }
 
 
@@ -453,6 +448,247 @@
             color: #999;
             font-style: italic;
         }
+
+        /* Estilos para tabs de categorias de productos */
+        .categorias-tabs {
+            margin-bottom: 20px;
+        }
+
+        .categorias-tabs .nav-link {
+            color: #666;
+            border: 2px solid #E7D9C2;
+            background: #F6EFE0;
+            margin-right: 10px;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .categorias-tabs .nav-link:hover {
+            background: #E7D9C2;
+            color: #333;
+        }
+
+        .categorias-tabs .nav-link.active {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .productos-lista {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Notificaciones flotantes */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            min-width: 300px;
+            max-width: 400px;
+            animation: slideInRight 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 5px solid;
+        }
+
+        .toast-notification.success {
+            border-left-color: #28a745;
+        }
+
+        .toast-notification.error {
+            border-left-color: #dc3545;
+        }
+
+        .toast-notification.warning {
+            border-left-color: #ffc107;
+        }
+
+        .toast-notification.info {
+            border-left-color: #17a2b8;
+        }
+
+        .toast-notification .toast-icon {
+            font-size: 28px;
+        }
+
+        .toast-notification.success .toast-icon {
+            color: #28a745;
+        }
+
+        .toast-notification.error .toast-icon {
+            color: #dc3545;
+        }
+
+        .toast-notification.warning .toast-icon {
+            color: #ffc107;
+        }
+
+        .toast-notification.info .toast-icon {
+            color: #17a2b8;
+        }
+
+        .toast-notification .toast-content {
+            flex: 1;
+        }
+
+        .toast-notification .toast-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .toast-notification .toast-message {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .toast-notification .toast-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .toast-notification .toast-close:hover {
+            color: #333;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast-notification.closing {
+            animation: slideOutRight 0.3s ease-out forwards;
+        }
+
+        /* Modal de confirmación personalizado */
+        .custom-confirm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .custom-confirm-box {
+            background: #F6EFE0;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        .custom-confirm-icon {
+            text-align: center;
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: #ffc107;
+        }
+
+        .custom-confirm-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .custom-confirm-message {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .custom-confirm-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .custom-confirm-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .custom-confirm-btn.confirm {
+            background: #dc3545;
+            color: white;
+        }
+
+        .custom-confirm-btn.confirm:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .custom-confirm-btn.cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .custom-confirm-btn.cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
     </style>
 
     <div class="mesas-container">
@@ -486,11 +722,6 @@
                 <div class="tab-pane fade show active" id="salon" role="tabpanel">
                     <div class="section-header">
                         <div class="section-title">Mesas del Salon</div>
-                        <div class="action-buttons">
-                            <button type="button" class="btn btn-success px-4 shadow-sm" onclick="agregarMesa('salon')">
-                                <i class="bi bi-plus-circle"></i> Agregar Mesa
-                            </button>
-                        </div>
                     </div>
                     <div class="mesas-grid" id="mesas-salon">
                         <!-- Mesas del salon se generaran dinamicamente -->
@@ -501,11 +732,6 @@
                 <div class="tab-pane fade" id="patio" role="tabpanel">
                     <div class="section-header">
                         <div class="section-title">Mesas del Patio</div>
-                        <div class="action-buttons">
-                            <button type="button" class="btn btn-success px-4 shadow-sm" onclick="agregarMesa('patio')">
-                                <i class="bi bi-plus-circle"></i> Agregar Mesa
-                            </button>
-                        </div>
                     </div>
                     <div class="mesas-grid" id="mesas-patio">
                         <!-- Mesas del patio se generaran dinamicamente -->
@@ -583,68 +809,210 @@
                         <label class="form-label">
                             <i class="bi bi-search"></i> Buscar Producto
                         </label>
-                        <input type="text" class="form-control" id="buscarProducto" placeholder="Buscar producto...">
+                        <input type="text" class="form-control" id="buscarProducto" placeholder="Buscar en todas las categorias...">
                     </div>
 
-                    <div class="productos-lista" id="productosLista">
-                        <!-- Productos de ejemplo -->
-                        <div class="producto-item" data-nombre="Hamburguesa Clasica" data-precio="1500">
-                            <div class="producto-info">
-                                <div class="producto-nombre">Hamburguesa Clasica</div>
-                                <div class="producto-precio">$1,500</div>
-                            </div>
-                            <div class="cantidad-control">
-                                <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                <input type="number" value="0" min="0" readonly>
-                                <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                    <!-- Tabs de categorias -->
+                    <ul class="nav nav-pills categorias-tabs" id="categoriasTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="comida-tab" data-bs-toggle="pill" data-bs-target="#comida" type="button" role="tab">
+                                <i class="bi bi-egg-fried"></i> Comida
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="bebidas-tab" data-bs-toggle="pill" data-bs-target="#bebidas" type="button" role="tab">
+                                <i class="bi bi-cup-straw"></i> Bebidas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="postres-tab" data-bs-toggle="pill" data-bs-target="#postres" type="button" role="tab">
+                                <i class="bi bi-cake2"></i> Postres
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Contenido de tabs -->
+                    <div class="tab-content" id="categoriasTabContent">
+                        <!-- Comida -->
+                        <div class="tab-pane fade show active" id="comida" role="tabpanel">
+                            <div class="productos-lista">
+                                <div class="producto-item" data-nombre="Hamburguesa Clasica" data-precio="1500" data-categoria="comida">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Hamburguesa Clasica</div>
+                                        <div class="producto-precio">$1,500</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Pizza Margarita" data-precio="2000" data-categoria="comida">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Pizza Margarita</div>
+                                        <div class="producto-precio">$2,000</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Ensalada Cesar" data-precio="1200" data-categoria="comida">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Ensalada Cesar</div>
+                                        <div class="producto-precio">$1,200</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Milanesa con Papas" data-precio="1800" data-categoria="comida">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Milanesa con Papas</div>
+                                        <div class="producto-precio">$1,800</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Pasta Bolognesa" data-precio="1600" data-categoria="comida">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Pasta Bolognesa</div>
+                                        <div class="producto-precio">$1,600</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="producto-item" data-nombre="Pizza Margarita" data-precio="2000">
-                            <div class="producto-info">
-                                <div class="producto-nombre">Pizza Margarita</div>
-                                <div class="producto-precio">$2,000</div>
-                            </div>
-                            <div class="cantidad-control">
-                                <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                <input type="number" value="0" min="0" readonly>
-                                <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                        <!-- Bebidas -->
+                        <div class="tab-pane fade" id="bebidas" role="tabpanel">
+                            <div class="productos-lista">
+                                <div class="producto-item" data-nombre="Coca Cola" data-precio="500" data-categoria="bebidas">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Coca Cola</div>
+                                        <div class="producto-precio">$500</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Cafe Americano" data-precio="300" data-categoria="bebidas">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Cafe Americano</div>
+                                        <div class="producto-precio">$300</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Jugo de Naranja" data-precio="400" data-categoria="bebidas">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Jugo de Naranja</div>
+                                        <div class="producto-precio">$400</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Agua Mineral" data-precio="250" data-categoria="bebidas">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Agua Mineral</div>
+                                        <div class="producto-precio">$250</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Cerveza" data-precio="600" data-categoria="bebidas">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Cerveza</div>
+                                        <div class="producto-precio">$600</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="producto-item" data-nombre="Ensalada Cesar" data-precio="1200">
-                            <div class="producto-info">
-                                <div class="producto-nombre">Ensalada Cesar</div>
-                                <div class="producto-precio">$1,200</div>
-                            </div>
-                            <div class="cantidad-control">
-                                <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                <input type="number" value="0" min="0" readonly>
-                                <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                            </div>
-                        </div>
+                        <!-- Postres -->
+                        <div class="tab-pane fade" id="postres" role="tabpanel">
+                            <div class="productos-lista">
+                                <div class="producto-item" data-nombre="Flan con Dulce de Leche" data-precio="800" data-categoria="postres">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Flan con Dulce de Leche</div>
+                                        <div class="producto-precio">$800</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
 
-                        <div class="producto-item" data-nombre="Coca Cola" data-precio="500">
-                            <div class="producto-info">
-                                <div class="producto-nombre">Coca Cola</div>
-                                <div class="producto-precio">$500</div>
-                            </div>
-                            <div class="cantidad-control">
-                                <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                <input type="number" value="0" min="0" readonly>
-                                <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                            </div>
-                        </div>
+                                <div class="producto-item" data-nombre="Tiramisu" data-precio="900" data-categoria="postres">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Tiramisu</div>
+                                        <div class="producto-precio">$900</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
 
-                        <div class="producto-item" data-nombre="Cafe Americano" data-precio="300">
-                            <div class="producto-info">
-                                <div class="producto-nombre">Cafe Americano</div>
-                                <div class="producto-precio">$300</div>
-                            </div>
-                            <div class="cantidad-control">
-                                <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                <input type="number" value="0" min="0" readonly>
-                                <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                <div class="producto-item" data-nombre="Helado" data-precio="700" data-categoria="postres">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Helado</div>
+                                        <div class="producto-precio">$700</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="producto-item" data-nombre="Cheesecake" data-precio="950" data-categoria="postres">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">Cheesecake</div>
+                                        <div class="producto-precio">$950</div>
+                                    </div>
+                                    <div class="cantidad-control">
+                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
+                                        <input type="number" value="0" min="0" readonly>
+                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -728,6 +1096,110 @@
         // Orden temporal (para editar antes de confirmar)
         let ordenTemporal = [];
 
+        // Sistema de notificaciones flotantes
+        function mostrarNotificacion(tipo, titulo, mensaje) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${tipo}`;
+
+            const iconos = {
+                success: 'bi-check-circle-fill',
+                error: 'bi-x-circle-fill',
+                warning: 'bi-exclamation-triangle-fill',
+                info: 'bi-info-circle-fill'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="bi ${iconos[tipo]}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${titulo}</div>
+                    <div class="toast-message">${mensaje}</div>
+                </div>
+                <button class="toast-close">
+                    <i class="bi bi-x"></i>
+                </button>
+            `;
+
+            // Agregar evento al botón de cerrar
+            const closeBtn = toast.querySelector('.toast-close');
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                cerrarNotificacion(this);
+            });
+
+            document.body.appendChild(toast);
+
+            // Auto-cerrar después de 4 segundos
+            setTimeout(() => {
+                cerrarNotificacion(closeBtn);
+            }, 4000);
+        }
+
+        function cerrarNotificacion(btn) {
+            if (!btn) return;
+            const toast = btn.closest ? btn.closest('.toast-notification') : btn.parentElement;
+            if (!toast) return;
+            if (toast.classList.contains('closing')) return; // Evitar cerrar múltiples veces
+
+            toast.classList.add('closing');
+            setTimeout(() => {
+                if (toast && toast.parentElement) {
+                    toast.remove();
+                }
+            }, 300);
+        }
+
+        // Modal de confirmación personalizado
+        function mostrarConfirmacion(titulo, mensaje, onConfirm) {
+            const overlay = document.createElement('div');
+            overlay.className = 'custom-confirm-overlay';
+            overlay.innerHTML = `
+                <div class="custom-confirm-box">
+                    <div class="custom-confirm-icon">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <div class="custom-confirm-title">${titulo}</div>
+                    <div class="custom-confirm-message">${mensaje}</div>
+                    <div class="custom-confirm-buttons">
+                        <button class="custom-confirm-btn cancel">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </button>
+                        <button class="custom-confirm-btn confirm">
+                            <i class="bi bi-check-circle"></i> Confirmar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // Botón cancelar
+            overlay.querySelector('.cancel').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                overlay.remove();
+            });
+
+            // Botón confirmar
+            overlay.querySelector('.confirm').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                overlay.remove();
+                if (onConfirm && typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            });
+
+            // Cerrar al hacer click fuera
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        }
+
         // Inicializar mesas de ejemplo
         function inicializarMesas() {
             // Mesas del salon
@@ -771,16 +1243,33 @@
                 const mesaCard = document.createElement('div');
                 mesaCard.className = 'mesa-card ' + mesa.estado;
                 mesaCard.innerHTML = `
-                    <button class="delete-btn" onclick="event.stopPropagation(); eliminarMesa('${seccion}', ${mesa.numero})">
+                    <button class="delete-btn">
                         <i class="bi bi-x"></i>
                     </button>
+                    <div class="mesa-number">${mesa.numero}</div>
                     <i class="bi bi-octagon-fill mesa-icon"></i>
-                    <div class="mesa-number">Mesa ${mesa.numero}</div>
-                    <div class="mesa-status">${mesa.estado === 'libre' ? 'Libre' : 'Ocupada'}</div>
                 `;
+
+                // Agregar evento al botón de eliminar
+                const deleteBtn = mesaCard.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    eliminarMesa(seccion, mesa.numero);
+                });
+
                 mesaCard.onclick = function() { seleccionarMesa(seccion, mesa.numero); };
                 container.appendChild(mesaCard);
             });
+
+            // Agregar card para añadir nueva mesa
+            const addCard = document.createElement('div');
+            addCard.className = 'add-mesa-card';
+            addCard.innerHTML = `
+                <i class="bi bi-plus-lg"></i>
+            `;
+            addCard.onclick = function() { agregarMesa(seccion); };
+            container.appendChild(addCard);
         }
 
         // Seleccionar una mesa
@@ -812,12 +1301,12 @@
             const camarero = document.getElementById('selectCamarero').value;
 
             if (!cantidadPersonas || cantidadPersonas < 1) {
-                alert('Por favor ingrese la cantidad de personas');
+                mostrarNotificacion('warning', 'Datos incompletos', 'Por favor ingrese la cantidad de personas.');
                 return;
             }
 
             if (!camarero) {
-                alert('Por favor seleccione un camarero');
+                mostrarNotificacion('warning', 'Datos incompletos', 'Por favor seleccione un camarero.');
                 return;
             }
 
@@ -848,6 +1337,35 @@
             document.querySelectorAll('.cantidad-control input').forEach(input => {
                 input.value = 0;
             });
+
+            // Resetear búsqueda
+            document.getElementById('buscarProducto').value = '';
+
+            // Mostrar tabs
+            document.getElementById('categoriasTabs').style.display = 'flex';
+
+            // Resetear tabs a su estado original (solo las del modal de orden)
+            document.querySelectorAll('#categoriasTabContent .tab-pane').forEach((pane, index) => {
+                if (index === 0) {
+                    pane.classList.add('show', 'active');
+                } else {
+                    pane.classList.remove('show', 'active');
+                }
+            });
+
+            // Activar la primera tab
+            document.querySelector('#comida-tab').classList.add('active');
+            document.querySelectorAll('.categorias-tabs .nav-link').forEach((tab, index) => {
+                if (index !== 0) {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // Mostrar todos los productos
+            document.querySelectorAll('.producto-item').forEach(item => {
+                item.style.display = 'flex';
+            });
+
             actualizarResumenOrden();
 
             const modal = new bootstrap.Modal(document.getElementById('modalOrden'));
@@ -921,7 +1439,7 @@
             });
 
             if (productos.length === 0) {
-                alert('Por favor seleccione al menos un producto');
+                mostrarNotificacion('warning', 'Orden vacía', 'Por favor seleccione al menos un producto.');
                 return;
             }
 
@@ -990,9 +1508,6 @@
 
         // Procesar pago
         function procesarPago() {
-            // Aqui se procesaria el pago
-            alert('Pago procesado exitosamente!');
-
             // Si es una mesa, cambiar su estado a libre y limpiar orden
             if (mesaActual && mesaActual.seccion !== 'mostrador') {
                 const mesa = mesasData[mesaActual.seccion].find(m => m.numero === mesaActual.numero);
@@ -1017,6 +1532,9 @@
             // Cerrar modal
             const modalResumenPago = bootstrap.Modal.getInstance(document.getElementById('modalResumenPago'));
             modalResumenPago.hide();
+
+            // Mostrar notificación de éxito
+            mostrarNotificacion('success', 'Pago procesado', '¡El pago se ha procesado exitosamente!');
         }
 
         // Agregar mas productos a la orden existente
@@ -1056,6 +1574,34 @@
                 input.value = 0;
             });
 
+            // Resetear búsqueda
+            document.getElementById('buscarProducto').value = '';
+
+            // Mostrar tabs
+            document.getElementById('categoriasTabs').style.display = 'flex';
+
+            // Resetear tabs a su estado original (solo las del modal de orden)
+            document.querySelectorAll('#categoriasTabContent .tab-pane').forEach((pane, index) => {
+                if (index === 0) {
+                    pane.classList.add('show', 'active');
+                } else {
+                    pane.classList.remove('show', 'active');
+                }
+            });
+
+            // Activar la primera tab
+            document.querySelector('#comida-tab').classList.add('active');
+            document.querySelectorAll('.categorias-tabs .nav-link').forEach((tab, index) => {
+                if (index !== 0) {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // Mostrar todos los productos
+            document.querySelectorAll('.producto-item').forEach(item => {
+                item.style.display = 'flex';
+            });
+
             // Precargar los productos existentes
             productosExistentes.forEach(prod => {
                 document.querySelectorAll('.producto-item').forEach(item => {
@@ -1086,12 +1632,28 @@
             renderizarSeccion(seccion);
         }
 
-        // Eliminar mesa
         function eliminarMesa(seccion, numero) {
-            if (confirm(`Esta seguro que desea eliminar la Mesa ${numero}?`)) {
-                mesasData[seccion] = mesasData[seccion].filter(m => m.numero !== numero);
-                renderizarSeccion(seccion);
+            const mesa = mesasData[seccion].find(m => m.numero === numero);
+
+            if (mesa && mesa.estado === 'ocupada') {
+                mostrarNotificacion('error', 'No se puede eliminar', 'No puedes eliminar una mesa que está ocupada. Cierra la mesa primero.');
+                return;
             }
+
+            mostrarConfirmacion(
+                'Eliminar Mesa',
+                `Estas seguro que deseas eliminar la Mesa ${numero}?`,
+                function() {
+                    mesasData[seccion] = mesasData[seccion].filter(m => m.numero !== numero);
+
+                    mesasData[seccion].forEach((mesa, index) => {
+                        mesa.numero = index + 1;
+                    });
+
+                    renderizarSeccion(seccion);
+                    mostrarNotificacion('success', 'Mesa eliminada', `La mesa ${numero} ha sido eliminada correctamente.`);
+                }
+            );
         }
 
         // Renderizar ordenes del mostrador
@@ -1167,14 +1729,33 @@
             if (buscarInput) {
                 buscarInput.addEventListener('input', function(e) {
                     const texto = e.target.value.toLowerCase();
-                    document.querySelectorAll('.producto-item').forEach(item => {
-                        const nombre = item.dataset.nombre.toLowerCase();
-                        if (nombre.includes(texto)) {
+
+                    if (texto === '') {
+                        // Si no hay texto de búsqueda, mostrar todos los productos
+                        document.querySelectorAll('.producto-item').forEach(item => {
                             item.style.display = 'flex';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
+                        });
+                        // Mostrar las tabs
+                        document.getElementById('categoriasTabs').style.display = 'flex';
+                    } else {
+                        // Ocultar las tabs cuando hay búsqueda
+                        document.getElementById('categoriasTabs').style.display = 'none';
+
+                        // Mostrar todos los tab-panes como activos para que se vean los resultados (solo del modal de orden)
+                        document.querySelectorAll('#categoriasTabContent .tab-pane').forEach(pane => {
+                            pane.classList.add('show', 'active');
+                        });
+
+                        // Buscar en todos los productos de todas las categorías
+                        document.querySelectorAll('.producto-item').forEach(item => {
+                            const nombre = item.dataset.nombre.toLowerCase();
+                            if (nombre.includes(texto)) {
+                                item.style.display = 'flex';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    }
                 });
             }
         });
