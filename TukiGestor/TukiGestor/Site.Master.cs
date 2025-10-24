@@ -38,10 +38,6 @@ namespace TukiGestor
             {
                 linkReporte.Attributes["class"] = "active";
             }
-            else if (fileName.Contains("configuracion"))
-            {
-                linkConfiguracion.Attributes["class"] = "active";
-            }
             else
             {
                 // Por defecto, si no coincide con ninguna, activar Inicio
