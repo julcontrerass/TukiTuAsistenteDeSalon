@@ -51,6 +51,15 @@ namespace TukiGestor
         protected global::System.Web.UI.HtmlControls.HtmlAnchor linkReporte;
 
         /// <summary>
+        /// linkConfiguracion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor linkConfiguracion;
+
+        /// <summary>
         /// MainContent control.
         /// </summary>
         /// <remarks>
