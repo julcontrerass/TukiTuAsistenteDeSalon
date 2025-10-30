@@ -11,7 +11,7 @@
             width: 90%;
             max-width: 1400px;
             padding: 20px;
-            padding-bottom: 120px;
+            padding-bottom: 120px;           
         }
 
         .sidebar.collapsed ~ .main-wrapper .mesas-container {
