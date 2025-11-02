@@ -80,56 +80,39 @@
             </div>
         </div>
 
+        <asp:Repeater ID="RepeaterProductos" runat="server">
+    <HeaderTemplate>
         <table class="table table-striped table-hover text-center shadow-lg">
             <thead class="table-dark">
                 <tr>
-                    <th>Categoría</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
                     <th>Cantidad</th>
                     <th>Precio</th>
                     <th>Eliminar</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Comida</td>
-                    <td>Papas Fritas</td>
-                    <td>Porción de papas medianas</td>
-                    <td>25</td>
-                    <td>$20</td>
-                    <td>
-                        <button type="button" class="btn btn-link text-danger">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Bebida</td>
-                    <td>Cerveza Artesanal</td>
-                    <td>Botella 500ml</td>
-                    <td>48</td>
-                    <td>$15</td>
-                    <td>
-                        <button type="button" class="btn btn-link text-danger">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Comida</td>
-                    <td>Hamburguesa Clásica</td>
-                    <td>Carne, lechuga, tomate y pan</td>
-                    <td>12</td>
-                    <td>$25</td>
-                    <td>
-                        <button type="button" class="btn btn-link text-danger">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
+    </HeaderTemplate>
+
+    <ItemTemplate>
+        <tr>
+            <td><%# Eval("Nombre") %></td>
+            <td><%# Eval("Stock") %></td>
+            <td>$<%# Eval("Precio") %></td>
+            <td>
+                <button type="button" class="btn btn-link text-danger">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </td>
+        </tr>
+    </ItemTemplate>
+
+    <FooterTemplate>
             </tbody>
         </table>
+    </FooterTemplate>
+</asp:Repeater>
+
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-4">
@@ -147,34 +130,24 @@
                     <h5 class="modal-title" id="nuevoProductoModalLabel">Agregar nuevo producto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-
                 <div class="modal-body bg-light">
                     <div class="mb-3">
-                        <label for="txtCategoria" class="form-label">Categoría</label>
-                        <asp:TextBox ID="txtCategoria" runat="server" CssClass="form-control" placeholder="Ej: Comida, Bebida, Postre"></asp:TextBox>
+                        <label for="ddlCategorias" class="form-label">Categoría</label>
+                        <asp:DropDownList ID="ddlCategorias" runat="server" CssClass="form-control"></asp:DropDownList>
                     </div>
-
                     <div class="mb-3">
                         <label for="txtNombre" class="form-label">Nombre del producto</label>
                         <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control" placeholder="Ej: Pizza Napolitana"></asp:TextBox>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="txtDescripcion" class="form-label">Descripción</label>
-                        <asp:TextBox ID="txtDescripcion" runat="server" CssClass="form-control" placeholder="Ej: Masa fina, tomate, mozzarella"></asp:TextBox>
-                    </div>
-
                     <div class="mb-3">
                         <label for="txtCantidad" class="form-label">Cantidad</label>
                         <asp:TextBox ID="txtCantidad" runat="server" CssClass="form-control" TextMode="Number" placeholder="Ej: 50"></asp:TextBox>
                     </div>
-
                     <div class="mb-3">
                         <label for="txtPrecio" class="form-label">Precio</label>
                         <asp:TextBox ID="txtPrecio" runat="server" CssClass="form-control" TextMode="Number" placeholder="Ej: 1200"></asp:TextBox>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <asp:Button ID="btnGuardar" runat="server" Text="Guardar" CssClass="btn btn-custom" OnClick="btnGuardar_Click" />
