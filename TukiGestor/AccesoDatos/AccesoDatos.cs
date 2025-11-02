@@ -24,7 +24,7 @@ namespace accesoDatos
         }
         public AccesoDatos()
         {
-            conexion = new SqlConnection("server=.\\SQLEXPRESS; database=TUKI_DB; integrated security=true");
+            conexion = new SqlConnection("server=.\\SQLEXPRESS; database=TUKI_DB; integrated security=true;");
             comando = new SqlCommand();
         }
         public void SetearConsulta(string consulta)

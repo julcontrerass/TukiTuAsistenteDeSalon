@@ -124,6 +124,7 @@
     <Content Include="Global.asax" />
     <Content Include="Mesas.aspx" />
     <Content Include="Registrarse.aspx" />
+    <Content Include="Scripts\BDD\TUKI__BDD.sql" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -288,9 +289,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AccesoDatos\accesoDatos.csproj">
+      <Project>{a5642096-97ba-4a52-8b84-99d3f708c9ff}</Project>
+      <Name>accesoDatos</Name>
+    </ProjectReference>
     <ProjectReference Include="..\dominio\dominio.csproj">
       <Project>{943b9b4e-c31a-42a8-9941-bcfe9aaa2249}</Project>
       <Name>dominio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service\Service.csproj">
+      <Project>{fef5a997-8fb2-4b57-ac32-24fd6f160b0e}</Project>
+      <Name>Service</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
