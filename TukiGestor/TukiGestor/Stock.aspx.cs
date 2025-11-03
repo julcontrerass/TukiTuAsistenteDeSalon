@@ -82,5 +82,23 @@ namespace TukiGestor
 
 
 
+        protected void RepeaterProductos_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "Eliminar")
+            {
+                int id = int.Parse(e.CommandArgument.ToString());
+                ProductoService service = new ProductoService();
+                service.Eliminar(id);
+
+                // Refrescamos la lista
+                CargarProductos();
+
+                //aca debo poner una ventana emergente que diga "Producto eliminado correctamente"
+            }
+        }
+
+
+
+
     }
 }

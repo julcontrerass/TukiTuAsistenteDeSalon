@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        <asp:Repeater ID="RepeaterProductos" runat="server">
+        <asp:Repeater ID="RepeaterProductos" runat="server" OnItemCommand="RepeaterProductos_ItemCommand">
     <HeaderTemplate>
         <table class="table table-striped table-hover text-center shadow-lg">
             <thead class="table-dark">
@@ -95,17 +95,17 @@
     </HeaderTemplate>
 
     <ItemTemplate>
-        <tr>
-            <td><%# Eval("Nombre") %></td>
-            <td><%# Eval("Stock") %></td>
-            <td>$<%# Eval("Precio") %></td>
-            <td>
-                <button type="button" class="btn btn-link text-danger">
-                    <i class="bi bi-trash-fill"></i>
-                </button>
-            </td>
-        </tr>
-    </ItemTemplate>
+    <tr>
+        <td><%# Eval("Nombre") %></td>
+        <td><%# Eval("Stock") %></td>
+        <td>$<%# Eval("Precio") %></td>
+        <td>
+            <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="Eliminar" CommandArgument='<%# Eval("ProductoId") %>'>
+                <i class="bi bi-trash-fill"></i>
+            </asp:LinkButton>
+        </td>
+    </tr>
+</ItemTemplate>
 
     <FooterTemplate>
             </tbody>

@@ -17,7 +17,7 @@ namespace Service
 
             try
             {
-                datos.SetearConsulta("SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock FROM PRODUCTO");
+                datos.SetearConsulta("SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock FROM PRODUCTO WHERE Disponible = 1");
                 datos.ejecutarLectura();
 
                 while (datos.Lector.Read())
@@ -74,6 +74,24 @@ namespace Service
         }
 
 
+        public void Eliminar(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("UPDATE PRODUCTO SET Disponible = 0 WHERE ProductoId = @id");
+                datos.setearParametro("@id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al eliminar producto: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
 
 
 
