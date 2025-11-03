@@ -13,5 +13,100 @@ namespace TukiGestor
 
     public partial class Mesas
     {
+
+        /// <summary>
+        /// Control PanelMensaje.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Panel PanelMensaje;
+
+        /// <summary>
+        /// Control LitMensaje.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Literal LitMensaje;
+
+        /// <summary>
+        /// Control HdnTabActivo.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.HiddenField HdnTabActivo;
+
+        /// <summary>
+        /// Control RepMesasSalon.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Repeater RepMesasSalon;
+
+        /// <summary>
+        /// Control LnkAgregarSalon.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.LinkButton LnkAgregarSalon;
+
+        /// <summary>
+        /// Control RepMesasPatio.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Repeater RepMesasPatio;
+
+        /// <summary>
+        /// Control LnkAgregarPatio.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.LinkButton LnkAgregarPatio;
+
+        /// <summary>
+        /// Control LitModalTitulo.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Literal LitModalTitulo;
+
+        /// <summary>
+        /// Control PanelMesaLibre.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Panel PanelMesaLibre;
+
+        /// <summary>
+        /// Control BtnOcuparMesa.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button BtnOcuparMesa;
+
+        /// <summary>
+        /// Control BtnEliminarMesaLibre.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button BtnEliminarMesaLibre;
+
+        /// <summary>
+        /// Control PanelMesaOcupada.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Panel PanelMesaOcupada;
+
+        /// <summary>
+        /// Control BtnLiberarMesa.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button BtnLiberarMesa;
+
+        /// <summary>
+        /// Control BtnEliminarMesaOcupada.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button BtnEliminarMesaOcupada;
+
+        /// <summary>
+        /// Control LnkAbrirMostrador.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.LinkButton LnkAbrirMostrador;
+
+        /// <summary>
+        /// Control LitNumeroMesaModal.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Literal LitNumeroMesaModal;
+
+        /// <summary>
+        /// Control TxtCantidadPersonas.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.TextBox TxtCantidadPersonas;
+
+        /// <summary>
+        /// Control DdlCamarero.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.DropDownList DdlCamarero;
+
+        /// <summary>
+        /// Control BtnConfirmarAbrirMesa.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button BtnConfirmarAbrirMesa;
     }
 }

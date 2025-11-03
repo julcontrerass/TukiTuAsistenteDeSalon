@@ -11,7 +11,7 @@
             width: 90%;
             max-width: 1400px;
             padding: 20px;
-            padding-bottom: 120px;           
+            padding-bottom: 120px;
         }
 
         .sidebar.collapsed ~ .main-wrapper .mesas-container {
@@ -85,9 +85,27 @@
             transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             position: relative;
-            display: flex;
+            display: flex !important;
             align-items: center;
             justify-content: center;
+            text-decoration: none !important;
+            color: inherit !important;
+            min-height: 140px;
+        }
+
+        a.mesa-card {
+            display: flex !important;
+        }
+
+        a.mesa-card:hover {
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+
+        a.mesa-card:focus {
+            text-decoration: none !important;
+            color: inherit !important;
+            outline: none;
         }
 
         .mesa-card:hover {
@@ -118,7 +136,7 @@
             z-index: 1;
         }
 
-        .mesa-card .delete-btn {
+        .delete-btn {
             position: absolute;
             top: 5px;
             right: 5px;
@@ -130,40 +148,68 @@
             height: 25px;
             font-size: 16px;
             cursor: pointer;
-            display: none;
+            display: none !important;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            z-index: 10;
+            text-decoration: none !important;
         }
 
-        .mesa-card:hover .delete-btn {
-            display: flex;
+        .mesas-grid > div:hover .delete-btn {
+            display: flex !important;
         }
 
         .delete-btn:hover {
-            background: #c82333;
+            background: #c82333 !important;
             transform: scale(1.1);
+            color: white !important;
+            text-decoration: none !important;
+        }
+
+        a.delete-btn {
+            display: none !important;
+            text-decoration: none !important;
+        }
+
+        .mesas-grid > div:hover a.delete-btn {
+            display: flex !important;
         }
 
         .add-mesa-card {
             background: #F6EFE0;
-            border: 2px solid #E7D9C2;
+            border: 2px dashed #E7D9C2;
             border-radius: 12px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            display: flex;
+            display: flex !important;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 140px;
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+
+        a.add-mesa-card {
+            display: flex !important;
         }
 
         .add-mesa-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            background: #E7D9C2;
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+
+        .add-mesa-card:focus {
+            text-decoration: none !important;
+            color: inherit !important;
+            outline: none;
         }
 
         .add-mesa-card i {
@@ -689,6 +735,13 @@
                 opacity: 1;
             }
         }
+
+        .mensaje-info {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 
     <div class="mesas-container">
@@ -697,20 +750,27 @@
                 <i class="bi bi-grid-3x3"></i> Gestion de Mesas
             </h2>
 
+            <!-- Mensaje de notificación -->
+            <asp:Panel ID="PanelMensaje" runat="server" Visible="false" CssClass="alert alert-dismissible fade show" role="alert">
+                <asp:Literal ID="LitMensaje" runat="server"></asp:Literal>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </asp:Panel>
+
             <!-- Tabs Navigation -->
+            <asp:HiddenField ID="HdnTabActivo" runat="server" Value="salon" />
             <ul class="nav nav-tabs" id="mesasTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="salon-tab" data-bs-toggle="tab" data-bs-target="#salon" type="button" role="tab">
+                    <button class="nav-link active" id="salon-tab" data-bs-toggle="tab" data-bs-target="#salon" type="button" role="tab" onclick="guardarTab('salon')">
                         <i class="bi bi-house-door"></i> Salon
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="patio-tab" data-bs-toggle="tab" data-bs-target="#patio" type="button" role="tab">
+                    <button class="nav-link" id="patio-tab" data-bs-toggle="tab" data-bs-target="#patio" type="button" role="tab" onclick="guardarTab('patio')">
                         <i class="bi bi-tree"></i> Patio
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="mostrador-tab" data-bs-toggle="tab" data-bs-target="#mostrador" type="button" role="tab">
+                    <button class="nav-link" id="mostrador-tab" data-bs-toggle="tab" data-bs-target="#mostrador" type="button" role="tab" onclick="guardarTab('mostrador')">
                         <i class="bi bi-shop"></i> Mostrador
                     </button>
                 </li>
@@ -723,8 +783,31 @@
                     <div class="section-header">
                         <div class="section-title">Mesas del Salon</div>
                     </div>
-                    <div class="mesas-grid" id="mesas-salon">
-                        <!-- Mesas del salon se generaran dinamicamente -->
+                    <div class="mesas-grid">
+                        <asp:Repeater ID="RepMesasSalon" runat="server">
+                            <ItemTemplate>
+                                <div style="position: relative;">
+                                    <asp:LinkButton ID="LnkMesa" runat="server"
+                                        CssClass='<%# "mesa-card " + ((string)Eval("Estado")).ToLower() %>'
+                                        CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") + "|salon|" + Eval("Estado") %>'
+                                        OnClick="SeleccionarMesa_Click">
+                                        <div class="mesa-number"><%# Eval("NumeroMesa") %></div>
+                                        <i class="bi bi-octagon-fill mesa-icon"></i>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="LnkEliminarMesa" runat="server"
+                                        CssClass="delete-btn"
+                                        CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") %>'
+                                        OnClick="EliminarMesaDirecta_Click"
+                                        OnClientClick="return confirm('¿Estás seguro de que deseas eliminar esta mesa?');">
+                                        <i class="bi bi-x"></i>
+                                    </asp:LinkButton>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                        <asp:LinkButton ID="LnkAgregarSalon" runat="server" CssClass="add-mesa-card" CommandArgument="salon" OnClick="AgregarMesa_Click">
+                            <i class="bi bi-plus-lg"></i>
+                            <div style="color: #666; font-size: 14px;">Agregar Mesa</div>
+                        </asp:LinkButton>
                     </div>
                 </div>
 
@@ -733,8 +816,31 @@
                     <div class="section-header">
                         <div class="section-title">Mesas del Patio</div>
                     </div>
-                    <div class="mesas-grid" id="mesas-patio">
-                        <!-- Mesas del patio se generaran dinamicamente -->
+                    <div class="mesas-grid">
+                        <asp:Repeater ID="RepMesasPatio" runat="server">
+                            <ItemTemplate>
+                                <div style="position: relative;">
+                                    <asp:LinkButton ID="LnkMesa" runat="server"
+                                        CssClass='<%# "mesa-card " + ((string)Eval("Estado")).ToLower() %>'
+                                        CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") + "|patio|" + Eval("Estado") %>'
+                                        OnClick="SeleccionarMesa_Click">
+                                        <div class="mesa-number"><%# Eval("NumeroMesa") %></div>
+                                        <i class="bi bi-octagon-fill mesa-icon"></i>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="LnkEliminarMesa" runat="server"
+                                        CssClass="delete-btn"
+                                        CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") %>'
+                                        OnClick="EliminarMesaDirecta_Click"
+                                        OnClientClick="return confirm('¿Estás seguro de que deseas eliminar esta mesa?');">
+                                        <i class="bi bi-x"></i>
+                                    </asp:LinkButton>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                        <asp:LinkButton ID="LnkAgregarPatio" runat="server" CssClass="add-mesa-card" CommandArgument="patio" OnClick="AgregarMesa_Click">
+                            <i class="bi bi-plus-lg"></i>
+                            <div style="color: #666; font-size: 14px;">Agregar Mesa</div>
+                        </asp:LinkButton>
                     </div>
                 </div>
 
@@ -743,9 +849,9 @@
                     <div class="section-header">
                         <div class="section-title">Mostrador</div>
                         <div class="action-buttons">
-                            <button type="button" class="btn btn-success btn-lg px-5 shadow-sm" onclick="abrirMostrador()">
-                                Abrir Mostrador
-                            </button>
+                            <asp:LinkButton ID="LnkAbrirMostrador" runat="server" CssClass="btn btn-success btn-lg px-5 shadow-sm" OnClick="AbrirMostrador_Click">
+                                <i class="bi bi-shop"></i> Abrir Mostrador
+                            </asp:LinkButton>
                         </div>
                     </div>
                     <div id="ordenes-mostrador-container">
@@ -762,33 +868,31 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalAbrirMesaLabel">
-                        <i class="bi bi-octagon-fill"></i> Mesa <span id="modal-mesa-numero"></span>
+                        <i class="bi bi-octagon-fill"></i> Abrir Mesa <asp:Literal ID="LitNumeroMesaModal" runat="server"></asp:Literal>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="cantidadPersonas" class="form-label">
+                        <label for="<%= TxtCantidadPersonas.ClientID %>" class="form-label">
                             <i class="bi bi-people-fill"></i> Cantidad de Personas
                         </label>
-                        <input type="number" class="form-control" id="cantidadPersonas" min="1" value="1" placeholder="Ingrese cantidad de personas">
+                        <asp:TextBox ID="TxtCantidadPersonas" runat="server" CssClass="form-control" TextMode="Number" min="1" placeholder="Ingrese cantidad de personas" Text="1"></asp:TextBox>
                     </div>
                     <div class="mb-4">
-                        <label for="selectCamarero" class="form-label">
+                        <label for="<%= DdlCamarero.ClientID %>" class="form-label">
                             <i class="bi bi-person-badge"></i> Camarero Asignado
                         </label>
-                        <select class="form-select" id="selectCamarero">
-                            <option value="">Seleccione un camarero</option>
-                            <option value="Juan Perez">Juan Perez</option>
-                            <option value="Maria Gonzalez">Maria Gonzalez</option>
-                            <option value="Carlos Rodriguez">Carlos Rodriguez</option>
-                            <option value="Ana Martinez">Ana Martinez</option>
-                            <option value="Luis Fernandez">Luis Fernandez</option>
-                        </select>
+                        <asp:DropDownList ID="DdlCamarero" runat="server" CssClass="form-select">
+                            <asp:ListItem Value="">Seleccione un camarero</asp:ListItem>
+                            <asp:ListItem Value="1">Juan Perez</asp:ListItem>
+                            <asp:ListItem Value="2">Maria Gonzalez</asp:ListItem>
+                            <asp:ListItem Value="3">Carlos Rodriguez</asp:ListItem>
+                            <asp:ListItem Value="4">Ana Martinez</asp:ListItem>
+                            <asp:ListItem Value="5">Luis Fernandez</asp:ListItem>
+                        </asp:DropDownList>
                     </div>
-                    <button type="button" class="btn-abrir-mesa" onclick="confirmarAbrirMesa()">
-                        <i class="bi bi-check-circle-fill"></i> Abrir Mesa
-                    </button>
+                    <asp:Button ID="BtnConfirmarAbrirMesa" runat="server" CssClass="btn-abrir-mesa" Text="Abrir Mesa" OnClick="ConfirmarAbrirMesa_Click" />
                 </div>
             </div>
         </div>
@@ -1078,683 +1182,63 @@
                 </div>
             </div>
         </div>
-    </div>//mostrador
+    </div>
 
     <script>
-        // Datos de las mesas
-        let mesasData = {
-            salon: [],
-            patio: []
-        };
+        // Solo funciones UI - Todo el estado se maneja en el servidor (ASP.NET)
 
-        // Ordenes del mostrador
-        let ordenesMostrador = [];
-
-        // Mesa actual seleccionada
-        let mesaActual = null;
-
-        // Orden temporal (para editar antes de confirmar)
-        let ordenTemporal = [];
-
-        // Sistema de notificaciones flotantes
-        function mostrarNotificacion(tipo, titulo, mensaje) {
-            const toast = document.createElement('div');
-            toast.className = `toast-notification ${tipo}`;
-
-            const iconos = {
-                success: 'bi-check-circle-fill',
-                error: 'bi-x-circle-fill',
-                warning: 'bi-exclamation-triangle-fill',
-                info: 'bi-info-circle-fill'
-            };
-
-            toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="bi ${iconos[tipo]}"></i>
-                </div>
-                <div class="toast-content">
-                    <div class="toast-title">${titulo}</div>
-                    <div class="toast-message">${mensaje}</div>
-                </div>
-                <button class="toast-close">
-                    <i class="bi bi-x"></i>
-                </button>
-            `;
-
-            // Agregar evento al botón de cerrar
-            const closeBtn = toast.querySelector('.toast-close');
-            closeBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                cerrarNotificacion(this);
-            });
-
-            document.body.appendChild(toast);
-
-            // Auto-cerrar después de 4 segundos
-            setTimeout(() => {
-                cerrarNotificacion(closeBtn);
-            }, 4000);
-        }
-
-        function cerrarNotificacion(btn) {
-            if (!btn) return;
-            const toast = btn.closest ? btn.closest('.toast-notification') : btn.parentElement;
-            if (!toast) return;
-            if (toast.classList.contains('closing')) return; // Evitar cerrar múltiples veces
-
-            toast.classList.add('closing');
-            setTimeout(() => {
-                if (toast && toast.parentElement) {
-                    toast.remove();
-                }
-            }, 300);
-        }
-
-        // Modal de confirmación personalizado
-        function mostrarConfirmacion(titulo, mensaje, onConfirm) {
-            const overlay = document.createElement('div');
-            overlay.className = 'custom-confirm-overlay';
-            overlay.innerHTML = `
-                <div class="custom-confirm-box">
-                    <div class="custom-confirm-icon">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                    </div>
-                    <div class="custom-confirm-title">${titulo}</div>
-                    <div class="custom-confirm-message">${mensaje}</div>
-                    <div class="custom-confirm-buttons">
-                        <button class="custom-confirm-btn cancel">
-                            <i class="bi bi-x-circle"></i> Cancelar
-                        </button>
-                        <button class="custom-confirm-btn confirm">
-                            <i class="bi bi-check-circle"></i> Confirmar
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(overlay);
-
-            // Botón cancelar
-            overlay.querySelector('.cancel').addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                overlay.remove();
-            });
-
-            // Botón confirmar
-            overlay.querySelector('.confirm').addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                overlay.remove();
-                if (onConfirm && typeof onConfirm === 'function') {
-                    onConfirm();
-                }
-            });
-
-            // Cerrar al hacer click fuera
-            overlay.addEventListener('click', function(e) {
-                if (e.target === overlay) {
-                    overlay.remove();
-                }
-            });
-        }
-
-        // Inicializar mesas de ejemplo
-        function inicializarMesas() {
-            // Mesas del salon
-            for (let i = 1; i <= 8; i++) {
-                mesasData.salon.push({
-                    numero: i,
-                    estado: 'libre',
-                    seccion: 'salon',
-                    orden: null, // null = no hay orden confirmada
-                    cantidadPersonas: 0,
-                    camarero: ''
-                });
+        // Guardar tab activo en HiddenField
+        function guardarTab(tab) {
+            var hdnTabActivo = document.getElementById('<%= HdnTabActivo.ClientID %>');
+            if (hdnTabActivo) {
+                hdnTabActivo.value = tab;
             }
-
-            // Mesas del patio
-            for (let i = 1; i <= 6; i++) {
-                mesasData.patio.push({
-                    numero: i,
-                    estado: 'libre',
-                    seccion: 'patio',
-                    orden: null,
-                    cantidadPersonas: 0,
-                    camarero: ''
-                });
-            }
-
-            renderizarMesas();
         }
 
-        // Renderizar mesas en el DOM
-        function renderizarMesas() {
-            renderizarSeccion('salon');
-            renderizarSeccion('patio');
-        }
+        // Restaurar tab activo después del PostBack
+        function restaurarTab() {
+            var hdnTabActivo = document.getElementById('<%= HdnTabActivo.ClientID %>');
+            if (hdnTabActivo && hdnTabActivo.value) {
+                var tabActivo = hdnTabActivo.value;
 
-        function renderizarSeccion(seccion) {
-            const container = document.getElementById('mesas-' + seccion);
-            container.innerHTML = '';
-
-            mesasData[seccion].forEach(mesa => {
-                const mesaCard = document.createElement('div');
-                mesaCard.className = 'mesa-card ' + mesa.estado;
-                mesaCard.innerHTML = `
-                    <button class="delete-btn">
-                        <i class="bi bi-x"></i>
-                    </button>
-                    <div class="mesa-number">${mesa.numero}</div>
-                    <i class="bi bi-octagon-fill mesa-icon"></i>
-                `;
-
-                // Agregar evento al botón de eliminar
-                const deleteBtn = mesaCard.querySelector('.delete-btn');
-                deleteBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    eliminarMesa(seccion, mesa.numero);
+                // Remover clase active de todos los tabs
+                document.querySelectorAll('#mesasTabs .nav-link').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('#mesasTabContent .tab-pane').forEach(p => {
+                    p.classList.remove('show', 'active');
                 });
 
-                mesaCard.onclick = function() { seleccionarMesa(seccion, mesa.numero); };
-                container.appendChild(mesaCard);
-            });
+                // Activar el tab correcto
+                var tabBtn = document.getElementById(tabActivo + '-tab');
+                var tabPane = document.getElementById(tabActivo);
 
-            // Agregar card para añadir nueva mesa
-            const addCard = document.createElement('div');
-            addCard.className = 'add-mesa-card';
-            addCard.innerHTML = `
-                <i class="bi bi-plus-lg"></i>
-            `;
-            addCard.onclick = function() { agregarMesa(seccion); };
-            container.appendChild(addCard);
-        }
-
-        // Seleccionar una mesa
-        function seleccionarMesa(seccion, numero) {
-            const mesa = mesasData[seccion].find(m => m.numero === numero);
-            if (!mesa) return;
-
-            mesaActual = { seccion, numero };
-
-            if (mesa.estado === 'libre') {
-                // Abrir modal para abrir la mesa
-                document.getElementById('modal-mesa-numero').textContent = numero;
-                document.getElementById('cantidadPersonas').value = 1;
-                document.getElementById('selectCamarero').value = '';
-                const modal = new bootstrap.Modal(document.getElementById('modalAbrirMesa'));
-                modal.show();
-            } else if (mesa.orden) {
-                // Si ya tiene orden confirmada, abrir modal de resumen
-                abrirModalResumenPago(mesa.orden);
-            } else {
-                // Si esta ocupada pero sin orden confirmada, abrir modal de orden
-                abrirModalOrden(numero);
-            }
-        }
-
-        // Confirmar abrir mesa
-        function confirmarAbrirMesa() {
-            const cantidadPersonas = document.getElementById('cantidadPersonas').value;
-            const camarero = document.getElementById('selectCamarero').value;
-
-            if (!cantidadPersonas || cantidadPersonas < 1) {
-                mostrarNotificacion('warning', 'Datos incompletos', 'Por favor ingrese la cantidad de personas.');
-                return;
-            }
-
-            if (!camarero) {
-                mostrarNotificacion('warning', 'Datos incompletos', 'Por favor seleccione un camarero.');
-                return;
-            }
-
-            // Cambiar estado de la mesa
-            const mesa = mesasData[mesaActual.seccion].find(m => m.numero === mesaActual.numero);
-            if (mesa) {
-                mesa.estado = 'ocupada';
-                mesa.cantidadPersonas = cantidadPersonas;
-                mesa.camarero = camarero;
-                renderizarSeccion(mesaActual.seccion);
-            }
-
-            // Cerrar modal de abrir mesa
-            const modalAbrirMesa = bootstrap.Modal.getInstance(document.getElementById('modalAbrirMesa'));
-            modalAbrirMesa.hide();
-
-            // Abrir modal de orden
-            setTimeout(() => {
-                abrirModalOrden(mesaActual.numero);
-            }, 300);
-        }
-
-        // Abrir modal de orden
-        function abrirModalOrden(numero) {
-            document.getElementById('modal-orden-mesa-numero').textContent = numero;
-
-            // Resetear cantidades
-            document.querySelectorAll('.cantidad-control input').forEach(input => {
-                input.value = 0;
-            });
-
-            // Resetear búsqueda
-            document.getElementById('buscarProducto').value = '';
-
-            // Mostrar tabs
-            document.getElementById('categoriasTabs').style.display = 'flex';
-
-            // Resetear tabs a su estado original (solo las del modal de orden)
-            document.querySelectorAll('#categoriasTabContent .tab-pane').forEach((pane, index) => {
-                if (index === 0) {
-                    pane.classList.add('show', 'active');
-                } else {
-                    pane.classList.remove('show', 'active');
-                }
-            });
-
-            // Activar la primera tab
-            document.querySelector('#comida-tab').classList.add('active');
-            document.querySelectorAll('.categorias-tabs .nav-link').forEach((tab, index) => {
-                if (index !== 0) {
-                    tab.classList.remove('active');
-                }
-            });
-
-            // Mostrar todos los productos
-            document.querySelectorAll('.producto-item').forEach(item => {
-                item.style.display = 'flex';
-            });
-
-            actualizarResumenOrden();
-
-            const modal = new bootstrap.Modal(document.getElementById('modalOrden'));
-            modal.show();
-        }
-
-        // Abrir mostrador
-        function abrirMostrador() {
-            mesaActual = { seccion: 'mostrador', numero: 0 };
-            abrirModalOrden('Mostrador');
-        }
-
-        // Cambiar cantidad de producto
-        function cambiarCantidad(button, cambio, event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            const input = button.parentElement.querySelector('input');
-            let cantidad = parseInt(input.value) || 0;
-            cantidad = Math.max(0, cantidad + cambio);
-            input.value = cantidad;
-            actualizarResumenOrden();
-        }
-
-        // Actualizar resumen de orden
-        function actualizarResumenOrden() {
-            const resumenDiv = document.getElementById('resumenOrden');
-            const totalSpan = document.getElementById('totalOrden');
-            let html = '';
-            let total = 0;
-
-            document.querySelectorAll('.producto-item').forEach(item => {
-                const cantidad = parseInt(item.querySelector('.cantidad-control input').value);
-                if (cantidad > 0) {
-                    const nombre = item.dataset.nombre;
-                    const precio = parseInt(item.dataset.precio);
-                    const subtotal = precio * cantidad;
-                    total += subtotal;
-
-                    html += `
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #333;">
-                            <span>${cantidad}x ${nombre}</span>
-                            <span style="font-weight: 600;">$${subtotal.toLocaleString()}</span>
-                        </div>
-                    `;
-                }
-            });
-
-            if (html === '') {
-                resumenDiv.innerHTML = '<p style="color: #999; font-style: italic;">No hay productos seleccionados</p>';
-            } else {
-                resumenDiv.innerHTML = html;
-            }
-
-            totalSpan.textContent = '$' + total.toLocaleString();
-        }
-
-        // Confirmar orden
-        function confirmarOrden() {
-            const productos = [];
-            document.querySelectorAll('.producto-item').forEach(item => {
-                const cantidad = parseInt(item.querySelector('.cantidad-control input').value);
-                if (cantidad > 0) {
-                    productos.push({
-                        nombre: item.dataset.nombre,
-                        cantidad: cantidad,
-                        precio: parseInt(item.dataset.precio)
-                    });
-                }
-            });
-
-            if (productos.length === 0) {
-                mostrarNotificacion('warning', 'Orden vacía', 'Por favor seleccione al menos un producto.');
-                return;
-            }
-
-            // Guardar orden en la mesa o mostrador
-            if (mesaActual.seccion === 'mostrador') {
-                // Agregar orden al mostrador
-                const ordenId = Date.now();
-                ordenesMostrador.push({
-                    id: ordenId,
-                    productos: productos,
-                    fecha: new Date(),
-                    estado: 'activa'
-                });
-                mesaActual.ordenId = ordenId;
-                renderizarOrdenesMostrador();
-            } else {
-                // Guardar orden en la mesa
-                const mesa = mesasData[mesaActual.seccion].find(m => m.numero === mesaActual.numero);
-                if (mesa) {
-                    mesa.orden = productos;
+                if (tabBtn && tabPane) {
+                    tabBtn.classList.add('active');
+                    tabPane.classList.add('show', 'active');
                 }
             }
-
-            // Cerrar modal de orden
-            const modalOrden = bootstrap.Modal.getInstance(document.getElementById('modalOrden'));
-            modalOrden.hide();
-
-            // Esperar un poco y abrir modal de resumen y pago
-            setTimeout(() => {
-                abrirModalResumenPago(productos);
-            }, 300);
         }
 
-        // Abrir modal de resumen y pago
-        function abrirModalResumenPago(productos) {
-            const mesaNumero = document.getElementById('modal-orden-mesa-numero').textContent;
-            document.getElementById('modal-resumen-mesa-numero').textContent = mesaNumero;
+        document.addEventListener('DOMContentLoaded', () => {
+            // Restaurar tab activo
+            restaurarTab();
 
-            const resumenDiv = document.getElementById('resumenCompleto');
-            const totalSpan = document.getElementById('totalPagar');
+            // Búsqueda de productos
+            const buscar = document.getElementById('buscarProducto');
+            const tabs = document.getElementById('categoriasTabs');
 
-            let html = '';
-            let total = 0;
-
-            productos.forEach(producto => {
-                const subtotal = producto.cantidad * producto.precio;
-                total += subtotal;
-
-                html += `
-                    <div class="resumen-item">
-                        <div class="resumen-item-info">
-                            <div class="resumen-item-nombre">${producto.nombre}</div>
-                            <div class="resumen-item-cantidad">Cantidad: ${producto.cantidad} x $${producto.precio.toLocaleString()}</div>
-                        </div>
-                        <div class="resumen-item-precio">$${subtotal.toLocaleString()}</div>
-                    </div>
-                `;
-            });
-
-            resumenDiv.innerHTML = html;
-            totalSpan.textContent = '$' + total.toLocaleString();
-
-            const modal = new bootstrap.Modal(document.getElementById('modalResumenPago'));
-            modal.show();
-        }
-
-        // Procesar pago
-        function procesarPago() {
-            // Si es una mesa, cambiar su estado a libre y limpiar orden
-            if (mesaActual && mesaActual.seccion !== 'mostrador') {
-                const mesa = mesasData[mesaActual.seccion].find(m => m.numero === mesaActual.numero);
-                if (mesa) {
-                    mesa.estado = 'libre';
-                    mesa.orden = null;
-                    mesa.cantidadPersonas = 0;
-                    mesa.camarero = '';
-                    renderizarSeccion(mesaActual.seccion);
-                }
-            } else {
-                // Si es mostrador, remover la orden de la lista
-                const mesaNumero = document.getElementById('modal-resumen-mesa-numero').textContent;
-                if (mesaNumero === 'Mostrador' && ordenesMostrador.length > 0) {
-                    // Encontrar y eliminar la orden actual por sus productos
-                    const modalResumen = document.getElementById('resumenCompleto');
-                    ordenesMostrador = ordenesMostrador.filter(orden => orden.estado === 'pagada' || orden.id !== mesaActual.ordenId);
-                }
-                renderizarOrdenesMostrador();
-            }
-
-            // Cerrar modal
-            const modalResumenPago = bootstrap.Modal.getInstance(document.getElementById('modalResumenPago'));
-            modalResumenPago.hide();
-
-            // Mostrar notificación de éxito
-            mostrarNotificacion('success', 'Pago procesado', '¡El pago se ha procesado exitosamente!');
-        }
-
-        // Agregar mas productos a la orden existente
-        function agregarMasProductos() {
-            // Obtener la orden actual
-            let ordenActual = [];
-
-            if (mesaActual.seccion === 'mostrador') {
-                const orden = ordenesMostrador.find(o => o.id === mesaActual.ordenId);
-                if (orden) {
-                    ordenActual = orden.productos;
-                }
-            } else {
-                const mesa = mesasData[mesaActual.seccion].find(m => m.numero === mesaActual.numero);
-                if (mesa && mesa.orden) {
-                    ordenActual = mesa.orden;
-                }
-            }
-
-            // Cerrar modal de resumen
-            const modalResumenPago = bootstrap.Modal.getInstance(document.getElementById('modalResumenPago'));
-            modalResumenPago.hide();
-
-            // Abrir modal de orden con los productos precargados
-            setTimeout(() => {
-                const mesaNumero = document.getElementById('modal-resumen-mesa-numero').textContent;
-                abrirModalOrdenConProductos(mesaNumero, ordenActual);
-            }, 300);
-        }
-
-        // Abrir modal de orden con productos precargados
-        function abrirModalOrdenConProductos(numero, productosExistentes) {
-            document.getElementById('modal-orden-mesa-numero').textContent = numero;
-
-            // Resetear todas las cantidades primero
-            document.querySelectorAll('.cantidad-control input').forEach(input => {
-                input.value = 0;
-            });
-
-            // Resetear búsqueda
-            document.getElementById('buscarProducto').value = '';
-
-            // Mostrar tabs
-            document.getElementById('categoriasTabs').style.display = 'flex';
-
-            // Resetear tabs a su estado original (solo las del modal de orden)
-            document.querySelectorAll('#categoriasTabContent .tab-pane').forEach((pane, index) => {
-                if (index === 0) {
-                    pane.classList.add('show', 'active');
-                } else {
-                    pane.classList.remove('show', 'active');
-                }
-            });
-
-            // Activar la primera tab
-            document.querySelector('#comida-tab').classList.add('active');
-            document.querySelectorAll('.categorias-tabs .nav-link').forEach((tab, index) => {
-                if (index !== 0) {
-                    tab.classList.remove('active');
-                }
-            });
-
-            // Mostrar todos los productos
-            document.querySelectorAll('.producto-item').forEach(item => {
-                item.style.display = 'flex';
-            });
-
-            // Precargar los productos existentes
-            productosExistentes.forEach(prod => {
-                document.querySelectorAll('.producto-item').forEach(item => {
-                    if (item.dataset.nombre === prod.nombre) {
-                        item.querySelector('.cantidad-control input').value = prod.cantidad;
-                    }
-                });
-            });
-
-            actualizarResumenOrden();
-
-            const modal = new bootstrap.Modal(document.getElementById('modalOrden'));
-            modal.show();
-        }
-
-        // Agregar nueva mesa
-        function agregarMesa(seccion) {
-            const maxNumero = mesasData[seccion].length > 0
-                ? Math.max(...mesasData[seccion].map(m => m.numero))
-                : 0;
-
-            mesasData[seccion].push({
-                numero: maxNumero + 1,
-                estado: 'libre',
-                seccion: seccion
-            });
-
-            renderizarSeccion(seccion);
-        }
-
-        function eliminarMesa(seccion, numero) {
-            const mesa = mesasData[seccion].find(m => m.numero === numero);
-
-            if (mesa && mesa.estado === 'ocupada') {
-                mostrarNotificacion('error', 'No se puede eliminar', 'No puedes eliminar una mesa que está ocupada. Cierra la mesa primero.');
-                return;
-            }
-
-            mostrarConfirmacion(
-                'Eliminar Mesa',
-                `Estas seguro que deseas eliminar la Mesa ${numero}?`,
-                function() {
-                    mesasData[seccion] = mesasData[seccion].filter(m => m.numero !== numero);
-
-                    mesasData[seccion].forEach((mesa, index) => {
-                        mesa.numero = index + 1;
-                    });
-
-                    renderizarSeccion(seccion);
-                    mostrarNotificacion('success', 'Mesa eliminada', `La mesa ${numero} ha sido eliminada correctamente.`);
-                }
-            );
-        }
-
-        // Renderizar ordenes del mostrador
-        function renderizarOrdenesMostrador() {
-            const container = document.getElementById('ordenes-mostrador-container');
-
-            if (ordenesMostrador.length === 0) {
-                container.innerHTML = '<div class="empty-ordenes">No hay ordenes activas en el mostrador</div>';
-                return;
-            }
-
-            let html = '<h4 style="color: #333; margin-bottom: 20px; font-weight: bold;">Ordenes Activas</h4>';
-
-            ordenesMostrador.forEach(orden => {
-                if (orden.estado === 'activa') {
-                    let total = 0;
-                    let productosHtml = '';
-
-                    orden.productos.forEach(prod => {
-                        const subtotal = prod.cantidad * prod.precio;
-                        total += subtotal;
-                        productosHtml += `
-                            <div class="orden-mostrador-producto">
-                                <span>${prod.cantidad}x ${prod.nombre}</span>
-                                <span>$${subtotal.toLocaleString()}</span>
-                            </div>
-                        `;
-                    });
-
-                    const fechaFormato = new Date(orden.fecha).toLocaleTimeString('es-ES', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-
-                    html += `
-                        <div class="orden-mostrador-card" onclick="verOrdenMostrador(${orden.id})">
-                            <div class="orden-mostrador-header">
-                                <div class="orden-mostrador-id">
-                                    <i class="bi bi-receipt"></i> Orden #${orden.id.toString().slice(-6)}
-                                </div>
-                                <div class="orden-mostrador-fecha">
-                                    <i class="bi bi-clock"></i> ${fechaFormato}
-                                </div>
-                            </div>
-                            <div class="orden-mostrador-productos">
-                                ${productosHtml}
-                            </div>
-                            <div class="orden-mostrador-total">
-                                Total: $${total.toLocaleString()}
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
-            container.innerHTML = html;
-        }
-
-        // Ver orden del mostrador
-        function verOrdenMostrador(ordenId) {
-            const orden = ordenesMostrador.find(o => o.id === ordenId);
-            if (!orden) return;
-
-            mesaActual = { seccion: 'mostrador', numero: 0, ordenId: ordenId };
-            abrirModalResumenPago(orden.productos);
-        }
-
-        // Busqueda de productos
-        document.addEventListener('DOMContentLoaded', function() {
-            inicializarMesas();
-
-            const buscarInput = document.getElementById('buscarProducto');
-            if (buscarInput) {
-                buscarInput.addEventListener('input', function(e) {
+            if (buscar) {
+                buscar.addEventListener('input', e => {
                     const texto = e.target.value.toLowerCase();
+                    const items = document.querySelectorAll('.producto-item');
+                    const panes = document.querySelectorAll('#categoriasTabContent .tab-pane');
 
-                    if (texto === '') {
-                        // Si no hay texto de búsqueda, mostrar todos los productos
-                        document.querySelectorAll('.producto-item').forEach(item => {
-                            item.style.display = 'flex';
-                        });
-                        // Mostrar las tabs
-                        document.getElementById('categoriasTabs').style.display = 'flex';
+                    if (!texto) {
+                        items.forEach(i => i.style.display = 'flex');
+                        tabs.style.display = 'flex';
                     } else {
-                        // Ocultar las tabs cuando hay búsqueda
-                        document.getElementById('categoriasTabs').style.display = 'none';
-
-                        // Mostrar todos los tab-panes como activos para que se vean los resultados (solo del modal de orden)
-                        document.querySelectorAll('#categoriasTabContent .tab-pane').forEach(pane => {
-                            pane.classList.add('show', 'active');
-                        });
-
-                        // Buscar en todos los productos de todas las categorías
-                        document.querySelectorAll('.producto-item').forEach(item => {
-                            const nombre = item.dataset.nombre.toLowerCase();
-                            if (nombre.includes(texto)) {
-                                item.style.display = 'flex';
-                            } else {
-                                item.style.display = 'none';
-                            }
-                        });
+                        tabs.style.display = 'none';
+                        panes.forEach(p => p.classList.add('show', 'active'));
+                        items.forEach(i => i.style.display = i.dataset.nombre.toLowerCase().includes(texto) ? 'flex' : 'none');
                     }
                 });
             }
