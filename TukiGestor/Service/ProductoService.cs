@@ -79,7 +79,7 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("UPDATE PRODUCTO SET Disponible = 0 WHERE ProductoId = @id");
+                datos.SetearConsulta("DELETE FROM PRODUCTO WHERE ProductoId = @id");
                 datos.setearParametro("@id", id);
                 datos.ejecutarAccion();
             }
