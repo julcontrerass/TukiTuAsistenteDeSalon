@@ -155,15 +155,15 @@
         }
 
         .tab-pane {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
 
-.tab-pane.active.show {
-  display: block;
-  opacity: 1;
-}
+        .tab-pane.active.show {
+            display: block;
+            opacity: 1;
+        }
 
 
 
@@ -180,287 +180,252 @@
             <div>
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
-                        <button class="nav-link active" id="mesas-tab" data-bs-toggle="tab" data-bs-target="#mesas" type="button" role="tab">
-                            <i class="bi bi-fork-knife"></i>
-                            Mesas
-                        </button>
-                    </li>
-
-                    <li class="nav-item">
-    <button class="nav-link" id="mozos-tab" data-bs-toggle="tab" data-bs-target="#meseros" type="button" role="tab">
-                    <i class="bi bi-person-circle"></i>
-        Meseros
-    </button>
-</li>
-
-
-
-                    <li class="nav-item">
-                        <button class="nav-link" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos" type="button" role="tab">
-                            <i class="bi bi-cup-straw"></i> Productos
-                        </button>
+                        <button class="nav-link active" id="mesas-tab" data-bs-toggle="tab" data-bs-target="#mesas" type="button" role="tab"><i class="bi bi-fork-knife"></i>Mesas</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" id="ventas-tab" data-bs-toggle="tab" data-bs-target="#ventas" type="button" role="tab">
-                            <i class="bi bi-receipt"></i> Ventas
-                        </button>
+                        <button class="nav-link" id="mozos-tab" data-bs-toggle="tab" data-bs-target="#meseros" type="button" role="tab"><i class="bi bi-person-circle"></i>Meseros</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" id="balance-tab" data-bs-toggle="tab" data-bs-target="#balance" type="button" role="tab">
-                            <i class="bi bi-book"></i> Balance
-                        </button>
+                        <button class="nav-link" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos" type="button" role="tab"><i class="bi bi-cup-straw"></i> Productos</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="ventas-tab" data-bs-toggle="tab" data-bs-target="#ventas" type="button" role="tab"><i class="bi bi-receipt"></i> Ventas</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="balance-tab" data-bs-toggle="tab" data-bs-target="#balance" type="button" role="tab"><i class="bi bi-book"></i> Balance</button>
                     </li>
                 </ul>
             </div>
 
             <div class="options-container">
                 <i class="bi bi-calendar-date calendario"></i>
-
                 <div class="separador"></div>
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle boton-turno" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Turno
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <button class="dropdown-item items-turno" type="button">Almuerzo</button></li>
-                        <li>
-                            <button class="dropdown-item items-turno" type="button">Cena</button></li>
-                    </ul>
-                </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle boton-turno" type="button" data-bs-toggle="dropdown" aria-expanded="false">Turno</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-turno" type="button">Almuerzo</button></li>
+                            <li>
+                                <button class="dropdown-item items-turno" type="button">Cena</button></li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle boton-rango" type="button" data-bs-toggle="dropdown" aria-expanded="false">Rango</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-rango" type="button">Diario</button>
 
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle boton-rango" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Rango
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <button class="dropdown-item items-rango" type="button">Diario</button></li>
-                        <li>
-                            <button class="dropdown-item items-rango" type="button">Semanal</button></li>
-                        <li>
-                            <button class="dropdown-item items-rango" type="button">Mensual</button></li>
-                        <li>
-    <button class="dropdown-item items-rango" type="button">Anual</button></li>
-                        <li>
-                            <button class="dropdown-item items-rango" type="button">Fechas personalizadas</button></li>
-                    </ul>
-                </div>
-                <div class="separador"></div>
-               
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-rango" type="button">Semanal</button>
 
-                    <div class="date-selector-container">
-                        <div class="selector-rango">
-                            <input class="custom-datepicker" type="date" id="fecha-desde" lang="es-ES">
-                            <span class="fecha-hasta" id="fecha-hasta-label">hasta</span>
-                            <input class="custom-datepicker" type="date" id="fecha-hasta" lang="es-ES">
-                        </div>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-rango" type="button">Mensual</button>
 
-                        <div class="selector-mes">
-                            <input class="custom-datepicker" type="month" id="fecha-mes">
-                        </div>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-rango" type="button">Anual</button>
 
-                        <div class="selector-año">
-                            <label for="fecha-anio" class="selector-año-label">Año</label>
-                            <input class="custom-datepicker" type="number" id="fecha-anio" min="2000" max="2030" placeholder="AAAA">
-                        </div>
-                    </div>            
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-rango" type="button">Fechas personalizadas</button>
 
-            </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="separador"></div>
+                        <div class="date-selector-container">
+                            <div class="selector-rango">
+                                <input class="custom-datepicker" type="date" id="fecha-desde" lang="es-ES">
+                                <span class="fecha-hasta" id="fecha-hasta-label">hasta</span>
+                                <input class="custom-datepicker" type="date" id="fecha-hasta" lang="es-ES">
+                            </div>
+                            <div class="selector-mes">
+                                <input class="custom-datepicker" type="month" id="fecha-mes">
+                            </div>
+                            <div class="selector-año">
+                                <label for="fecha-anio" class="selector-año-label">Año</label>
+                                <input class="custom-datepicker" type="number" id="fecha-anio" min="2000" max="2030" placeholder="AAAA">
+                            </div>
+                        </div>            
+                    </div>
 
             <!--  > Pestaña Mesas <!-->
 
             <div class="tab-pane fade active show pestaña-mesas" id="mesas" role="tabpanel">
-
                 <div class="options-container-pestañas">
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Ranking de mesas
-                        </button>
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Ranking de mesas</button>
                         <ul class="dropdown-menu">
                             <li>
-                                <button class="dropdown-item items-mesas" type="button">Ranking de mesas</button></li>
-                            
+                                <button class="dropdown-item items-mesas" type="button">Ranking de mesas</button>
+
+                            </li>
                         </ul>
                     </div>
-
                     <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Con más
-    </button>
-    <ul class="dropdown-menu">
-        <li>
-            <button class="dropdown-item items-mesas" type="button">Con más</button></li>
-        <li>
-            <button class="dropdown-item items-mesas" type="button">Con menos</button></li>
-    </ul>
-</div>
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Con más</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Con más</button>
 
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Con menos</button>
+
+                            </li>
+                        </ul>
+                    </div>
                     <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Facturación
-    </button>
-    <ul class="dropdown-menu">
-        <li>
-            <button class="dropdown-item items-mesas" type="button">Facturación</button></li>
-        <li>
-            <button class="dropdown-item items-mesas" type="button">Ocupación</button></li>
-    </ul>
-</div>
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Facturación</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Facturación</button>
+
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Ocupación</button>
+
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-
             </div>
 
             <!--  > Pestaña Meseros <!-->
             <div class="tab-pane fade pestaña-meseros" id="meseros" role="tabpanel">
-
                 <div class="options-container-pestañas">
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Ranking de meseros
-                        </button>
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Ranking de meseros</button>
                         <ul class="dropdown-menu">
                             <li>
-                                <button class="dropdown-item items-mesas" type="button">Ranking de meseros</button></li>
+                                <button class="dropdown-item items-mesas" type="button">Ranking de meseros</button>
+                            </li>
                         </ul>
                     </div>
-
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Con más
-                        </button>
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Con más</button>
                         <ul class="dropdown-menu">
                             <li>
-                                <button class="dropdown-item items-mesas" type="button">Con más</button></li>
+                                <button class="dropdown-item items-mesas" type="button">Con más</button>
+                            </li>
                             <li>
-                                <button class="dropdown-item items-mesas" type="button">Con menos</button></li>
+                                <button class="dropdown-item items-mesas" type="button">Con menos</button>
+                            </li>
                         </ul>
                     </div>
-
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Facturación     
-                        </button>
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Facturación</button>
                         <ul class="dropdown-menu">
                             <li>
-                                <button class="dropdown-item items-mesas" type="button">Facturación</button></li>
+                                <button class="dropdown-item items-mesas" type="button">Facturación</button>
+                            </li>
                             <li>
-                                <button class="dropdown-item items-mesas" type="button">Mesas atendidas</button></li>
+                                <button class="dropdown-item items-mesas" type="button">Mesas atendidas</button>
+                            </li>
                         </ul>
                     </div>
-
                 </div>
-
             </div>
 
             <!--  > Pestaña productos <!-->
-<div class="tab-pane fade pestaña-productos" id="productos" role="tabpanel">
-
-    <div class="options-container-pestañas">
-        <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Ranking
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <button class="dropdown-item items-mesas" type="button">Ranking</button></li>
-            </ul>
+            <div class="tab-pane fade pestaña-productos" id="productos" role="tabpanel">
+                <div class="options-container-pestañas">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Ranking</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Ranking</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">10 Productos</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-productos" type="button">10 Productos</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-productos" type="button">20 Productos</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-productos" type="button">30 Productos</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-productos" type="button">40 Productos</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-productos" type="button">50 Productos</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Con más</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-productos" type="button">Con más</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-productos" type="button">Con menos</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Facturación</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Facturación</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Ventas</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Margen</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Categoría</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Categoría</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Bebidas</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Platos Principales</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Postres</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-mesas" type="button">Adicionales</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade pestaña-ventas" id="ventas" role="tabpanel">
+                <div class="options-container-pestañas">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Tipo de pago</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item items-ventas" type="button">Efectivo</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-ventas" type="button">Tarjeta de Crédito</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item items-ventas" type="button">Transferencia</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-
-          <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          10 Productos
-      </button>
-      <ul class="dropdown-menu">
-          <li>
-              <button class="dropdown-item items-productos" type="button">10 Productos</button></li>
-           <li>
-     <button class="dropdown-item items-productos" type="button">20 Productos</button></li>
-           <li>
-     <button class="dropdown-item items-productos" type="button">30 Productos</button></li>
-           <li>
-     <button class="dropdown-item items-productos" type="button">40 Productos</button></li>
-           <li>
-     <button class="dropdown-item items-productos" type="button">50 Productos</button></li>
-      </ul>
-  </div>
-
-
-        <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Con más
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <button class="dropdown-item items-productos" type="button">Con más</button></li>
-                <li>
-                    <button class="dropdown-item items-productos" type="button">Con menos</button></li>
-            </ul>
-        </div>
-
-        <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Facturación     
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <button class="dropdown-item items-mesas" type="button">Facturación</button></li>
-                <li>
-                    <button class="dropdown-item items-mesas" type="button">Ventas</button></li>
-                <li>
-    <button class="dropdown-item items-mesas" type="button">Margen</button></li>
-            </ul>
-        </div>
-
-            <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Categoría     
-        </button>
-        <ul class="dropdown-menu">
-            <li>
-                <button class="dropdown-item items-mesas" type="button">Categoría</button></li>
-            <li>
-                <button class="dropdown-item items-mesas" type="button">Bebidas</button></li>
-            <li>
-<button class="dropdown-item items-mesas" type="button">Platos Principales</button></li>
-                        <li>
-<button class="dropdown-item items-mesas" type="button">Postres</button></li>
-                                    <li>
-<button class="dropdown-item items-mesas" type="button">Adicionales</button></li>
-        </ul>
-    </div>
-
-
-    </div>
-
-</div>
-
-
-        
-
-   <div class="tab-pane fade pestaña-ventas" id="ventas" role="tabpanel">
-       <div class="options-container-pestañas">
-           <div class="dropdown">
-               <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-Tipo de pago               </button>
-               <ul class="dropdown-menu">
-                   <li>
-                       <button class="dropdown-item items-ventas" type="button">Efectivo</button></li>
-                   <li>
-                       <button class="dropdown-item items-ventas" type="button">Tarjeta de Crédito</button></li>
-                   <li>
-    <button class="dropdown-item items-ventas" type="button">Transferencia</button></li>
-               </ul>
-           </div>
-       </div>
-   </div>
-
-
-
-
-        </div>
-
-
     </div>
 
 

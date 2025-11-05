@@ -19,7 +19,6 @@ namespace Service
             {
                 datos.SetearConsulta("SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock FROM PRODUCTO WHERE Disponible = 1");
                 datos.ejecutarLectura();
-
                 while (datos.Lector.Read())
                 {
                     Producto prod = new Producto();
@@ -33,7 +32,6 @@ namespace Service
 
                     lista.Add(prod);
                 }
-
                 return lista;
             }
             catch (Exception ex)
@@ -52,9 +50,7 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("INSERT INTO PRODUCTO (Nombre, Precio, Disponible, CategoriaId, Stock) " +
-                                     "VALUES (@Nombre, @Precio, @Disponible, @CategoriaId, @Stock)");
-
+                datos.SetearConsulta("INSERT INTO PRODUCTO (Nombre, Precio, Disponible, CategoriaId, Stock) " + "VALUES (@Nombre, @Precio, @Disponible, @CategoriaId, @Stock)");
                 datos.setearParametro("@Nombre", nuevo.Nombre);
                 datos.setearParametro("@Precio", nuevo.Precio);
                 datos.setearParametro("@Disponible", nuevo.Disponible);

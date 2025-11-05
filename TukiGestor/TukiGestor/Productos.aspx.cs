@@ -17,6 +17,7 @@ namespace TukiGestor
             {
                 CargarProductos();
                 CargarCategorias();
+                CargarListadoCategorias();
             }
         }
 
@@ -75,7 +76,7 @@ namespace TukiGestor
             }
             catch (Exception ex)
             {
-                ScriptManager.RegisterStartupScript(this, GetType(), "alert", $"alert('Error al agregar producto: {ex.Message}');", true);
+                //acá debo poner una ventana emergente que diga "Error al agregar producto"
             }
         }
 
@@ -97,6 +98,72 @@ namespace TukiGestor
             }
         }
 
+
+        private void CargarListadoCategorias()
+        {
+            try
+            {
+                CategoriaService categoriaService = new CategoriaService();
+                List<Categoria> categorias = categoriaService.Listar();
+
+                RepeaterCategorias.DataSource = categorias;
+                RepeaterCategorias.DataBind();
+            }
+            catch (Exception ex)
+            {
+                //deberia agregar una ventana emergente que diga "Error al cargar categorías"
+            }
+        }
+
+
+        protected void btnGuardarCategoria_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Categoria nueva = new Categoria();
+                nueva.Nombre = txtNombreCategoria.Text.Trim();
+                nueva.Activa = true;
+
+                if (string.IsNullOrEmpty(nueva.Nombre))
+                {
+                    //deberia agregar una ventana emergente que diga "Por favor ingrese un nombre para la categoría"
+                    return;
+                }
+
+                CategoriaService service = new CategoriaService();
+                service.Agregar(nueva);
+
+                //deberia agregar una ventana emergente que diga "Categoría agregada correctamente"
+
+                // Limpiamos los campos
+                txtNombreCategoria.Text = "";
+                // Actualizamos el dropdown de productos
+                CargarCategorias();
+                CargarListadoCategorias();
+            }
+            catch (Exception ex)
+            {
+                //deberia agregar una ventana emergente que diga "Error al agregar categoría"
+            }
+        }
+
+
+
+        protected void RepeaterCategorias_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "Eliminar")
+            {
+                int id = int.Parse(e.CommandArgument.ToString());
+                CategoriaService service = new CategoriaService();
+                service.Eliminar(id);
+
+                // Refrescamos la lista
+                CargarCategorias();
+                CargarListadoCategorias();
+
+                //debería agregar ventana emergente que diga "Categoría eliminada correctamente"
+            }
+        }
 
 
 
