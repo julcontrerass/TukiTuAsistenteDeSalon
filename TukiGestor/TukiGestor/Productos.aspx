@@ -183,7 +183,7 @@
                 <ContentTemplate>
                     <div class="tab-content mt-3">
 
-                        <!-- LISTADO -->
+                        <!-- listado -->
                         <asp:Panel ID="pnlListado" runat="server" CssClass="tab-pane fade active show">
                             <div class="d-flex justify-content-center mb-4">
                                 <div class="input-group" style="width: 400px;">
@@ -214,7 +214,7 @@
                                             <asp:LinkButton runat="server" CssClass="btn btn-link text-warning me-2" CommandName="Editar" CommandArgument='<%# Eval("ProductoId") %>'>
                                                 <i class="bi bi-pencil-fill"></i>
                                             </asp:LinkButton>
-                                            <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="Eliminar"  CommandArgument='<%# Eval("ProductoId") %>' OnClientClick="return confirm('¿Está seguro de eliminar este producto?');">
+                                            <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="Eliminar" CommandArgument='<%# Eval("ProductoId") %>' OnClientClick="return confirm('¿Está seguro de eliminar este producto?');">
                                                 <i class="bi bi-trash-fill"></i>
                                             </asp:LinkButton>
                                         </td>
@@ -228,7 +228,7 @@
                             </asp:Repeater>
                         </asp:Panel>
 
-                        <!-- NUEVO PRODUCTO -->
+                        <!-- nuevo producto -->
                         <asp:Panel ID="pnlNuevo" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">
                                 <h4 class="mb-3">Agregar nuevo producto</h4>
@@ -252,7 +252,7 @@
                             </div>
                         </asp:Panel>
 
-                        <!-- EDITAR PRODUCTO -->
+                        <!-- editar producto -->
                         <asp:Panel ID="pnlEditar" runat="server" CssClass="tab-pane fade" Visible="false">
                             <div class="p-4">
                                 <h4 class="mb-3">Editar producto</h4>
@@ -280,7 +280,7 @@
                             </div>
                         </asp:Panel>
 
-                        <!-- CATEGORIAS -->
+                        <!-- categorias -->
                         <asp:Panel ID="pnlCategorias" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">
                                 <h4 class="mb-3 text-center">Categorías de productos</h4>
@@ -291,7 +291,7 @@
                                                 <thead class="table-dark sticky-top">
                                                     <tr>
                                                         <th>Nombre</th>
-                                                        <th>Eliminar</th>
+                                                        <th>Acciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -300,7 +300,10 @@
                                             <tr>
                                                 <td><%# Eval("Nombre") %></td>
                                                 <td>
-                                                    <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="Eliminar"  CommandArgument='<%# Eval("CategoriaId") %>' OnClientClick="return confirm('¿Está seguro de eliminar esta categoría?');">
+                                                    <asp:LinkButton runat="server" CssClass="btn btn-link text-warning me-2" CommandName="EditarCategoria" CommandArgument='<%# Eval("CategoriaId") %>'>
+                                                        <i class="bi bi-pencil-fill"></i>
+                                                    </asp:LinkButton>
+                                                    <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="Eliminar" CommandArgument='<%# Eval("CategoriaId") %>' OnClientClick="return confirm('¿Está seguro de eliminar esta categoría?');">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </asp:LinkButton>
                                                 </td>
@@ -315,7 +318,7 @@
                             </div>
                         </asp:Panel>
 
-                        <!-- NUEVA CATEGORÍA -->
+                        <!-- nueva categoria -->
                         <asp:Panel ID="pnlCategoriaNueva" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">
                                 <h4 class="mb-3">Agregar nueva categoría</h4>
@@ -326,6 +329,23 @@
                                 <asp:Button ID="btnGuardarCategoria" runat="server" Text="Guardar" CssClass="btn btn-custom mt-3" OnClick="btnGuardarCategoria_Click" />
                             </div>
                         </asp:Panel>
+
+                        <!-- editar categoria -->
+                        <asp:Panel ID="pnlEditarCategoria" runat="server" CssClass="tab-pane fade" Visible="false">
+                            <div class="p-4">
+                                <h4 class="mb-3">Editar categoría</h4>
+                                <asp:HiddenField ID="hfCategoriaId" runat="server" />
+                                <div class="mb-3">
+                                    <label for="txtNombreCategoriaEditar" class="form-label">Nombre</label>
+                                    <asp:TextBox ID="txtNombreCategoriaEditar" runat="server" CssClass="form-control" placeholder="Ej: Entrada"></asp:TextBox>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <asp:Button ID="btnActualizarCategoria" runat="server" Text="Actualizar" CssClass="btn btn-custom mt-3" OnClick="btnActualizarCategoria_Click" />
+                                    <asp:Button ID="btnCancelarEditarCategoria" runat="server" Text="Cancelar" CssClass="btn btn-secondary mt-3" OnClick="btnCancelarEditarCategoria_Click" />
+                                </div>
+                            </div>
+                        </asp:Panel>
+
                     </div>
                 </ContentTemplate>
             </asp:UpdatePanel>

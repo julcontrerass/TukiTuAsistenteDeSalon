@@ -66,7 +66,7 @@ namespace TukiGestor
             }
         }
 
-        // ========== SISTEMA DE MENSAJES ==========
+        // ========== mensajes ==========
         private void MostrarMensaje(string mensaje, string tipo)
         {
             pnlMensaje.Visible = true;
@@ -88,7 +88,7 @@ namespace TukiGestor
             pnlMensaje.Visible = false;
         }
 
-        // ========== NAVEGACIÓN ENTRE TABS ==========
+        
         protected void btnTabListado_Click(object sender, EventArgs e)
         {
             MostrarTab("listado");
@@ -115,21 +115,23 @@ namespace TukiGestor
 
         private void MostrarTab(string tab)
         {
-            // Ocultamos los paneles
+            // Ocultar todos los paneles
             pnlListado.CssClass = "tab-pane fade";
             pnlNuevo.CssClass = "tab-pane fade";
             pnlEditar.CssClass = "tab-pane fade";
             pnlEditar.Visible = false;
             pnlCategorias.CssClass = "tab-pane fade";
             pnlCategoriaNueva.CssClass = "tab-pane fade";
+            pnlEditarCategoria.CssClass = "tab-pane fade";
+            pnlEditarCategoria.Visible = false;
 
-            // reseteamos clases de los botones
+            // Resetear clases de los botones
             btnTabListado.CssClass = "nav-link";
             btnTabNuevo.CssClass = "nav-link";
             btnTabCategorias.CssClass = "nav-link";
             btnTabCategoriaNueva.CssClass = "nav-link";
 
-            // mostramos el panel correspondiente
+            // Mostrar el panel correspondiente
             switch (tab)
             {
                 case "listado":
@@ -143,7 +145,6 @@ namespace TukiGestor
                 case "editar":
                     pnlEditar.CssClass = "tab-pane fade active show";
                     pnlEditar.Visible = true;
-                    btnTabListado.CssClass = "nav-link";
                     break;
                 case "categorias":
                     pnlCategorias.CssClass = "tab-pane fade active show";
@@ -153,12 +154,16 @@ namespace TukiGestor
                     pnlCategoriaNueva.CssClass = "tab-pane fade active show";
                     btnTabCategoriaNueva.CssClass = "nav-link active";
                     break;
+                case "editarCategoria":
+                    pnlEditarCategoria.CssClass = "tab-pane fade active show";
+                    pnlEditarCategoria.Visible = true;
+                    break;
             }
 
             UpdatePanelContenido.Update();
         }
 
-        
+
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             try
@@ -316,7 +321,7 @@ namespace TukiGestor
             }
         }
 
-        
+
         protected void RepeaterCategorias_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName == "Eliminar")
@@ -336,6 +341,75 @@ namespace TukiGestor
                     MostrarMensaje("Error al eliminar categoría: " + ex.Message, "error");
                 }
             }
+            else if (e.CommandName == "EditarCategoria")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    CategoriaService service = new CategoriaService();
+                    List<Categoria> categorias = service.Listar();
+                    Categoria categoria = categorias.FirstOrDefault(c => c.CategoriaId == id);
+
+                    if (categoria != null)
+                    {
+                        hfCategoriaId.Value = categoria.CategoriaId.ToString();
+                        txtNombreCategoriaEditar.Text = categoria.Nombre;
+
+                        MostrarTab("editarCategoria");
+                        OcultarMensaje();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al cargar categoría: " + ex.Message, "error");
+                }
+            }
         }
+
+
+        protected void btnActualizarCategoria_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Categoria categoria = new Categoria();
+                categoria.CategoriaId = int.Parse(hfCategoriaId.Value);
+                categoria.Nombre = txtNombreCategoriaEditar.Text.Trim();
+                categoria.Activa = true;
+
+                if (string.IsNullOrEmpty(categoria.Nombre))
+                {
+                    MostrarMensaje("Por favor ingrese un nombre para la categoría", "warning");
+                    return;
+                }
+
+                CategoriaService service = new CategoriaService();
+                service.Modificar(categoria);
+
+                LimpiarFormularioEditarCategoria();
+                CargarCategorias();
+                CargarCategoriasEditar();
+                CargarListadoCategorias();
+                MostrarTab("categorias");
+                MostrarMensaje("Categoría actualizada correctamente", "success");
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al actualizar categoría: " + ex.Message, "error");
+            }
+        }
+
+        protected void btnCancelarEditarCategoria_Click(object sender, EventArgs e)
+        {
+            LimpiarFormularioEditarCategoria();
+            MostrarTab("categorias");
+        }
+
+        private void LimpiarFormularioEditarCategoria()
+        {
+            hfCategoriaId.Value = "";
+            txtNombreCategoriaEditar.Text = "";
+        }
+
+
     }
 }
