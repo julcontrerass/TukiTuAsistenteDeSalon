@@ -93,7 +93,51 @@ namespace Service
             }
         }
 
+        public List<Producto> BuscarProductos(string textoBusqueda)
+        {
+            List<Producto> lista = new List<Producto>();
+            AccesoDatos datos = new AccesoDatos();
 
+            try
+            {
+                if (string.IsNullOrWhiteSpace(textoBusqueda))
+                {
+                    return Listar();
+                }
+
+                // Buscar productos por nombre usando LIKE
+                datos.SetearConsulta(@"SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock
+                                      FROM PRODUCTO
+                                      WHERE Disponible = 1
+                                      AND Nombre LIKE @texto");
+
+                datos.setearParametro("@texto", "%" + textoBusqueda + "%");
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    Producto prod = new Producto();
+                    prod.ProductoId = (int)datos.Lector["ProductoId"];
+                    prod.Nombre = (string)datos.Lector["Nombre"];
+                    prod.Precio = (decimal)datos.Lector["Precio"];
+                    prod.Disponible = (bool)datos.Lector["Disponible"];
+                    prod.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    prod.Stock = (int)datos.Lector["Stock"];
+
+                    lista.Add(prod);
+                }
+
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al buscar productos: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
 
     }
 }

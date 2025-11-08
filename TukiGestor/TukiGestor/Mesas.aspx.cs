@@ -12,6 +12,19 @@ namespace TukiGestor
     public partial class Mesas : System.Web.UI.Page
     {
         private MesaService mesaService = new MesaService();
+        private ProductoService productoService = new ProductoService();
+        private CategoriaService categoriaService = new CategoriaService();
+
+        // Listas públicas para binding
+        public List<Categoria> Categorias { get; set; }
+        public List<Producto> Productos { get; set; }
+
+        // Propiedad para controlar si hay búsqueda activa
+        public bool HayBusquedaActiva
+        {
+            get { return ViewState["HayBusquedaActiva"] != null && (bool)ViewState["HayBusquedaActiva"]; }
+            set { ViewState["HayBusquedaActiva"] = value; }
+        }
 
         // Propiedades para controlar modales
         public string MostrarModalAbrirMesa
@@ -37,12 +50,20 @@ namespace TukiGestor
             // SIEMPRE cargar desde la base de datos (incluso en postbacks y refresh)
             // Esto asegura que los datos estén actualizados en todo momento
             CargarMesasEnRepeaters();
+            CargarCategoriasYProductos();
 
             // Manejar mensajes del patrón Post-Redirect-Get
             if (!IsPostBack && Session["MensajeExito"] != null)
             {
                 MostrarMensaje(Session["MensajeExito"].ToString(), "success");
                 Session.Remove("MensajeExito");
+            }
+
+            // Restaurar tab activo desde Session
+            if (!IsPostBack && Session["TabActivo"] != null)
+            {
+                HdnTabActivo.Value = Session["TabActivo"].ToString();
+                Session.Remove("TabActivo");
             }
         }
 
@@ -64,6 +85,66 @@ namespace TukiGestor
             {
                 MostrarMensaje("Error al cargar las mesas: " + ex.Message, "danger");
             }
+        }
+
+        private void CargarCategoriasYProductos()
+        {
+            try
+            {
+                // Cargar categorías desde la base de datos
+                Categorias = categoriaService.Listar();
+
+                // Cargar todos los productos (búsqueda se hace en JavaScript)
+                Productos = productoService.Listar();
+
+                // Bind a los repeaters de tabs
+                RepCategorias.DataSource = Categorias;
+                RepCategorias.DataBind();
+
+                // Bind al repeater de contenido
+                RepCategoriasContenido.DataSource = Categorias;
+                RepCategoriasContenido.DataBind();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cargar productos y categorías: " + ex.Message, "danger");
+            }
+        }
+
+        // Método auxiliar para obtener productos de una categoría específica
+        public List<Producto> ObtenerProductosPorCategoria(int categoriaId)
+        {
+            if (Productos == null) return new List<Producto>();
+            return Productos.Where(p => p.CategoriaId == categoriaId).ToList();
+        }
+
+        // Método para generar HTML de productos por categoría
+        protected string GenerarProductosCategoria(int categoriaId)
+        {
+            var productos = ObtenerProductosPorCategoria(categoriaId);
+            if (productos == null || productos.Count == 0)
+            {
+                return "<p style='color: #999; text-align: center; padding: 20px;'>No hay productos en esta categoría</p>";
+            }
+
+            System.Text.StringBuilder html = new System.Text.StringBuilder();
+            foreach (var prod in productos)
+            {
+                html.AppendFormat(@"
+                    <div class='producto-item' data-nombre='{0}' data-precio='{1}' data-categoria='categoria-{2}' data-productoid='{3}'>
+                        <div class='producto-info'>
+                            <div class='producto-nombre'>{0}</div>
+                            <div class='producto-precio'>${1:N0}</div>
+                        </div>
+                        <div class='cantidad-control'>
+                            <button type='button' onclick='cambiarCantidad(this, -1, event)'>-</button>
+                            <input type='number' value='0' min='0' readonly>
+                            <button type='button' onclick='cambiarCantidad(this, 1, event)'>+</button>
+                        </div>
+                    </div>
+                ", prod.Nombre, prod.Precio, categoriaId, prod.ProductoId);
+            }
+            return html.ToString();
         }
 
         protected void SeleccionarMesa_Click(object sender, EventArgs e)
@@ -192,9 +273,6 @@ namespace TukiGestor
                 LinkButton btn = (LinkButton)sender;
                 string ubicacion = btn.CommandArgument;
 
-                // Guardar tab activo
-                HdnTabActivo.Value = ubicacion;
-
                 // Obtener el próximo número de mesa para esta ubicación
                 List<Mesa> mesasExistentes = mesaService.ListarMesasPorUbicacion(ubicacion);
                 int proximoNumero = mesasExistentes.Count + 1;
@@ -210,8 +288,13 @@ namespace TukiGestor
 
                 mesaService.AgregarMesa(nuevaMesa);
 
+                // Guardar tab activo y mensaje en Session
+                Session["TabActivo"] = ubicacion;
                 Session["MensajeExito"] = "Mesa " + proximoNumero + " agregada exitosamente en " + ubicacion + ".";
-                Response.Redirect(Request.RawUrl);
+
+                // Redirigir a URL limpia para evitar reenvío de formulario
+                Response.Redirect(Request.Url.AbsolutePath, false);
+                Context.ApplicationInstance.CompleteRequest();
             }
             catch (Exception ex)
             {
@@ -227,11 +310,45 @@ namespace TukiGestor
                 string[] args = btn.CommandArgument.Split('|');
                 int mesaId = int.Parse(args[0]);
                 string numeroMesa = args[1];
+                string ubicacion = args[2];
 
                 mesaService.EliminarMesa(mesaId);
 
+                // Guardar tab activo y mensaje en Session
+                Session["TabActivo"] = ubicacion;
                 Session["MensajeExito"] = "Mesa " + numeroMesa + " eliminada exitosamente.";
-                Response.Redirect(Request.RawUrl);
+
+                // Redirigir a URL limpia para evitar reenvío de formulario
+                Response.Redirect(Request.Url.AbsolutePath, false);
+                Context.ApplicationInstance.CompleteRequest();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al eliminar la mesa: " + ex.Message, "danger");
+            }
+        }
+
+        protected void ConfirmarEliminarMesa_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Obtener los valores de los HiddenFields
+                if (!string.IsNullOrEmpty(HdnMesaIdEliminar.Value))
+                {
+                    int mesaId = int.Parse(HdnMesaIdEliminar.Value);
+                    string numeroMesa = HdnMesaNumeroEliminar.Value;
+                    string ubicacion = HdnMesaUbicacionEliminar.Value;
+
+                    mesaService.EliminarMesa(mesaId);
+
+                    // Guardar tab activo y mensaje en Session
+                    Session["TabActivo"] = ubicacion;
+                    Session["MensajeExito"] = "Mesa " + numeroMesa + " eliminada exitosamente.";
+
+                    // Redirigir a URL limpia para evitar reenvío de formulario
+                    Response.Redirect(Request.Url.AbsolutePath, false);
+                    Context.ApplicationInstance.CompleteRequest();
+                }
             }
             catch (Exception ex)
             {
@@ -247,11 +364,17 @@ namespace TukiGestor
                 {
                     int mesaId = (int)ViewState["MesaIdSeleccionada"];
                     string numeroMesa = ViewState["NumeroMesaSeleccionada"].ToString();
+                    string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "salon";
 
                     mesaService.EliminarMesa(mesaId);
 
+                    // Guardar tab activo y mensaje en Session
+                    Session["TabActivo"] = ubicacion;
                     Session["MensajeExito"] = "Mesa " + numeroMesa + " eliminada exitosamente.";
-                    Response.Redirect(Request.RawUrl);
+
+                    // Redirigir a URL limpia para evitar reenvío de formulario
+                    Response.Redirect(Request.Url.AbsolutePath, false);
+                    Context.ApplicationInstance.CompleteRequest();
                 }
             }
             catch (Exception ex)
@@ -268,11 +391,17 @@ namespace TukiGestor
                 {
                     int mesaId = (int)ViewState["MesaIdSeleccionada"];
                     string numeroMesa = ViewState["NumeroMesaSeleccionada"].ToString();
+                    string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "salon";
 
                     mesaService.ActualizarEstadoMesa(mesaId, "ocupada");
 
+                    // Guardar tab activo y mensaje en Session
+                    Session["TabActivo"] = ubicacion;
                     Session["MensajeExito"] = "Mesa " + numeroMesa + " ocupada exitosamente.";
-                    Response.Redirect(Request.RawUrl);
+
+                    // Redirigir a URL limpia para evitar reenvío de formulario
+                    Response.Redirect(Request.Url.AbsolutePath, false);
+                    Context.ApplicationInstance.CompleteRequest();
                 }
             }
             catch (Exception ex)
@@ -289,11 +418,17 @@ namespace TukiGestor
                 {
                     int mesaId = (int)ViewState["MesaIdSeleccionada"];
                     string numeroMesa = ViewState["NumeroMesaSeleccionada"].ToString();
+                    string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "salon";
 
                     mesaService.ActualizarEstadoMesa(mesaId, "libre");
 
+                    // Guardar tab activo y mensaje en Session
+                    Session["TabActivo"] = ubicacion;
                     Session["MensajeExito"] = "Mesa " + numeroMesa + " liberada exitosamente.";
-                    Response.Redirect(Request.RawUrl);
+
+                    // Redirigir a URL limpia para evitar reenvío de formulario
+                    Response.Redirect(Request.Url.AbsolutePath, false);
+                    Context.ApplicationInstance.CompleteRequest();
                 }
             }
             catch (Exception ex)
@@ -328,6 +463,99 @@ namespace TukiGestor
             PanelMensaje.Visible = true;
             PanelMensaje.CssClass = "alert alert-" + tipo + " alert-dismissible fade show";
             LitMensaje.Text = mensaje;
+        }
+
+        protected void BuscarProducto_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                string textoBusqueda = TxtBuscarProducto.Text.Trim();
+
+                if (!string.IsNullOrWhiteSpace(textoBusqueda))
+                {
+                    // Activar modo búsqueda
+                    HayBusquedaActiva = true;
+
+                    // Filtrar productos usando el servicio (busca directamente en la BD)
+                    Productos = productoService.BuscarProductos(textoBusqueda);
+
+                    // Mostrar botón de limpiar
+                    BtnLimpiarBusqueda.Style["display"] = "inline-block";
+                }
+                else
+                {
+                    // Si está vacío, mostrar todos los productos
+                    HayBusquedaActiva = false;
+                    CargarCategoriasYProductos();
+
+                    // Ocultar botón de limpiar
+                    BtnLimpiarBusqueda.Style["display"] = "none";
+                }
+
+                // Actualizar el UpdatePanel
+                UpdatePanelProductos.Update();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al buscar productos: " + ex.Message, "danger");
+            }
+        }
+
+        protected void LimpiarBusqueda_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Limpiar el textbox
+                TxtBuscarProducto.Text = string.Empty;
+
+                // Desactivar modo búsqueda
+                HayBusquedaActiva = false;
+
+                // Ocultar botón de limpiar
+                BtnLimpiarBusqueda.Style["display"] = "none";
+
+                // Recargar todos los productos
+                CargarCategoriasYProductos();
+
+                // Actualizar el UpdatePanel
+                UpdatePanelProductos.Update();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al limpiar búsqueda: " + ex.Message, "danger");
+            }
+        }
+
+        // Método para generar HTML de productos filtrados (búsqueda)
+        protected string GenerarProductosBusqueda()
+        {
+            if (Productos == null || Productos.Count == 0)
+            {
+                return "<div style='text-align: center; padding: 40px; color: #999;'><i class='bi bi-search' style='font-size: 3rem;'></i><p style='margin-top: 20px;'>No se encontraron productos</p></div>";
+            }
+
+            System.Text.StringBuilder html = new System.Text.StringBuilder();
+            html.Append("<div class='productos-busqueda' style='display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 10px;'>");
+
+            foreach (var prod in Productos)
+            {
+                html.AppendFormat(@"
+                    <div class='producto-item' data-nombre='{0}' data-precio='{1}' data-productoid='{3}'>
+                        <div class='producto-info'>
+                            <div class='producto-nombre'>{0}</div>
+                            <div class='producto-precio'>${1:N0}</div>
+                        </div>
+                        <div class='cantidad-control'>
+                            <button type='button' onclick='cambiarCantidad(this, -1, event)'>-</button>
+                            <input type='number' value='0' min='0' readonly>
+                            <button type='button' onclick='cambiarCantidad(this, 1, event)'>+</button>
+                        </div>
+                    </div>
+                ", prod.Nombre, prod.Precio, prod.CategoriaId, prod.ProductoId);
+            }
+
+            html.Append("</div>");
+            return html.ToString();
         }
     }
 }

@@ -794,13 +794,10 @@
                                         <div class="mesa-number"><%# Eval("NumeroMesa") %></div>
                                         <i class="bi bi-octagon-fill mesa-icon"></i>
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="LnkEliminarMesa" runat="server"
-                                        CssClass="delete-btn"
-                                        CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") %>'
-                                        OnClick="EliminarMesaDirecta_Click"
-                                        OnClientClick="return confirm('¿Estás seguro de que deseas eliminar esta mesa?');">
+                                    <button type="button" class="delete-btn"
+                                        onclick='abrirModalEliminar(<%# Eval("MesaId") %>, "<%# Eval("NumeroMesa") %>", "salon")'>
                                         <i class="bi bi-x"></i>
-                                    </asp:LinkButton>
+                                    </button>
                                 </div>
                             </ItemTemplate>
                         </asp:Repeater>
@@ -827,13 +824,10 @@
                                         <div class="mesa-number"><%# Eval("NumeroMesa") %></div>
                                         <i class="bi bi-octagon-fill mesa-icon"></i>
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="LnkEliminarMesa" runat="server"
-                                        CssClass="delete-btn"
-                                        CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") %>'
-                                        OnClick="EliminarMesaDirecta_Click"
-                                        OnClientClick="return confirm('¿Estás seguro de que deseas eliminar esta mesa?');">
+                                    <button type="button" class="delete-btn"
+                                        onclick='abrirModalEliminar(<%# Eval("MesaId") %>, "<%# Eval("NumeroMesa") %>", "patio")'>
                                         <i class="bi bi-x"></i>
-                                    </asp:LinkButton>
+                                    </button>
                                 </div>
                             </ItemTemplate>
                         </asp:Repeater>
@@ -909,217 +903,77 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <i class="bi bi-search"></i> Buscar Producto
-                        </label>
-                        <input type="text" class="form-control" id="buscarProducto" placeholder="Buscar en todas las categorias...">
-                    </div>
-
-                    <!-- Tabs de categorias -->
-                    <ul class="nav nav-pills categorias-tabs" id="categoriasTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="comida-tab" data-bs-toggle="pill" data-bs-target="#comida" type="button" role="tab">
-                                <i class="bi bi-egg-fried"></i> Comida
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="bebidas-tab" data-bs-toggle="pill" data-bs-target="#bebidas" type="button" role="tab">
-                                <i class="bi bi-cup-straw"></i> Bebidas
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="postres-tab" data-bs-toggle="pill" data-bs-target="#postres" type="button" role="tab">
-                                <i class="bi bi-cake2"></i> Postres
-                            </button>
-                        </li>
-                    </ul>
-
-                    <!-- Contenido de tabs -->
-                    <div class="tab-content" id="categoriasTabContent">
-                        <!-- Comida -->
-                        <div class="tab-pane fade show active" id="comida" role="tabpanel">
-                            <div class="productos-lista">
-                                <div class="producto-item" data-nombre="Hamburguesa Clasica" data-precio="1500" data-categoria="comida">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Hamburguesa Clasica</div>
-                                        <div class="producto-precio">$1,500</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Pizza Margarita" data-precio="2000" data-categoria="comida">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Pizza Margarita</div>
-                                        <div class="producto-precio">$2,000</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Ensalada Cesar" data-precio="1200" data-categoria="comida">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Ensalada Cesar</div>
-                                        <div class="producto-precio">$1,200</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Milanesa con Papas" data-precio="1800" data-categoria="comida">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Milanesa con Papas</div>
-                                        <div class="producto-precio">$1,800</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Pasta Bolognesa" data-precio="1600" data-categoria="comida">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Pasta Bolognesa</div>
-                                        <div class="producto-precio">$1,600</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
+                    <asp:UpdatePanel ID="UpdatePanelProductos" runat="server" UpdateMode="Conditional">
+                        <ContentTemplate>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Buscar Producto
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <asp:TextBox ID="TxtBuscarProducto" runat="server"
+                                        CssClass="form-control"
+                                        placeholder="Buscar en todas las categorias..."
+                                        onkeydown="return handleEnterBusqueda(event);"
+                                        OnTextChanged="BuscarProducto_TextChanged">
+                                    </asp:TextBox>
+                                    <asp:LinkButton ID="BtnLimpiarBusqueda" runat="server"
+                                        CssClass="btn btn-outline-secondary"
+                                        OnClick="LimpiarBusqueda_Click"
+                                        Style="display: none;">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                    </asp:LinkButton>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Bebidas -->
-                        <div class="tab-pane fade" id="bebidas" role="tabpanel">
-                            <div class="productos-lista">
-                                <div class="producto-item" data-nombre="Coca Cola" data-precio="500" data-categoria="bebidas">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Coca Cola</div>
-                                        <div class="producto-precio">$500</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
+                            <% if (!HayBusquedaActiva) { %>
+                                <!-- Tabs de categorias dinámicos -->
+                                <ul class="nav nav-pills categorias-tabs" id="categoriasTabs" role="tablist">
+                                    <asp:Repeater ID="RepCategorias" runat="server">
+                                        <ItemTemplate>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link <%# Container.ItemIndex == 0 ? "active" : "" %>"
+                                                        id='categoria-<%# Eval("CategoriaId") %>-tab'
+                                                        data-bs-toggle="pill"
+                                                        data-bs-target='#categoria-<%# Eval("CategoriaId") %>'
+                                                        type="button"
+                                                        role="tab">
+                                                    <i class="bi bi-tag-fill"></i> <%# Eval("Nombre") %>
+                                                </button>
+                                            </li>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                </ul>
+
+                                <!-- Contenido de tabs dinámico -->
+                                <div class="tab-content" id="categoriasTabContent">
+                                    <asp:Repeater ID="RepCategoriasContenido" runat="server" DataSource='<%# Categorias %>'>
+                                        <ItemTemplate>
+                                            <div class='tab-pane fade <%# Container.ItemIndex == 0 ? "show active" : "" %>'
+                                                 id='categoria-<%# Eval("CategoriaId") %>'
+                                                 role="tabpanel">
+                                                <div class="productos-lista">
+                                                    <%# GenerarProductosCategoria((int)Eval("CategoriaId")) %>
+                                                </div>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                </div>
+                            <% } else { %>
+                                <!-- Resultados de búsqueda -->
+                                <div id="resultadosBusqueda">
+                                    <h6 style="color: #666; margin-bottom: 15px;">
+                                        <i class="bi bi-search"></i> Resultados de busqueda para "<%= TxtBuscarProducto.Text %>"
+                                    </h6>
+                                    <div class="productos-lista">
+                                        <%= GenerarProductosBusqueda() %>
                                     </div>
                                 </div>
-
-                                <div class="producto-item" data-nombre="Cafe Americano" data-precio="300" data-categoria="bebidas">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Cafe Americano</div>
-                                        <div class="producto-precio">$300</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Jugo de Naranja" data-precio="400" data-categoria="bebidas">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Jugo de Naranja</div>
-                                        <div class="producto-precio">$400</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Agua Mineral" data-precio="250" data-categoria="bebidas">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Agua Mineral</div>
-                                        <div class="producto-precio">$250</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Cerveza" data-precio="600" data-categoria="bebidas">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Cerveza</div>
-                                        <div class="producto-precio">$600</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Postres -->
-                        <div class="tab-pane fade" id="postres" role="tabpanel">
-                            <div class="productos-lista">
-                                <div class="producto-item" data-nombre="Flan con Dulce de Leche" data-precio="800" data-categoria="postres">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Flan con Dulce de Leche</div>
-                                        <div class="producto-precio">$800</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Tiramisu" data-precio="900" data-categoria="postres">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Tiramisu</div>
-                                        <div class="producto-precio">$900</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Helado" data-precio="700" data-categoria="postres">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Helado</div>
-                                        <div class="producto-precio">$700</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="producto-item" data-nombre="Cheesecake" data-precio="950" data-categoria="postres">
-                                    <div class="producto-info">
-                                        <div class="producto-nombre">Cheesecake</div>
-                                        <div class="producto-precio">$950</div>
-                                    </div>
-                                    <div class="cantidad-control">
-                                        <button type="button" onclick="cambiarCantidad(this, -1, event)">-</button>
-                                        <input type="number" value="0" min="0" readonly>
-                                        <button type="button" onclick="cambiarCantidad(this, 1, event)">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                            <% } %>
+                        </ContentTemplate>
+                    </asp:UpdatePanel>
 
                     <div class="orden-resumen">
                         <h6 style="color: #333; font-weight: bold; margin-bottom: 15px;">
@@ -1184,10 +1038,146 @@
         </div>
     </div>
 
-    <script>
-        // Solo funciones UI - Todo el estado se maneja en el servidor (ASP.NET)
+    <!-- Modal Confirmación Eliminar Mesa -->
+    <div class="modal fade" id="modalEliminarMesa" tabindex="-1" aria-labelledby="modalEliminarMesaLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="modalEliminarMesaLabel">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="bi bi-trash3-fill text-danger" style="font-size: 48px;"></i>
+                    <p class="mt-3 mb-0" style="font-size: 16px;">¿Estas seguro de que deseas eliminar la mesa <strong><span id="modalEliminarNumero"></span></strong>?</p>
+                    <p class="text-muted mt-2">Esta accion no se puede deshacer.</p>
+                    <asp:HiddenField ID="HdnMesaIdEliminar" runat="server" />
+                    <asp:HiddenField ID="HdnMesaNumeroEliminar" runat="server" />
+                    <asp:HiddenField ID="HdnMesaUbicacionEliminar" runat="server" />
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <asp:Button ID="BtnConfirmarEliminar" runat="server" CssClass="btn btn-danger px-4" Text="Eliminar" OnClick="ConfirmarEliminarMesa_Click" />
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // Guardar tab activo en HiddenField
+    <script>
+        // ========================================
+        // FUNCIONES PARA MANEJO DE PRODUCTOS
+        // ========================================
+
+        // Cambiar cantidad de un producto
+        function cambiarCantidad(boton, incremento, event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const productoItem = boton.closest('.producto-item');
+            const input = productoItem.querySelector('input[type="number"]');
+            let cantidad = parseInt(input.value) || 0;
+
+            // Actualizar cantidad
+            cantidad += incremento;
+            if (cantidad < 0) cantidad = 0;
+
+            input.value = cantidad;
+
+            // Actualizar resumen de la orden
+            actualizarResumenOrden();
+        }
+
+        // Actualizar el resumen de la orden
+        function actualizarResumenOrden() {
+            const resumenDiv = document.getElementById('resumenOrden');
+            const totalSpan = document.getElementById('totalOrden');
+
+            // Obtener todos los productos con cantidad > 0
+            const todosProductos = document.querySelectorAll('.producto-item');
+            const productosSeleccionados = [];
+
+            todosProductos.forEach(producto => {
+                const input = producto.querySelector('input[type="number"]');
+                const cantidad = parseInt(input.value) || 0;
+
+                if (cantidad > 0) {
+                    const nombre = producto.getAttribute('data-nombre');
+                    const precio = parseFloat(producto.getAttribute('data-precio'));
+                    const productoId = producto.getAttribute('data-productoid');
+
+                    productosSeleccionados.push({
+                        id: productoId,
+                        nombre: nombre,
+                        precio: precio,
+                        cantidad: cantidad,
+                        subtotal: precio * cantidad
+                    });
+                }
+            });
+
+            // Actualizar HTML del resumen
+            if (productosSeleccionados.length === 0) {
+                resumenDiv.innerHTML = '<p style="color: #999; font-style: italic;">No hay productos seleccionados</p>';
+                totalSpan.textContent = '$0';
+            } else {
+                let html = '<div style="max-height: 200px; overflow-y: auto;">';
+                let total = 0;
+
+                productosSeleccionados.forEach(prod => {
+                    total += prod.subtotal;
+                    html += `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                            <div>
+                                <strong>${prod.nombre}</strong>
+                                <span style="color: #666; font-size: 14px;"> x${prod.cantidad}</span>
+                            </div>
+                            <div style="font-weight: 600;">$${prod.subtotal.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+                resumenDiv.innerHTML = html;
+                totalSpan.textContent = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            }
+        }
+
+        // Confirmar orden
+        function confirmarOrden() {
+            const todosProductos = document.querySelectorAll('.producto-item');
+            let hayProductos = false;
+
+            todosProductos.forEach(producto => {
+                const input = producto.querySelector('input[type="number"]');
+                const cantidad = parseInt(input.value) || 0;
+                if (cantidad > 0) {
+                    hayProductos = true;
+                }
+            });
+
+            if (!hayProductos) {
+                alert('Por favor selecciona al menos un producto');
+                return;
+            }
+
+            // TODO: Aquí se debe guardar el pedido en la base de datos
+            alert('Funcionalidad de confirmar orden pendiente de implementar');
+        }
+
+        function abrirModalEliminar(mesaId, numeroMesa, ubicacion) {
+            document.getElementById('<%= HdnMesaIdEliminar.ClientID %>').value = mesaId;
+            document.getElementById('<%= HdnMesaNumeroEliminar.ClientID %>').value = numeroMesa;
+            document.getElementById('<%= HdnMesaUbicacionEliminar.ClientID %>').value = ubicacion;
+
+            document.getElementById('modalEliminarNumero').textContent = numeroMesa;
+
+            var modal = new bootstrap.Modal(document.getElementById('modalEliminarMesa'));
+            modal.show();
+        }
+
         function guardarTab(tab) {
             var hdnTabActivo = document.getElementById('<%= HdnTabActivo.ClientID %>');
             if (hdnTabActivo) {
@@ -1218,29 +1208,65 @@
             }
         }
 
+        // Manejar Enter en el textbox de búsqueda
+        function handleEnterBusqueda(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                // Hacer PostBack del TextBox para ejecutar búsqueda
+                __doPostBack('<%= TxtBuscarProducto.UniqueID %>', '');
+                return false;
+            }
+            return true;
+        }
+
+        // Mantener foco en el textbox después del PostBack
+        var Sys = Sys || {};
+        Sys.WebForms = Sys.WebForms || {};
+        Sys.WebForms.PageRequestManager = Sys.WebForms.PageRequestManager || {};
+
+        function mantenerFocoEnBusqueda() {
+            var prm = Sys.WebForms.PageRequestManager.getInstance();
+            if (prm) {
+                prm.add_endRequest(function (sender, args) {
+                    // Después del PostBack, devolver el foco al textbox
+                    var txtBuscar = document.getElementById('<%= TxtBuscarProducto.ClientID %>');
+                    if (txtBuscar) {
+                        setTimeout(function() {
+                            txtBuscar.focus();
+                            // Colocar cursor al final del texto
+                            var len = txtBuscar.value.length;
+                            if (txtBuscar.setSelectionRange) {
+                                txtBuscar.setSelectionRange(len, len);
+                            }
+                        }, 100);
+                    }
+                });
+            }
+        }
+
+        // Limpiar búsqueda al cerrar modal
+        function limpiarBusquedaAlCerrarModal() {
+            var txtBuscar = document.getElementById('<%= TxtBuscarProducto.ClientID %>');
+            if (txtBuscar && txtBuscar.value.trim()) {
+                // Hacer click en el botón de limpiar
+                var btnLimpiar = document.getElementById('<%= BtnLimpiarBusqueda.ClientID %>');
+                if (btnLimpiar && btnLimpiar.style.display !== 'none') {
+                    btnLimpiar.click();
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Restaurar tab activo
             restaurarTab();
 
-            // Búsqueda de productos
-            const buscar = document.getElementById('buscarProducto');
-            const tabs = document.getElementById('categoriasTabs');
+            // Inicializar mantener foco en búsqueda después de UpdatePanel
+            mantenerFocoEnBusqueda();
 
-            if (buscar) {
-                buscar.addEventListener('input', e => {
-                    const texto = e.target.value.toLowerCase();
-                    const items = document.querySelectorAll('.producto-item');
-                    const panes = document.querySelectorAll('#categoriasTabContent .tab-pane');
-
-                    if (!texto) {
-                        items.forEach(i => i.style.display = 'flex');
-                        tabs.style.display = 'flex';
-                    } else {
-                        tabs.style.display = 'none';
-                        panes.forEach(p => p.classList.add('show', 'active'));
-                        items.forEach(i => i.style.display = i.dataset.nombre.toLowerCase().includes(texto) ? 'flex' : 'none');
-                    }
-                });
+            // Agregar evento al cerrar modal de orden
+            const modalOrden = document.getElementById('modalOrden');
+            if (modalOrden) {
+                modalOrden.addEventListener('hidden.bs.modal', limpiarBusquedaAlCerrarModal);
             }
         });
     </script>
