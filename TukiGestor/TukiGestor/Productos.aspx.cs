@@ -168,20 +168,51 @@ namespace TukiGestor
         {
             try
             {
+                string nombre = txtNombre.Text.Trim();
+                string strCantidad = txtCantidad.Text.Trim();
+                string strPrecio = txtPrecio.Text.Trim();
                 int categoriaId = int.Parse(ddlCategorias.SelectedValue);
 
+                // VALIDACIONES
+                if (string.IsNullOrEmpty(nombre))
+                {
+                    MostrarMensaje("Por favor ingrese un nombre para el producto.", "warning");
+                    return;
+                }
                 if (categoriaId == 0)
                 {
-                    MostrarMensaje("Por favor seleccione una categoría", "warning");
+                    MostrarMensaje("Por favor seleccione una categoría.", "warning");
+                    return;
+                }
+                if (!int.TryParse(strCantidad, out int cantidad))
+                {
+                    MostrarMensaje("Ingrese una cantidad válida (número entero).", "warning");
+                    return;
+                }
+                if (cantidad < 0)
+                {
+                    MostrarMensaje("La cantidad no puede ser negativa.", "warning");
+                    return;
+                }
+                if (!decimal.TryParse(strPrecio, out decimal precio))
+                {
+                    MostrarMensaje("Ingrese un precio válido (número).", "warning");
+                    return;
+                }
+                if (precio < 0)
+                {
+                    MostrarMensaje("El precio no puede ser negativo.", "warning");
                     return;
                 }
 
-                Producto nuevo = new Producto();
-                nuevo.Nombre = txtNombre.Text.Trim();
-                nuevo.Stock = int.Parse(txtCantidad.Text.Trim());
-                nuevo.Precio = decimal.Parse(txtPrecio.Text.Trim());
-                nuevo.Disponible = true;
-                nuevo.CategoriaId = categoriaId;
+                Producto nuevo = new Producto
+                {
+                    Nombre = nombre,
+                    Stock = cantidad,
+                    Precio = precio,
+                    Disponible = true,
+                    CategoriaId = categoriaId
+                };
 
                 ProductoService service = new ProductoService();
                 service.Agregar(nuevo);
@@ -193,7 +224,7 @@ namespace TukiGestor
                 ddlCategorias.SelectedIndex = 0;
 
                 CargarProductos();
-                MostrarMensaje("Producto agregado correctamente", "success");
+                MostrarMensaje("Producto agregado correctamente.", "success");
             }
             catch (Exception ex)
             {
@@ -201,18 +232,53 @@ namespace TukiGestor
             }
         }
 
-        
+
+
         protected void btnActualizar_Click(object sender, EventArgs e)
         {
             try
             {
-                Producto producto = new Producto();
-                producto.ProductoId = int.Parse(hfProductoId.Value);
-                producto.Nombre = txtNombreEditar.Text.Trim();
-                producto.Stock = int.Parse(txtCantidadEditar.Text.Trim());
-                producto.Precio = decimal.Parse(txtPrecioEditar.Text.Trim());
-                producto.CategoriaId = int.Parse(ddlCategoriasEditar.SelectedValue);
-                producto.Disponible = true;
+                string nombre = txtNombreEditar.Text.Trim();
+                string strCantidad = txtCantidadEditar.Text.Trim();
+                string strPrecio = txtPrecioEditar.Text.Trim();
+                int categoriaId = int.Parse(ddlCategoriasEditar.SelectedValue);
+
+                // VALIDACIONES
+                if (string.IsNullOrEmpty(nombre))
+                {
+                    MostrarMensaje("Por favor ingrese un nombre para el producto.", "warning");
+                    return;
+                }
+                if (!int.TryParse(strCantidad, out int cantidad))
+                {
+                    MostrarMensaje("Ingrese una cantidad válida (número entero).", "warning");
+                    return;
+                }
+                if (cantidad < 0)
+                {
+                    MostrarMensaje("La cantidad no puede ser negativa.", "warning");
+                    return;
+                }
+                if (!decimal.TryParse(strPrecio, out decimal precio))
+                {
+                    MostrarMensaje("Ingrese un precio válido (número).", "warning");
+                    return;
+                }
+                if (precio < 0)
+                {
+                    MostrarMensaje("El precio no puede ser negativo.", "warning");
+                    return;
+                }
+
+                Producto producto = new Producto
+                {
+                    ProductoId = int.Parse(hfProductoId.Value),
+                    Nombre = nombre,
+                    Stock = cantidad,
+                    Precio = precio,
+                    CategoriaId = categoriaId,
+                    Disponible = true
+                };
 
                 ProductoService service = new ProductoService();
                 service.Modificar(producto);
@@ -220,13 +286,14 @@ namespace TukiGestor
                 LimpiarFormularioEditar();
                 CargarProductos();
                 MostrarTab("listado");
-                MostrarMensaje("Producto actualizado correctamente", "success");
+                MostrarMensaje("Producto actualizado correctamente.", "success");
             }
             catch (Exception ex)
             {
                 MostrarMensaje("Error al actualizar producto: " + ex.Message, "error");
             }
         }
+
 
         protected void btnCancelarEditar_Click(object sender, EventArgs e)
         {
