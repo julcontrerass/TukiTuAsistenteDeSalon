@@ -115,7 +115,7 @@ namespace TukiGestor
 
         private void MostrarTab(string tab)
         {
-            // Ocultar todos los paneles
+            // ocultamos todos los paneles
             pnlListado.CssClass = "tab-pane fade";
             pnlNuevo.CssClass = "tab-pane fade";
             pnlEditar.CssClass = "tab-pane fade";
@@ -125,13 +125,13 @@ namespace TukiGestor
             pnlEditarCategoria.CssClass = "tab-pane fade";
             pnlEditarCategoria.Visible = false;
 
-            // Resetear clases de los botones
+            // reseteamos las clases de los botones
             btnTabListado.CssClass = "nav-link";
             btnTabNuevo.CssClass = "nav-link";
             btnTabCategorias.CssClass = "nav-link";
             btnTabCategoriaNueva.CssClass = "nav-link";
 
-            // Mostrar el panel correspondiente
+            // mostramos el panel correspondiente
             switch (tab)
             {
                 case "listado":
@@ -243,10 +243,17 @@ namespace TukiGestor
             ddlCategoriasEditar.SelectedIndex = 0;
         }
 
-        
+
         protected void RepeaterProductos_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            if (e.CommandName == "Eliminar")
+            if (e.CommandName == "ConfirmarEliminarProducto")
+            {
+                hfIdEliminar.Value = e.CommandArgument.ToString();
+                hfTipoEliminar.Value = "producto";
+                lblConfirmarMensaje.Text = "¿Seguro que desea eliminar este producto?";
+                pnlConfirmarEliminar.Visible = true;
+            }
+            else if (e.CommandName == "Eliminar")
             {
                 try
                 {
@@ -291,7 +298,8 @@ namespace TukiGestor
             }
         }
 
-        
+
+
         protected void btnGuardarCategoria_Click(object sender, EventArgs e)
         {
             try
@@ -324,7 +332,14 @@ namespace TukiGestor
 
         protected void RepeaterCategorias_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            if (e.CommandName == "Eliminar")
+            if (e.CommandName == "ConfirmarEliminarCategoria")
+            {
+                hfIdEliminar.Value = e.CommandArgument.ToString();
+                hfTipoEliminar.Value = "categoria";
+                lblConfirmarMensaje.Text = "¿Seguro que desea eliminar esta categoría?";
+                pnlConfirmarEliminar.Visible = true;
+            }
+            else if (e.CommandName == "Eliminar")
             {
                 try
                 {
@@ -365,7 +380,6 @@ namespace TukiGestor
                 }
             }
         }
-
 
         protected void btnActualizarCategoria_Click(object sender, EventArgs e)
         {
@@ -410,6 +424,47 @@ namespace TukiGestor
             txtNombreCategoriaEditar.Text = "";
         }
 
+        protected void btnAceptarEliminar_Click(object sender, EventArgs e)
+        {
+            int id = int.Parse(hfIdEliminar.Value);
+            string tipo = hfTipoEliminar.Value;
 
+            if (tipo == "producto")
+            {
+                try
+                {
+                    ProductoService service = new ProductoService();
+                    service.Eliminar(id);
+                    CargarProductos();
+                    MostrarMensaje("Producto eliminado correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al eliminar producto: " + ex.Message, "error");
+                }
+            }
+            else if (tipo == "categoria")
+            {
+                try
+                {
+                    CategoriaService service = new CategoriaService();
+                    service.Eliminar(id);
+                    CargarCategorias();
+                    CargarCategoriasEditar();
+                    CargarListadoCategorias();
+                    MostrarMensaje("Categoría eliminada correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al eliminar categoría: " + ex.Message, "error");
+                }
+            }
+
+            pnlConfirmarEliminar.Visible = false;
+        }
+        protected void btnCancelarEliminar_Click(object sender, EventArgs e)
+        {
+            pnlConfirmarEliminar.Visible = false;
+        }
     }
 }

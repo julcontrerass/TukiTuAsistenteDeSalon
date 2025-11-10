@@ -138,7 +138,33 @@
             color: #856404;
             border: 1px solid #ffeaa7;
         }
-    </style>
+
+
+
+        .confirmar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(33, 33, 33, 0.8);
+            z-index: 2000;
+        }
+
+        .confirmar-box {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 25px 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        </style>
 
     <div class="productos-container">
         <div class="tabs-container">
@@ -214,20 +240,19 @@
                                             <asp:LinkButton runat="server" CssClass="btn btn-link text-warning me-2" CommandName="Editar" CommandArgument='<%# Eval("ProductoId") %>'>
                                                 <i class="bi bi-pencil-fill"></i>
                                             </asp:LinkButton>
-                                            <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="Eliminar" CommandArgument='<%# Eval("ProductoId") %>' OnClientClick="return confirm('¿Está seguro de eliminar este producto?');">
+                                            <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="ConfirmarEliminarProducto" CommandArgument='<%# Eval("ProductoId") %>'>
                                                 <i class="bi bi-trash-fill"></i>
                                             </asp:LinkButton>
                                         </td>
                                     </tr>
                                 </ItemTemplate>
                                 <FooterTemplate>
-                                    </tbody>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </FooterTemplate>
                             </asp:Repeater>
                         </asp:Panel>
-
                         <!-- nuevo producto -->
                         <asp:Panel ID="pnlNuevo" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">
@@ -251,7 +276,6 @@
                                 <asp:Button ID="btnGuardar" runat="server" Text="Guardar" CssClass="btn btn-custom mt-3" OnClick="btnGuardar_Click" />
                             </div>
                         </asp:Panel>
-
                         <!-- editar producto -->
                         <asp:Panel ID="pnlEditar" runat="server" CssClass="tab-pane fade" Visible="false">
                             <div class="p-4">
@@ -279,7 +303,6 @@
                                 </div>
                             </div>
                         </asp:Panel>
-
                         <!-- categorias -->
                         <asp:Panel ID="pnlCategorias" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">
@@ -303,7 +326,7 @@
                                                     <asp:LinkButton runat="server" CssClass="btn btn-link text-warning me-2" CommandName="EditarCategoria" CommandArgument='<%# Eval("CategoriaId") %>'>
                                                         <i class="bi bi-pencil-fill"></i>
                                                     </asp:LinkButton>
-                                                    <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="Eliminar" CommandArgument='<%# Eval("CategoriaId") %>' OnClientClick="return confirm('¿Está seguro de eliminar esta categoría?');">
+                                                    <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="ConfirmarEliminarCategoria" CommandArgument='<%# Eval("CategoriaId") %>'>
                                                         <i class="bi bi-trash-fill"></i>
                                                     </asp:LinkButton>
                                                 </td>
@@ -317,7 +340,6 @@
                                 </div>
                             </div>
                         </asp:Panel>
-
                         <!-- nueva categoria -->
                         <asp:Panel ID="pnlCategoriaNueva" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">
@@ -329,7 +351,6 @@
                                 <asp:Button ID="btnGuardarCategoria" runat="server" Text="Guardar" CssClass="btn btn-custom mt-3" OnClick="btnGuardarCategoria_Click" />
                             </div>
                         </asp:Panel>
-
                         <!-- editar categoria -->
                         <asp:Panel ID="pnlEditarCategoria" runat="server" CssClass="tab-pane fade" Visible="false">
                             <div class="p-4">
@@ -345,8 +366,19 @@
                                 </div>
                             </div>
                         </asp:Panel>
-
                     </div>
+                    <asp:Panel ID="pnlConfirmarEliminar" runat="server" CssClass="confirmar-overlay d-flex justify-content-center align-items-center" Visible="false">
+                        <div class="confirmar-box text-center">
+                            <h5 class="text-warning mb-3">Confirmar eliminación</h5>
+                            <asp:Label ID="lblConfirmarMensaje" runat="server" Text="¿Desea eliminar este elemento?"></asp:Label>
+                            <asp:HiddenField ID="hfIdEliminar" runat="server" />
+                            <asp:HiddenField ID="hfTipoEliminar" runat="server" />
+                            <div class="mt-4 d-flex justify-content-around">
+                                <asp:Button ID="btnAceptarEliminar" runat="server" Text="Eliminar" CssClass="btn btn-danger" OnClick="btnAceptarEliminar_Click" />
+                                <asp:Button ID="btnCancelarEliminar" runat="server" Text="Cancelar" CssClass="btn btn-secondary" OnClick="btnCancelarEliminar_Click" />
+                            </div>
+                       </div>
+                   </asp:Panel>
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
