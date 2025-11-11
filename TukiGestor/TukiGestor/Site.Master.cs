@@ -30,7 +30,7 @@ namespace TukiGestor
             {
                 linkMesas.Attributes["class"] = "active";
             }
-            else if (fileName.Contains("stock"))
+            else if (fileName.Contains("productos") || currentPage.Contains("/productos"))
             {
                 linkStock.Attributes["class"] = "active";
             }
