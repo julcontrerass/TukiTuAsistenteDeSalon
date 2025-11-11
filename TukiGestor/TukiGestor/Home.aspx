@@ -71,7 +71,38 @@
             color: #000;
             text-decoration: none;
         }
+
+        .reloj-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .reloj-hora {
+            font-size: 2em;
+            font-weight: 600;
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .reloj-fecha {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            text-align: center;
+        }
     </style>
+
+    <div class="reloj-container">
+        <div class="reloj-hora" id="relojHora">00:00:00</div>
+        <div class="reloj-fecha" id="relojFecha"></div>
+    </div>
+
     <div class="home-container">
         <div class="welcome-section">
             <h2>Bienvenido a tu asistente de salón</h2>
@@ -79,4 +110,32 @@
             <a href="Mesas.aspx" class="btn-primary-custom">Comenzar</a>
         </div>
     </div>
+
+    <script>
+        function actualizarReloj() {
+            const ahora = new Date();
+
+            // Formatear hora
+            const horas = String(ahora.getHours()).padStart(2, '0');
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            const segundos = String(ahora.getSeconds()).padStart(2, '0');
+
+            // Formatear fecha
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+            const diaSemana = dias[ahora.getDay()];
+            const dia = ahora.getDate();
+            const mes = meses[ahora.getMonth()];
+            const año = ahora.getFullYear();
+
+            // Actualizar elementos
+            document.getElementById('relojHora').textContent = `${horas}:${minutos}:${segundos}`;
+            document.getElementById('relojFecha').textContent = `${diaSemana}, ${dia} de ${mes} de ${año}`;
+        }
+
+        // Actualizar reloj cada segundo
+        actualizarReloj();
+        setInterval(actualizarReloj, 1000);
+    </script>
 </asp:Content>
