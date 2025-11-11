@@ -52,7 +52,6 @@ CREATE TABLE [dbo].[MESA](
 	[NumeroMesa] [varchar](50) NULL,
 	[Ubicacion] [varchar](50) NULL,
 	[Estado] [varchar](50) NULL,
-	[Activa] [bit] NOT NULL,
 CONSTRAINT [PK_MESA] PRIMARY KEY CLUSTERED
 (
 	[MesaId] ASC
@@ -192,26 +191,26 @@ VALUES
 ('Luis', 'Fernandez', 1, 5);
 GO
 
-INSERT INTO MESA (NumeroMesa, Ubicacion, Estado, Activa)
+INSERT INTO MESA (NumeroMesa, Ubicacion, Estado)
 VALUES
-('1', 'salon', 'libre', 1),
-('2', 'salon', 'libre', 1),
-('3', 'salon', 'libre', 1),
-('4', 'salon', 'libre', 1),
-('5', 'salon', 'libre', 1),
-('6', 'salon', 'libre', 1),
-('7', 'salon', 'libre', 1),
-('8', 'salon', 'libre', 1);
+('1', 'salon', 'libre'),
+('2', 'salon', 'libre'),
+('3', 'salon', 'libre'),
+('4', 'salon', 'libre'),
+('5', 'salon', 'libre'),
+('6', 'salon', 'libre'),
+('7', 'salon', 'libre'),
+('8', 'salon', 'libre');
 GO
 
-INSERT INTO MESA (NumeroMesa, Ubicacion, Estado, Activa)
+INSERT INTO MESA (NumeroMesa, Ubicacion, Estado)
 VALUES
-('1', 'patio', 'libre', 1),
-('2', 'patio', 'libre', 1),
-('3', 'patio', 'libre', 1),
-('4', 'patio', 'libre', 1),
-('5', 'patio', 'libre', 1),
-('6', 'patio', 'libre', 1);
+('1', 'patio', 'libre'),
+('2', 'patio', 'libre'),
+('3', 'patio', 'libre'),
+('4', 'patio', 'libre'),
+('5', 'patio', 'libre'),
+('6', 'patio', 'libre');
 GO
 
 -- ============================================

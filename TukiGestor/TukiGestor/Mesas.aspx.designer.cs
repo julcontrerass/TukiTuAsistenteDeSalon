@@ -87,6 +87,15 @@ namespace TukiGestor
         protected global::System.Web.UI.WebControls.LinkButton LnkAbrirMostrador;
 
         /// <summary>
+        /// Control RepOrdenesMostrador.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater RepOrdenesMostrador;
+
+        /// <summary>
         /// Control LitNumeroMesaModal.
         /// </summary>
         /// <remarks>
@@ -193,6 +202,51 @@ namespace TukiGestor
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField HdnMesaUbicacionEliminar;
+
+        /// <summary>
+        /// Control HdnProductosOrden.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField HdnProductosOrden;
+
+        /// <summary>
+        /// Control HdnPedidoIdActual.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField HdnPedidoIdActual;
+
+        /// <summary>
+        /// Control BtnConfirmarOrdenHidden.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button BtnConfirmarOrdenHidden;
+
+        /// <summary>
+        /// Control BtnRealizarPagoHidden.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button BtnRealizarPagoHidden;
+
+        /// <summary>
+        /// Control BtnCancelarOrdenHidden.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button BtnCancelarOrdenHidden;
 
         /// <summary>
         /// Control BtnConfirmarEliminar.

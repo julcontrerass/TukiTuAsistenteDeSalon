@@ -5,13 +5,14 @@
         .mesas-container {
             position: fixed;
             left: calc(50vw + 140px);
-            top: 40px;
             transform: translateX(-50%);
+            top: 40px;
             z-index: 100;
-            width: 90%;
+            min-width: 80%;
             max-width: 1400px;
             padding: 20px;
             padding-bottom: 120px;
+            min-height: 80vh;
         }
 
         .sidebar.collapsed ~ .main-wrapper .mesas-container {
@@ -23,11 +24,12 @@
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            min-height: 80vh;
         }
 
         .nav-tabs {
             border-bottom: 2px solid #E7D9C2;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
 
         .nav-tabs .nav-link {
@@ -48,6 +50,39 @@
             background-color: #E7D9C2;
             color: #333;
             border: none;
+        }
+
+        .tab-pane {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            max-height: calc(80vh - 150px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .tab-pane.active.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Estilos para el scrollbar */
+        .tab-pane::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tab-pane::-webkit-scrollbar-track {
+            background: #F6EFE0;
+            border-radius: 10px;
+        }
+
+        .tab-pane::-webkit-scrollbar-thumb {
+            background: #E7D9C2;
+            border-radius: 10px;
+        }
+
+        .tab-pane::-webkit-scrollbar-thumb:hover {
+            background: #d4c5ae;
         }
 
         .section-header {
@@ -73,6 +108,27 @@
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
+            max-height: calc(80vh - 250px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .mesas-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .mesas-grid::-webkit-scrollbar-track {
+            background: #F6EFE0;
+            border-radius: 10px;
+        }
+
+        .mesas-grid::-webkit-scrollbar-thumb {
+            background: #E7D9C2;
+            border-radius: 10px;
+        }
+
+        .mesas-grid::-webkit-scrollbar-thumb:hover {
+            background: #d4c5ae;
         }
 
         .mesa-card {
@@ -415,7 +471,6 @@
             font-size: 18px;
         }
 
-        /* Estilos para botones generales */
         .btn-success:active {
             background-color: #1e7e34;
             border-color: #1c7430;
@@ -426,12 +481,33 @@
             border-color: #545b62;
         }
 
-        /* Estilos para ordenes del mostrador */
         #ordenes-mostrador-container {
             margin-top: 20px;
+            max-height: calc(80vh - 250px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        #ordenes-mostrador-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #ordenes-mostrador-container::-webkit-scrollbar-track {
+            background: #F6EFE0;
+            border-radius: 10px;
+        }
+
+        #ordenes-mostrador-container::-webkit-scrollbar-thumb {
+            background: #E7D9C2;
+            border-radius: 10px;
+        }
+
+        #ordenes-mostrador-container::-webkit-scrollbar-thumb:hover {
+            background: #d4c5ae;
         }
 
         .orden-mostrador-card {
+            display: block;
             background: #F6EFE0;
             border: 2px solid #E7D9C2;
             border-radius: 12px;
@@ -440,11 +516,15 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: inherit;
         }
 
         .orden-mostrador-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: inherit;
         }
 
         .orden-mostrador-header {
@@ -794,10 +874,13 @@
                                         <div class="mesa-number"><%# Eval("NumeroMesa") %></div>
                                         <i class="bi bi-octagon-fill mesa-icon"></i>
                                     </asp:LinkButton>
-                                    <button type="button" class="delete-btn"
-                                        onclick='abrirModalEliminar(<%# Eval("MesaId") %>, "<%# Eval("NumeroMesa") %>", "salon")'>
+                                    <asp:LinkButton ID="LnkEliminarMesa" runat="server"
+                                        CssClass="delete-btn"
+                                        CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") + "|salon" %>'
+                                        OnClick="AbrirModalEliminarMesa_Click"
+                                        OnClientClick="event.stopPropagation();">
                                         <i class="bi bi-x"></i>
-                                    </button>
+                                    </asp:LinkButton>
                                 </div>
                             </ItemTemplate>
                         </asp:Repeater>
@@ -824,10 +907,13 @@
                                         <div class="mesa-number"><%# Eval("NumeroMesa") %></div>
                                         <i class="bi bi-octagon-fill mesa-icon"></i>
                                     </asp:LinkButton>
-                                    <button type="button" class="delete-btn"
-                                        onclick='abrirModalEliminar(<%# Eval("MesaId") %>, "<%# Eval("NumeroMesa") %>", "patio")'>
+                                    <asp:LinkButton ID="LnkEliminarMesa" runat="server"
+                                        CssClass="delete-btn"
+                                        CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") + "|patio" %>'
+                                        OnClick="AbrirModalEliminarMesa_Click"
+                                        OnClientClick="event.stopPropagation();">
                                         <i class="bi bi-x"></i>
-                                    </button>
+                                    </asp:LinkButton>
                                 </div>
                             </ItemTemplate>
                         </asp:Repeater>
@@ -849,7 +935,29 @@
                         </div>
                     </div>
                     <div id="ordenes-mostrador-container">
-                        <!-- Ordenes del mostrador se renderizaran aqui -->
+                        <asp:Repeater ID="RepOrdenesMostrador" runat="server">
+                            <ItemTemplate>
+                                <asp:LinkButton ID="LnkOrden" runat="server"
+                                    CssClass="orden-mostrador-card"
+                                    CommandArgument='<%# Eval("PedidoId") + "|" + Eval("NumeroMesa") + "|" + Eval("Ubicacion") %>'
+                                    OnClick="SeleccionarOrdenMostrador_Click">
+                                    <div class="orden-mostrador-header">
+                                        <div>
+                                            <div class="orden-mostrador-id">Orden #<%# Eval("PedidoId") %></div>
+                                            <div class="orden-mostrador-fecha"><%# ((DateTime)Eval("FechaPedido")).ToString("dd/MM/yyyy HH:mm") %></div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-weight: 600; color: #666;"><%# Eval("Ubicacion").ToString().ToUpper() %></div>
+                                            <%# (bool)Eval("MostrarMesa") ? "<div style='font-size: 14px; color: #999;'>Mesa: " + Eval("NumeroMesa") + "</div>" : "" %>
+                                        </div>
+                                    </div>
+                                    <div class="orden-mostrador-productos">
+                                        <%# GenerarDetallesOrden((int)Eval("PedidoId")) %>
+                                    </div>
+                                    <div class="orden-mostrador-total">Total: $<%# ((decimal)Eval("Total")).ToString("N0") %></div>
+                                </asp:LinkButton>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </div>
                 </div>
             </div>
@@ -997,17 +1105,33 @@
     </div>
 
     <!-- Modal Resumen y Pago -->
-    <div class="modal fade" id="modalResumenPago" tabindex="-1" aria-labelledby="modalResumenPagoLabel" aria-hidden="true">
+    <div class="modal fade" id="modalResumenPago" tabindex="-1" aria-labelledby="modalResumenPagoLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalResumenPagoLabel">
-                        <i class="bi bi-receipt-cutoff"></i> Resumen de la Cuenta - Mesa <span id="modal-resumen-mesa-numero"></span>
+                        <i class="bi bi-receipt-cutoff"></i> Orden #<span id="modal-numero-orden"></span> - Mesa <span id="modal-resumen-mesa-numero"></span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="resumen-completo" id="resumenCompleto">
+                    <!-- Información de la orden -->
+                    <div class="orden-info mb-3" style="background: #F6EFE0; padding: 15px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="color: #666;">Fecha:</span>
+                            <span id="modal-fecha-orden" style="font-weight: 600;"></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">Mesa:</span>
+                            <span id="modal-ubicacion-mesa" style="font-weight: 600;"></span>
+                        </div>
+                    </div>
+
+                    <!-- Lista de productos -->
+                    <h6 style="color: #333; font-weight: bold; margin-bottom: 15px;">
+                        <i class="bi bi-cart-check"></i> Productos
+                    </h6>
+                    <div class="resumen-completo" id="resumenCompleto" style="max-height: 300px; overflow-y: auto;">
                         <!-- Se llenara con JavaScript -->
                     </div>
 
@@ -1019,17 +1143,17 @@
                     </div>
 
                     <div class="d-flex flex-column gap-3 mt-4">
+                        <button type="button" class="btn btn-warning w-100 py-3" style="font-weight: 600; font-size: 16px;" onclick="agregarMasProductos()">
+                            <i class="bi bi-plus-circle"></i> Agregar Mas Productos
+                        </button>
                         <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-warning flex-fill py-3" style="font-weight: 600; font-size: 16px;" onclick="agregarMasProductos()">
-                                <i class="bi bi-plus-circle"></i> Agregar Productos
+                            <button type="button" class="btn btn-danger flex-fill py-3" style="font-weight: 600; font-size: 16px;"
+                                onclick="if (confirm('¿Estás seguro de que deseas cancelar esta orden? Se perderán todos los productos.')) { <%= Page.ClientScript.GetPostBackEventReference(BtnCancelarOrdenHidden, "") %>; }">
+                                <i class="bi bi-trash"></i> Cancelar Orden
                             </button>
-                        </div>
-                        <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-success flex-fill py-3" style="font-weight: 600; font-size: 16px;" onclick="procesarPago()">
-                                <i class="bi bi-cash-coin"></i> Procesar Pago
-                            </button>
-                            <button type="button" class="btn btn-secondary flex-fill py-3" style="font-weight: 600; font-size: 16px;" data-bs-dismiss="modal">
-                                <i class="bi bi-x-circle"></i> Cancelar
+                            <button type="button" class="btn btn-success flex-fill py-3" style="font-weight: 600; font-size: 16px;"
+                                onclick="<%= Page.ClientScript.GetPostBackEventReference(BtnRealizarPagoHidden, "") %>">
+                                <i class="bi bi-cash-coin"></i> Realizar Pago
                             </button>
                         </div>
                     </div>
@@ -1044,7 +1168,7 @@
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="modalEliminarMesaLabel">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Eliminación
+                        <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Eliminacion
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -1055,6 +1179,11 @@
                     <asp:HiddenField ID="HdnMesaIdEliminar" runat="server" />
                     <asp:HiddenField ID="HdnMesaNumeroEliminar" runat="server" />
                     <asp:HiddenField ID="HdnMesaUbicacionEliminar" runat="server" />
+                    <asp:HiddenField ID="HdnProductosOrden" runat="server" />
+                    <asp:HiddenField ID="HdnPedidoIdActual" runat="server" />
+                    <asp:Button ID="BtnConfirmarOrdenHidden" runat="server" Style="display:none;" OnClick="ConfirmarOrden_Click" />
+                    <asp:Button ID="BtnRealizarPagoHidden" runat="server" Style="display:none;" OnClick="RealizarPago_Click" />
+                    <asp:Button ID="BtnCancelarOrdenHidden" runat="server" Style="display:none;" OnClick="CancelarOrden_Click" />
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
@@ -1095,9 +1224,14 @@
             const resumenDiv = document.getElementById('resumenOrden');
             const totalSpan = document.getElementById('totalOrden');
 
-            // Obtener todos los productos con cantidad > 0
+            // Verificar si hay productos existentes (cuando estamos agregando más productos)
+            const tieneExistentes = resumenDiv && resumenDiv.getAttribute('data-tiene-existentes') === 'true';
+            const productosExistentes = window.productosExistentesOrden || [];
+            const totalExistente = window.totalExistenteOrden || 0;
+
+            // Obtener todos los productos NUEVOS con cantidad > 0
             const todosProductos = document.querySelectorAll('.producto-item');
-            const productosSeleccionados = [];
+            const productosNuevos = [];
 
             todosProductos.forEach(producto => {
                 const input = producto.querySelector('input[type="number"]');
@@ -1108,7 +1242,7 @@
                     const precio = parseFloat(producto.getAttribute('data-precio'));
                     const productoId = producto.getAttribute('data-productoid');
 
-                    productosSeleccionados.push({
+                    productosNuevos.push({
                         id: productoId,
                         nombre: nombre,
                         precio: precio,
@@ -1118,64 +1252,98 @@
                 }
             });
 
-            // Actualizar HTML del resumen
-            if (productosSeleccionados.length === 0) {
-                resumenDiv.innerHTML = '<p style="color: #999; font-style: italic;">No hay productos seleccionados</p>';
-                totalSpan.textContent = '$0';
-            } else {
-                let html = '<div style="max-height: 200px; overflow-y: auto;">';
-                let total = 0;
+            // Construir HTML del resumen
+            let html = '';
+            let total = 0;
 
-                productosSeleccionados.forEach(prod => {
+            // Si hay productos existentes, mostrarlos primero
+            if (tieneExistentes && productosExistentes.length > 0) {
+                productosExistentes.forEach(prod => {
                     total += prod.subtotal;
                     html += `
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                            <div>
-                                <strong>${prod.nombre}</strong>
-                                <span style="color: #666; font-size: 14px;"> x${prod.cantidad}</span>
+                        <div class="resumen-item" data-tipo="existente">
+                            <div class="resumen-item-info">
+                                <div class="resumen-item-nombre">${prod.nombre}</div>
+                                <div class="resumen-item-cantidad">Cantidad: ${prod.cantidad} x $${prod.precio.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
                             </div>
-                            <div style="font-weight: 600;">$${prod.subtotal.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
+                            <div class="resumen-item-precio">$${prod.subtotal.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
                         </div>
                     `;
                 });
+            }
 
-                html += '</div>';
+            // Agregar productos nuevos
+            if (productosNuevos.length > 0) {
+                productosNuevos.forEach(prod => {
+                    total += prod.subtotal;
+                    html += `
+                        <div class="resumen-item" data-tipo="nuevo">
+                            <div class="resumen-item-info">
+                                <div class="resumen-item-nombre">${prod.nombre}</div>
+                                <div class="resumen-item-cantidad">Cantidad: ${prod.cantidad} x $${prod.precio.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
+                            </div>
+                            <div class="resumen-item-precio">$${prod.subtotal.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Actualizar HTML del resumen
+            if (html === '') {
+                resumenDiv.innerHTML = '<p style="color: #999; font-style: italic;">No hay productos seleccionados</p>';
+                totalSpan.textContent = '$0';
+            } else {
                 resumenDiv.innerHTML = html;
                 totalSpan.textContent = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0});
             }
         }
 
-        // Confirmar orden
+        // Confirmar orden - Recolectar datos y enviar al servidor
         function confirmarOrden() {
             const todosProductos = document.querySelectorAll('.producto-item');
-            let hayProductos = false;
+            const productosSeleccionados = [];
 
             todosProductos.forEach(producto => {
                 const input = producto.querySelector('input[type="number"]');
                 const cantidad = parseInt(input.value) || 0;
+
                 if (cantidad > 0) {
-                    hayProductos = true;
+                    const productoId = producto.getAttribute('data-productoid');
+                    const precio = parseFloat(producto.getAttribute('data-precio'));
+                    const nombre = producto.getAttribute('data-nombre');
+
+                    productosSeleccionados.push({
+                        ProductoId: parseInt(productoId),
+                        Cantidad: cantidad,
+                        PrecioUnitario: precio,
+                        Nombre: nombre
+                    });
                 }
             });
 
-            if (!hayProductos) {
+            if (productosSeleccionados.length === 0) {
                 alert('Por favor selecciona al menos un producto');
                 return;
             }
 
-            // TODO: Aquí se debe guardar el pedido en la base de datos
-            alert('Funcionalidad de confirmar orden pendiente de implementar');
+            // Guardar productos en HiddenField y hacer PostBack
+            document.getElementById('<%= HdnProductosOrden.ClientID %>').value = JSON.stringify(productosSeleccionados);
+            <%= Page.ClientScript.GetPostBackEventReference(BtnConfirmarOrdenHidden, "") %>;
         }
 
-        function abrirModalEliminar(mesaId, numeroMesa, ubicacion) {
-            document.getElementById('<%= HdnMesaIdEliminar.ClientID %>').value = mesaId;
-            document.getElementById('<%= HdnMesaNumeroEliminar.ClientID %>').value = numeroMesa;
-            document.getElementById('<%= HdnMesaUbicacionEliminar.ClientID %>').value = ubicacion;
+        // Agregar mas productos - vuelve al modal de orden
+        function agregarMasProductos() {
+            const modalResumen = bootstrap.Modal.getInstance(document.getElementById('modalResumenPago'));
+            if (modalResumen) {
+                modalResumen.hide();
+            }
 
-            document.getElementById('modalEliminarNumero').textContent = numeroMesa;
-
-            var modal = new bootstrap.Modal(document.getElementById('modalEliminarMesa'));
-            modal.show();
+            setTimeout(function() {
+                var numeroMesa = document.getElementById('modal-resumen-mesa-numero').textContent;
+                document.getElementById('modal-orden-mesa-numero').textContent = numeroMesa;
+                const modalOrden = new bootstrap.Modal(document.getElementById('modalOrden'));
+                modalOrden.show();
+            }, 300);
         }
 
         function guardarTab(tab) {

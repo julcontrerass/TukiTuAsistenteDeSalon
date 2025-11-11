@@ -14,5 +14,6 @@ namespace dominio
         public bool EstadoPedido { get; set; }
         public decimal Total { get; set; }
         public int AsignacionId { get; set; }
+        public bool EsMostrador { get; set; }
     }
 }

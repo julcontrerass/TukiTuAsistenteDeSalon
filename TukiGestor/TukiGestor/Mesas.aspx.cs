@@ -14,6 +14,8 @@ namespace TukiGestor
         private MesaService mesaService = new MesaService();
         private ProductoService productoService = new ProductoService();
         private CategoriaService categoriaService = new CategoriaService();
+        private PedidoService pedidoService = new PedidoService();
+        private AsignacionMesaService asignacionService = new AsignacionMesaService();
 
         // Listas públicas para binding
         public List<Categoria> Categorias { get; set; }
@@ -51,6 +53,7 @@ namespace TukiGestor
             // Esto asegura que los datos estén actualizados en todo momento
             CargarMesasEnRepeaters();
             CargarCategoriasYProductos();
+            CargarOrdenesActivas();
 
             // Manejar mensajes del patrón Post-Redirect-Get
             if (!IsPostBack && Session["MensajeExito"] != null)
@@ -64,6 +67,109 @@ namespace TukiGestor
             {
                 HdnTabActivo.Value = Session["TabActivo"].ToString();
                 Session.Remove("TabActivo");
+            }
+
+            // Abrir modal de orden si se acaba de abrir una mesa
+            if (!IsPostBack && Session["MesaAbrir"] != null)
+            {
+                string numeroMesa = Session["MesaAbrir"].ToString();
+                Session.Remove("MesaAbrir");
+                AbrirModalOrden(numeroMesa);
+            }
+        }
+
+        private void CargarOrdenesActivas()
+        {
+            try
+            {
+                // Obtener todas las órdenes activas
+                List<Pedido> ordenesActivas = pedidoService.ObtenerPedidosActivos();
+
+                // Filtrar SOLO las órdenes de mostrador (EsMostrador = true)
+                var ordenesParaMostrador = new List<object>();
+
+                foreach (var orden in ordenesActivas)
+                {
+                    // SOLO agregar si es orden de mostrador
+                    if (orden.EsMostrador)
+                    {
+                        ordenesParaMostrador.Add(new
+                        {
+                            PedidoId = orden.PedidoId,
+                            FechaPedido = orden.FechaPedido,
+                            Ubicacion = "Mostrador",
+                            NumeroMesa = "N/A",
+                            Total = orden.Total,
+                            MostrarMesa = false
+                        });
+                    }
+                }
+
+                RepOrdenesMostrador.DataSource = ordenesParaMostrador;
+                RepOrdenesMostrador.DataBind();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cargar ordenes: " + ex.Message, "danger");
+            }
+        }
+
+        protected string GenerarDetallesOrden(int pedidoId)
+        {
+            try
+            {
+                List<DetallePedido> detalles = pedidoService.ObtenerDetallesPedido(pedidoId);
+                System.Text.StringBuilder html = new System.Text.StringBuilder();
+
+                foreach (var detalle in detalles)
+                {
+                    html.AppendFormat(@"
+                        <div class='orden-mostrador-producto'>
+                            <span>{0} x {1}</span>
+                            <span>${2:N0}</span>
+                        </div>",
+                        detalle.Cantidad,
+                        detalle.NombreProducto,
+                        detalle.Subtotal
+                    );
+                }
+
+                return html.ToString();
+            }
+            catch
+            {
+                return "<p>Error al cargar detalles</p>";
+            }
+        }
+
+        protected void SeleccionarOrdenMostrador_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                LinkButton btn = (LinkButton)sender;
+                string[] args = btn.CommandArgument.Split('|');
+                int pedidoId = int.Parse(args[0]);
+                string numeroMesa = args[1];
+                string ubicacion = args[2];
+
+                // LIMPIAR ViewState antes de establecer nuevos valores para evitar contaminacion cruzada
+                LimpiarViewState();
+
+                // Establecer contexto de mostrador
+                ViewState["EsMostrador"] = true;
+                ViewState["MesaIdSeleccionada"] = null;
+                ViewState["NumeroMesaSeleccionada"] = "Mostrador";
+                ViewState["UbicacionSeleccionada"] = "mostrador";
+
+                // Guardar tab activo
+                HdnTabActivo.Value = "mostrador";
+
+                // Mostrar resumen del pedido
+                MostrarResumenPedido(pedidoId, numeroMesa, ubicacion);
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al seleccionar orden: " + ex.Message, "danger");
             }
         }
 
@@ -87,6 +193,29 @@ namespace TukiGestor
             }
         }
 
+        private void CargarMesasPorUbicacion(string ubicacion)
+        {
+            try
+            {
+                List<Mesa> mesas = mesaService.ListarMesasPorUbicacion(ubicacion);
+
+                if (ubicacion == "salon")
+                {
+                    RepMesasSalon.DataSource = mesas;
+                    RepMesasSalon.DataBind();
+                }
+                else if (ubicacion == "patio")
+                {
+                    RepMesasPatio.DataSource = mesas;
+                    RepMesasPatio.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al actualizar las mesas: " + ex.Message, "danger");
+            }
+        }
+
         private void CargarCategoriasYProductos()
         {
             try
@@ -107,7 +236,7 @@ namespace TukiGestor
             }
             catch (Exception ex)
             {
-                MostrarMensaje("Error al cargar productos y categorías: " + ex.Message, "danger");
+                MostrarMensaje("Error al cargar productos y categorias: " + ex.Message, "danger");
             }
         }
 
@@ -158,11 +287,15 @@ namespace TukiGestor
                 string ubicacion = args[2];
                 string estado = args[3];
 
+                // LIMPIAR ViewState antes de establecer nuevos valores para evitar contaminacion cruzada
+                LimpiarViewState();
+
                 // Guardar información en ViewState para usar en otros métodos
                 ViewState["MesaIdSeleccionada"] = mesaId;
                 ViewState["NumeroMesaSeleccionada"] = numeroMesa;
                 ViewState["UbicacionSeleccionada"] = ubicacion;
                 ViewState["EstadoMesaSeleccionada"] = estado;
+                ViewState["EsMostrador"] = false;
 
                 // Guardar tab activo
                 HdnTabActivo.Value = ubicacion;
@@ -185,8 +318,30 @@ namespace TukiGestor
                 }
                 else
                 {
-                    // Si está ocupada, abrir modal de orden directamente
-                    AbrirModalOrden(numeroMesa);
+                    // Si está ocupada, verificar si tiene un pedido activo
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorMesa(mesaId);
+                    if (asignacion != null)
+                    {
+                        // Buscar pedido activo para esta asignacion
+                        List<Pedido> pedidos = pedidoService.ObtenerPedidosActivos();
+                        Pedido pedidoActivo = pedidos.FirstOrDefault(p => p.AsignacionId == asignacion.AsignacionId);
+
+                        if (pedidoActivo != null)
+                        {
+                            // Tiene pedido activo, mostrar resumen
+                            MostrarResumenPedido(pedidoActivo.PedidoId, numeroMesa, ubicacion);
+                        }
+                        else
+                        {
+                            // No tiene pedido, abrir modal de orden para agregar productos
+                            AbrirModalOrden(numeroMesa);
+                        }
+                    }
+                    else
+                    {
+                        // No tiene asignacion activa, abrir modal de orden para agregar productos
+                        AbrirModalOrden(numeroMesa);
+                    }
                 }
             }
             catch (Exception ex)
@@ -221,6 +376,9 @@ namespace TukiGestor
                 int cantidadPersonas = int.Parse(TxtCantidadPersonas.Text);
                 int meseroId = int.Parse(DdlCamarero.SelectedValue);
 
+                // Guardar meseroId en ViewState para usarlo después
+                ViewState["MeseroIdSeleccionado"] = meseroId;
+
                 // Mantener tab activo
                 HdnTabActivo.Value = ubicacion;
 
@@ -230,9 +388,14 @@ namespace TukiGestor
                 // TODO: Aquí debería crear la asignación de mesa y el pedido en la BD
                 // Por ahora solo actualizamos el estado de la mesa
 
-                // Después de abrir la mesa, ir directo al modal de orden
-                MostrarMensaje("Mesa " + numeroMesa + " abierta exitosamente.", "success");
-                AbrirModalOrden(numeroMesa);
+                // Guardar datos en Session para el patrón Post-Redirect-Get
+                Session["TabActivo"] = ubicacion;
+                Session["MesaAbrir"] = numeroMesa;
+                Session["MensajeExito"] = "Mesa " + numeroMesa + " abierta exitosamente.";
+
+                // Redireccionar para evitar el problema de reenvío de formulario
+                Response.Redirect(Request.Url.AbsolutePath, false);
+                Context.ApplicationInstance.CompleteRequest();
             }
             catch (Exception ex)
             {
@@ -254,16 +417,141 @@ namespace TukiGestor
 
         private void AbrirModalOrden(string numeroMesa)
         {
-            // TODO: Aquí se debería configurar el modal de orden con los productos
-            // Por ahora solo abrimos el modal
+            // Abrir modal de orden para una NUEVA orden (no agregar más productos)
             string script = $@"
                 setTimeout(function() {{
+                    // Restaurar tab activo
+                    restaurarTab();
+
+                    // Limpiar variables globales de productos existentes
+                    window.productosExistentesOrden = [];
+                    window.totalExistenteOrden = 0;
+
+                    // Limpiar atributo de tiene-existentes
+                    var resumenOrden = document.getElementById('resumenOrden');
+                    if (resumenOrden) {{
+                        resumenOrden.removeAttribute('data-tiene-existentes');
+                        resumenOrden.innerHTML = '<p style=""color: #999; font-style: italic;"">No hay productos seleccionados</p>';
+                    }}
+
+                    // Limpiar total
+                    var totalOrden = document.getElementById('totalOrden');
+                    if (totalOrden) {{
+                        totalOrden.textContent = '$0';
+                    }}
+
+                    // Limpiar todas las cantidades de productos
+                    document.querySelectorAll('.producto-item input[type=""number""]').forEach(function(input) {{
+                        input.value = 0;
+                    }});
+
+                    // Abrir modal de orden
                     document.getElementById('modal-orden-mesa-numero').textContent = '{numeroMesa}';
                     var modal = new bootstrap.Modal(document.getElementById('modalOrden'));
                     modal.show();
                 }}, 100);
             ";
             ClientScript.RegisterStartupScript(this.GetType(), "AbrirModalOrden", script, true);
+        }
+
+        private void MostrarResumenPedido(int pedidoId, string numeroMesa, string ubicacion)
+        {
+            try
+            {
+                // Obtener el pedido
+                Pedido pedido = pedidoService.ObtenerPedidoPorId(pedidoId);
+                if (pedido == null)
+                {
+                    MostrarMensaje("No se encontro el pedido.", "warning");
+                    return;
+                }
+
+                // Obtener los detalles del pedido
+                List<DetallePedido> detalles = pedidoService.ObtenerDetallesPedido(pedidoId);
+
+                // Guardar pedidoId en HiddenField
+                HdnPedidoIdActual.Value = pedidoId.ToString();
+
+                // Generar HTML con los productos
+                System.Text.StringBuilder htmlProductos = new System.Text.StringBuilder();
+                foreach (var detalle in detalles)
+                {
+                    decimal subtotal = detalle.Cantidad * detalle.PrecioUnitario;
+                    htmlProductos.AppendFormat(@"
+                        <div class='resumen-item'>
+                            <div class='resumen-item-info'>
+                                <div class='resumen-item-nombre'>{0}</div>
+                                <div class='resumen-item-cantidad'>Cantidad: {1} x ${2:N0}</div>
+                            </div>
+                            <div class='resumen-item-precio'>${3:N0}</div>
+                        </div>",
+                        detalle.NombreProducto,
+                        detalle.Cantidad,
+                        detalle.PrecioUnitario,
+                        subtotal
+                    );
+                }
+
+                // Abrir el modal con JavaScript
+                string script = $@"
+                    setTimeout(function() {{
+                        // Restaurar tab activo
+                        restaurarTab();
+
+                        // Establecer datos del modal
+                        document.getElementById('modal-numero-orden').textContent = '{pedidoId}';
+                        document.getElementById('modal-resumen-mesa-numero').textContent = '{numeroMesa}';
+                        document.getElementById('modal-ubicacion-mesa').textContent = '{ubicacion.ToUpper()} - Mesa {numeroMesa}';
+                        document.getElementById('modal-fecha-orden').textContent = '{pedido.FechaPedido.ToString("dd/MM/yyyy HH:mm")}';
+                        document.getElementById('resumenCompleto').innerHTML = `{htmlProductos.ToString()}`;
+                        document.getElementById('totalPagar').textContent = '${pedido.Total:N0}';
+
+                        // Abrir modal de resumen
+                        var modal = new bootstrap.Modal(document.getElementById('modalResumenPago'));
+                        modal.show();
+                    }}, 100);
+                ";
+                ClientScript.RegisterStartupScript(this.GetType(), "MostrarResumenPedido", script, true);
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al mostrar el resumen del pedido: " + ex.Message, "danger");
+            }
+        }
+
+        protected void AbrirModalEliminarMesa_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                LinkButton btn = (LinkButton)sender;
+                string[] args = btn.CommandArgument.Split('|');
+                int mesaId = int.Parse(args[0]);
+                string numeroMesa = args[1];
+                string ubicacion = args[2];
+
+                // Guardar datos en HiddenFields
+                HdnMesaIdEliminar.Value = mesaId.ToString();
+                HdnMesaNumeroEliminar.Value = numeroMesa;
+                HdnMesaUbicacionEliminar.Value = ubicacion;
+
+                // Guardar tab activo
+                HdnTabActivo.Value = ubicacion;
+
+                // Abrir modal de confirmación
+                string script = @"
+                    setTimeout(function() {
+                        restaurarTab();
+                        document.getElementById('modalEliminarNumero').textContent = '" + numeroMesa + @"';
+                        var modal = new bootstrap.Modal(document.getElementById('modalEliminarMesa'));
+                        modal.show();
+                    }, 100);
+                ";
+                ClientScript.RegisterStartupScript(this.GetType(), "AbrirModalEliminar", script, true);
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al abrir modal de eliminacion: " + ex.Message, "danger");
+            }
         }
 
         protected void AgregarMesa_Click(object sender, EventArgs e)
@@ -273,24 +561,18 @@ namespace TukiGestor
                 LinkButton btn = (LinkButton)sender;
                 string ubicacion = btn.CommandArgument;
 
-                // Obtener el próximo número de mesa para esta ubicación
-                List<Mesa> mesasExistentes = mesaService.ListarMesasPorUbicacion(ubicacion);
-                int proximoNumero = mesasExistentes.Count + 1;
-
-                // Crear nueva mesa
+                // Crear nueva mesa (el número se asigna automáticamente en el servicio)
                 Mesa nuevaMesa = new Mesa
                 {
-                    NumeroMesa = proximoNumero.ToString(),
                     Ubicacion = ubicacion,
-                    Estado = "libre",
-                    Activa = true
+                    Estado = "libre"
                 };
 
                 mesaService.AgregarMesa(nuevaMesa);
 
                 // Guardar tab activo y mensaje en Session
                 Session["TabActivo"] = ubicacion;
-                Session["MensajeExito"] = "Mesa " + proximoNumero + " agregada exitosamente en " + ubicacion + ".";
+                Session["MensajeExito"] = "Mesa agregada exitosamente en " + ubicacion + ".";
 
                 // Redirigir a URL limpia para evitar reenvío de formulario
                 Response.Redirect(Request.Url.AbsolutePath, false);
@@ -441,6 +723,9 @@ namespace TukiGestor
         {
             try
             {
+                // LIMPIAR ViewState antes de establecer nuevos valores para evitar contaminacion cruzada
+                LimpiarViewState();
+
                 // Guardar tab activo
                 HdnTabActivo.Value = "mostrador";
 
@@ -448,6 +733,7 @@ namespace TukiGestor
                 ViewState["EsMostrador"] = true;
                 ViewState["MesaIdSeleccionada"] = null;
                 ViewState["NumeroMesaSeleccionada"] = "Mostrador";
+                ViewState["UbicacionSeleccionada"] = "mostrador";
 
                 // Abrir modal de orden
                 AbrirModalOrden("Mostrador");
@@ -463,6 +749,18 @@ namespace TukiGestor
             PanelMensaje.Visible = true;
             PanelMensaje.CssClass = "alert alert-" + tipo + " alert-dismissible fade show";
             LitMensaje.Text = mensaje;
+        }
+
+        // Metodo auxiliar para limpiar ViewState y evitar contaminacion cruzada entre secciones
+        private void LimpiarViewState()
+        {
+            ViewState["MesaIdSeleccionada"] = null;
+            ViewState["NumeroMesaSeleccionada"] = null;
+            ViewState["UbicacionSeleccionada"] = null;
+            ViewState["EstadoMesaSeleccionada"] = null;
+            ViewState["EsMostrador"] = null;
+            ViewState["MeseroIdSeleccionado"] = null;
+            HdnPedidoIdActual.Value = string.Empty;
         }
 
         protected void BuscarProducto_TextChanged(object sender, EventArgs e)
@@ -522,11 +820,11 @@ namespace TukiGestor
             }
             catch (Exception ex)
             {
-                MostrarMensaje("Error al limpiar búsqueda: " + ex.Message, "danger");
+                MostrarMensaje("Error al limpiar busqueda: " + ex.Message, "danger");
             }
         }
 
-        // Método para generar HTML de productos filtrados (búsqueda)
+        // Metodo para generar HTML de productos filtrados (busqueda)
         protected string GenerarProductosBusqueda()
         {
             if (Productos == null || Productos.Count == 0)
@@ -556,6 +854,423 @@ namespace TukiGestor
 
             html.Append("</div>");
             return html.ToString();
+        }
+
+        protected void ConfirmarOrden_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Obtener los datos del HiddenField
+                string productosJson = HdnProductosOrden.Value;
+
+                if (string.IsNullOrEmpty(productosJson))
+                {
+                    MostrarMensaje("No se recibieron productos en la orden", "warning");
+                    return;
+                }
+
+                // Deserializar el JSON a una lista de objetos
+                var productosSeleccionados = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(
+                    productosJson,
+                    new[] { new { ProductoId = 0, Cantidad = 0, PrecioUnitario = 0m, Nombre = "" } }
+                );
+
+                if (productosSeleccionados == null || productosSeleccionados.Length == 0)
+                {
+                    MostrarMensaje("No se seleccionaron productos", "warning");
+                    return;
+                }
+
+                // Calcular el total
+                decimal total = 0;
+                foreach (var producto in productosSeleccionados)
+                {
+                    total += producto.Cantidad * producto.PrecioUnitario;
+                }
+
+                int pedidoId;
+                bool esMostrador = ViewState["EsMostrador"] != null && (bool)ViewState["EsMostrador"];
+                string numeroMesa = ViewState["NumeroMesaSeleccionada"]?.ToString() ?? "Mostrador";
+                string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "mostrador";
+
+                // Verificar si es una actualización de pedido existente (agregar más productos)
+                if (!string.IsNullOrEmpty(HdnPedidoIdActual.Value))
+                {
+                    // Es una actualización - agregar productos al pedido existente
+                    pedidoId = int.Parse(HdnPedidoIdActual.Value);
+
+                    // Obtener el pedido actual para sumar al total existente
+                    Pedido pedidoActual = pedidoService.ObtenerPedidoPorId(pedidoId);
+                    decimal totalAnterior = pedidoActual.Total;
+
+                    // Agregar los nuevos detalles del pedido
+                    foreach (var producto in productosSeleccionados)
+                    {
+                        DetallePedido detalle = new DetallePedido
+                        {
+                            PedidoId = pedidoId,
+                            ProductoId = producto.ProductoId,
+                            Cantidad = producto.Cantidad,
+                            PrecioUnitario = producto.PrecioUnitario,
+                            Subtotal = producto.Cantidad * producto.PrecioUnitario
+                        };
+                        pedidoService.AgregarDetallePedido(detalle);
+                    }
+
+                    // Actualizar el total del pedido sumando el nuevo total al anterior
+                    decimal totalNuevo = totalAnterior + total;
+                    pedidoService.ActualizarTotalPedido(pedidoId, totalNuevo);
+                }
+                else
+                {
+                    // Es un pedido nuevo
+                    // Crear asignación de mesa (si no es mostrador)
+                    int asignacionId = 0;
+
+                    if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
+                    {
+                        int mesaId = (int)ViewState["MesaIdSeleccionada"];
+
+                        // Verificar si ya existe una asignación activa
+                        AsignacionMesa asignacionExistente = asignacionService.ObtenerAsignacionPorMesa(mesaId);
+
+                        if (asignacionExistente != null)
+                        {
+                            asignacionId = asignacionExistente.AsignacionId;
+                        }
+                        else
+                        {
+                            // Si no existe, crear nueva asignación (usar el mesero seleccionado previamente)
+                            int meseroId = 1; // Por defecto
+                            if (ViewState["MeseroIdSeleccionado"] != null)
+                            {
+                                meseroId = (int)ViewState["MeseroIdSeleccionado"];
+                            }
+
+                            AsignacionMesa nuevaAsignacion = new AsignacionMesa
+                            {
+                                MesaId = mesaId,
+                                MeseroId = meseroId,
+                                FechaAsignacion = DateTime.Now,
+                                Activa = true
+                            };
+
+                            asignacionId = asignacionService.CrearAsignacion(nuevaAsignacion);
+                        }
+                    }
+
+                    // Crear el pedido
+                    Pedido nuevoPedido = new Pedido
+                    {
+                        FechaPedido = DateTime.Now,
+                        EstadoPedido = true,
+                        Total = total,
+                        AsignacionId = asignacionId
+                    };
+
+                    pedidoId = pedidoService.CrearPedido(nuevoPedido);
+
+                    // Agregar los detalles del pedido
+                    foreach (var producto in productosSeleccionados)
+                    {
+                        DetallePedido detalle = new DetallePedido
+                        {
+                            PedidoId = pedidoId,
+                            ProductoId = producto.ProductoId,
+                            Cantidad = producto.Cantidad,
+                            PrecioUnitario = producto.PrecioUnitario,
+                            Subtotal = producto.Cantidad * producto.PrecioUnitario
+                        };
+                        pedidoService.AgregarDetallePedido(detalle);
+                    }
+
+                    // Si NO es mostrador, actualizar estado de la mesa a ocupada
+                    if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
+                    {
+                        int mesaId = (int)ViewState["MesaIdSeleccionada"];
+                        mesaService.ActualizarEstadoMesa(mesaId, "ocupada");
+                    }
+                }
+
+                // Guardar el pedidoId para el modal de resumen
+                HdnPedidoIdActual.Value = pedidoId.ToString();
+
+                // Limpiar el HiddenField de productos
+                HdnProductosOrden.Value = string.Empty;
+
+                // Recargar las órdenes de mostrador si es una orden de mostrador
+                if (esMostrador)
+                {
+                    CargarOrdenesActivas();
+                }
+
+                // Guardar tab activo
+                HdnTabActivo.Value = ubicacion;
+
+                // Mostrar el modal de resumen usando el método del servidor
+                MostrarResumenPedido(pedidoId, numeroMesa, ubicacion);
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al confirmar la orden: " + ex.Message, "danger");
+            }
+        }
+
+        protected void RealizarPago_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Obtener el pedidoId del HiddenField
+                if (string.IsNullOrEmpty(HdnPedidoIdActual.Value))
+                {
+                    MostrarMensaje("No se encontro el pedido", "warning");
+                    return;
+                }
+
+                int pedidoId = int.Parse(HdnPedidoIdActual.Value);
+
+                // Finalizar el pedido
+                pedidoService.FinalizarPedido(pedidoId);
+
+                // Liberar la mesa (si no es mostrador)
+                bool esMostrador = ViewState["EsMostrador"] != null && (bool)ViewState["EsMostrador"];
+                string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "mostrador";
+
+                if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
+                {
+                    int mesaId = (int)ViewState["MesaIdSeleccionada"];
+
+                    // Cambiar estado de la mesa a libre
+                    mesaService.ActualizarEstadoMesa(mesaId, "libre");
+
+                    // Desactivar la asignación
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorMesa(mesaId);
+                    if (asignacion != null)
+                    {
+                        asignacionService.DesactivarAsignacion(asignacion.AsignacionId);
+                    }
+                }
+
+                // Limpiar ViewState
+                ViewState["MesaIdSeleccionada"] = null;
+                ViewState["NumeroMesaSeleccionada"] = null;
+                ViewState["UbicacionSeleccionada"] = null;
+                ViewState["EsMostrador"] = null;
+                HdnPedidoIdActual.Value = string.Empty;
+
+                // Guardar mensaje y tab activo en Session
+                Session["TabActivo"] = ubicacion;
+                Session["MensajeExito"] = "Pago realizado exitosamente. Orden #" + pedidoId + " finalizada.";
+
+                // Redirigir para evitar reenvío de formulario
+                Response.Redirect(Request.Url.AbsolutePath, false);
+                Context.ApplicationInstance.CompleteRequest();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al procesar el pago: " + ex.Message, "danger");
+            }
+        }
+
+        protected void AgregarMasProductos_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Obtener el pedidoId del HiddenField
+                if (string.IsNullOrEmpty(HdnPedidoIdActual.Value))
+                {
+                    MostrarMensaje("No se encontro el pedido", "warning");
+                    return;
+                }
+
+                int pedidoId = int.Parse(HdnPedidoIdActual.Value);
+
+                // Obtener los detalles del pedido actual
+                List<DetallePedido> detalles = pedidoService.ObtenerDetallesPedido(pedidoId);
+
+                // Obtener el pedido para saber la mesa y reconstruir el contexto correcto
+                Pedido pedido = pedidoService.ObtenerPedidoPorId(pedidoId);
+                string numeroMesa = "Mostrador";
+                string ubicacion = "mostrador";
+
+                // Reconstruir el ViewState basado en el pedido actual para mantener el contexto correcto
+                if (pedido.EsMostrador)
+                {
+                    // Es mostrador
+                    ViewState["EsMostrador"] = true;
+                    ViewState["MesaIdSeleccionada"] = null;
+                    ViewState["NumeroMesaSeleccionada"] = "Mostrador";
+                    ViewState["UbicacionSeleccionada"] = "mostrador";
+                    numeroMesa = "Mostrador";
+                    ubicacion = "mostrador";
+                }
+                else if (pedido.AsignacionId > 0)
+                {
+                    // Es una mesa
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionId);
+                    if (asignacion != null)
+                    {
+                        Mesa mesa = mesaService.ObtenerMesaPorId(asignacion.MesaId);
+                        if (mesa != null)
+                        {
+                            numeroMesa = mesa.NumeroMesa;
+                            ubicacion = mesa.Ubicacion;
+
+                            // Establecer ViewState para mantener contexto
+                            ViewState["EsMostrador"] = false;
+                            ViewState["MesaIdSeleccionada"] = mesa.MesaId;
+                            ViewState["NumeroMesaSeleccionada"] = mesa.NumeroMesa;
+                            ViewState["UbicacionSeleccionada"] = mesa.Ubicacion;
+                        }
+                    }
+                }
+
+                // Guardar tab activo
+                HdnTabActivo.Value = ubicacion;
+
+                // Generar JavaScript para abrir modal
+                // IMPORTANTE: Mostrar productos existentes en el RESUMEN DE LA ORDEN
+                System.Text.StringBuilder scriptProductos = new System.Text.StringBuilder();
+                scriptProductos.Append("setTimeout(function() {");
+                scriptProductos.Append("restaurarTab();");
+
+                // Limpiar todos los inputs (ponerlos en 0) para agregar solo productos NUEVOS
+                scriptProductos.Append(@"
+                    document.querySelectorAll('.producto-item input[type=""number""]').forEach(function(input) {
+                        input.value = 0;
+                    });
+                ");
+
+                // Construir HTML del resumen con productos existentes Y datos JSON para JavaScript
+                System.Text.StringBuilder htmlResumen = new System.Text.StringBuilder();
+                System.Text.StringBuilder jsonProductosExistentes = new System.Text.StringBuilder();
+                jsonProductosExistentes.Append("[");
+                decimal totalExistente = 0;
+                bool primero = true;
+
+                foreach (var detalle in detalles)
+                {
+                    totalExistente += detalle.Subtotal;
+                    htmlResumen.AppendFormat(@"
+                        <div class='resumen-item' data-tipo='existente'>
+                            <div class='resumen-item-info'>
+                                <div class='resumen-item-nombre'>{0}</div>
+                                <div class='resumen-item-cantidad'>Cantidad: {1} x ${2:N0}</div>
+                            </div>
+                            <div class='resumen-item-precio'>${3:N0}</div>
+                        </div>",
+                        detalle.NombreProducto.Replace("'", "\\'"),
+                        detalle.Cantidad,
+                        detalle.PrecioUnitario,
+                        detalle.Subtotal
+                    );
+
+                    // Construir JSON de productos existentes para JavaScript
+                    if (!primero) jsonProductosExistentes.Append(",");
+                    jsonProductosExistentes.AppendFormat(@"{{""nombre"":""{0}"",""cantidad"":{1},""precio"":{2},""subtotal"":{3}}}",
+                        detalle.NombreProducto.Replace("\"", "\\\""),
+                        detalle.Cantidad,
+                        detalle.PrecioUnitario,
+                        detalle.Subtotal
+                    );
+                    primero = false;
+                }
+
+                jsonProductosExistentes.Append("]");
+
+                // Establecer el HTML del resumen directamente (SIN llamar a actualizarResumenOrden)
+                // porque esa funcion solo lee los inputs que estan en 0
+                scriptProductos.AppendFormat(@"
+                    // Guardar productos existentes en variable global para que actualizarResumenOrden pueda usarlos
+                    window.productosExistentesOrden = {0};
+                    window.totalExistenteOrden = {1};
+
+                    // Establecer el resumen con los productos existentes
+                    var resumenOrden = document.getElementById('resumenOrden');
+                    if (resumenOrden) {{
+                        resumenOrden.innerHTML = `{2}`;
+                        // Marcar que hay productos existentes
+                        resumenOrden.setAttribute('data-tiene-existentes', 'true');
+                    }}
+
+                    // Establecer el total
+                    var totalOrden = document.getElementById('totalOrden');
+                    if (totalOrden) {{
+                        totalOrden.textContent = '${3:N0}';
+                    }}
+
+                    // Establecer el numero de mesa en el modal
+                    document.getElementById('modal-orden-mesa-numero').textContent = '{4}';
+
+                    // Abrir el modal
+                    var modal = new bootstrap.Modal(document.getElementById('modalOrden'));
+                    modal.show();
+                ", jsonProductosExistentes.ToString(), totalExistente, htmlResumen.ToString().Replace("`", "\\`"), totalExistente, numeroMesa);
+
+                scriptProductos.Append("}, 100);");
+
+                ClientScript.RegisterStartupScript(this.GetType(), "AbrirModalConProductos", scriptProductos.ToString(), true);
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al agregar mas productos: " + ex.Message, "danger");
+            }
+        }
+
+        protected void CancelarOrden_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Obtener el pedidoId del HiddenField
+                if (string.IsNullOrEmpty(HdnPedidoIdActual.Value))
+                {
+                    MostrarMensaje("No se encontro el pedido", "warning");
+                    return;
+                }
+
+                int pedidoId = int.Parse(HdnPedidoIdActual.Value);
+
+                // Cancelar el pedido (elimina pedido y detalles)
+                pedidoService.CancelarPedido(pedidoId);
+
+                // Liberar la mesa (si no es mostrador)
+                bool esMostrador = ViewState["EsMostrador"] != null && (bool)ViewState["EsMostrador"];
+                string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "mostrador";
+
+                if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
+                {
+                    int mesaId = (int)ViewState["MesaIdSeleccionada"];
+
+                    // Cambiar estado de la mesa a libre
+                    mesaService.ActualizarEstadoMesa(mesaId, "libre");
+
+                    // Desactivar la asignación
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorMesa(mesaId);
+                    if (asignacion != null)
+                    {
+                        asignacionService.DesactivarAsignacion(asignacion.AsignacionId);
+                    }
+                }
+
+                // Limpiar ViewState
+                ViewState["MesaIdSeleccionada"] = null;
+                ViewState["NumeroMesaSeleccionada"] = null;
+                ViewState["UbicacionSeleccionada"] = null;
+                ViewState["EsMostrador"] = null;
+                HdnPedidoIdActual.Value = string.Empty;
+
+                // Guardar mensaje y tab activo en Session
+                Session["TabActivo"] = ubicacion;
+                Session["MensajeExito"] = "Orden #" + pedidoId + " cancelada exitosamente.";
+
+                // Redirigir para evitar reenvío de formulario
+                Response.Redirect(Request.Url.AbsolutePath, false);
+                Context.ApplicationInstance.CompleteRequest();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cancelar la orden: " + ex.Message, "danger");
+            }
         }
     }
 }
