@@ -115,7 +115,7 @@ namespace TukiGestor
 
         private void MostrarTab(string tab)
         {
-            // Ocultar todos los paneles
+            // ocultamos todos los paneles
             pnlListado.CssClass = "tab-pane fade";
             pnlNuevo.CssClass = "tab-pane fade";
             pnlEditar.CssClass = "tab-pane fade";
@@ -125,13 +125,13 @@ namespace TukiGestor
             pnlEditarCategoria.CssClass = "tab-pane fade";
             pnlEditarCategoria.Visible = false;
 
-            // Resetear clases de los botones
+            // reseteamos las clases de los botones
             btnTabListado.CssClass = "nav-link";
             btnTabNuevo.CssClass = "nav-link";
             btnTabCategorias.CssClass = "nav-link";
             btnTabCategoriaNueva.CssClass = "nav-link";
 
-            // Mostrar el panel correspondiente
+            // mostramos el panel correspondiente
             switch (tab)
             {
                 case "listado":
@@ -168,20 +168,51 @@ namespace TukiGestor
         {
             try
             {
+                string nombre = txtNombre.Text.Trim();
+                string strCantidad = txtCantidad.Text.Trim();
+                string strPrecio = txtPrecio.Text.Trim();
                 int categoriaId = int.Parse(ddlCategorias.SelectedValue);
 
+                // VALIDACIONES
+                if (string.IsNullOrEmpty(nombre))
+                {
+                    MostrarMensaje("Por favor ingrese un nombre para el producto.", "warning");
+                    return;
+                }
                 if (categoriaId == 0)
                 {
-                    MostrarMensaje("Por favor seleccione una categoría", "warning");
+                    MostrarMensaje("Por favor seleccione una categoría.", "warning");
+                    return;
+                }
+                if (!int.TryParse(strCantidad, out int cantidad))
+                {
+                    MostrarMensaje("Ingrese una cantidad válida (número entero).", "warning");
+                    return;
+                }
+                if (cantidad < 0)
+                {
+                    MostrarMensaje("La cantidad no puede ser negativa.", "warning");
+                    return;
+                }
+                if (!decimal.TryParse(strPrecio, out decimal precio))
+                {
+                    MostrarMensaje("Ingrese un precio válido (número).", "warning");
+                    return;
+                }
+                if (precio < 0)
+                {
+                    MostrarMensaje("El precio no puede ser negativo.", "warning");
                     return;
                 }
 
-                Producto nuevo = new Producto();
-                nuevo.Nombre = txtNombre.Text.Trim();
-                nuevo.Stock = int.Parse(txtCantidad.Text.Trim());
-                nuevo.Precio = decimal.Parse(txtPrecio.Text.Trim());
-                nuevo.Disponible = true;
-                nuevo.CategoriaId = categoriaId;
+                Producto nuevo = new Producto
+                {
+                    Nombre = nombre,
+                    Stock = cantidad,
+                    Precio = precio,
+                    Disponible = true,
+                    CategoriaId = categoriaId
+                };
 
                 ProductoService service = new ProductoService();
                 service.Agregar(nuevo);
@@ -193,7 +224,7 @@ namespace TukiGestor
                 ddlCategorias.SelectedIndex = 0;
 
                 CargarProductos();
-                MostrarMensaje("Producto agregado correctamente", "success");
+                MostrarMensaje("Producto agregado correctamente.", "success");
             }
             catch (Exception ex)
             {
@@ -201,18 +232,53 @@ namespace TukiGestor
             }
         }
 
-        
+
+
         protected void btnActualizar_Click(object sender, EventArgs e)
         {
             try
             {
-                Producto producto = new Producto();
-                producto.ProductoId = int.Parse(hfProductoId.Value);
-                producto.Nombre = txtNombreEditar.Text.Trim();
-                producto.Stock = int.Parse(txtCantidadEditar.Text.Trim());
-                producto.Precio = decimal.Parse(txtPrecioEditar.Text.Trim());
-                producto.CategoriaId = int.Parse(ddlCategoriasEditar.SelectedValue);
-                producto.Disponible = true;
+                string nombre = txtNombreEditar.Text.Trim();
+                string strCantidad = txtCantidadEditar.Text.Trim();
+                string strPrecio = txtPrecioEditar.Text.Trim();
+                int categoriaId = int.Parse(ddlCategoriasEditar.SelectedValue);
+
+                // VALIDACIONES
+                if (string.IsNullOrEmpty(nombre))
+                {
+                    MostrarMensaje("Por favor ingrese un nombre para el producto.", "warning");
+                    return;
+                }
+                if (!int.TryParse(strCantidad, out int cantidad))
+                {
+                    MostrarMensaje("Ingrese una cantidad válida (número entero).", "warning");
+                    return;
+                }
+                if (cantidad < 0)
+                {
+                    MostrarMensaje("La cantidad no puede ser negativa.", "warning");
+                    return;
+                }
+                if (!decimal.TryParse(strPrecio, out decimal precio))
+                {
+                    MostrarMensaje("Ingrese un precio válido (número).", "warning");
+                    return;
+                }
+                if (precio < 0)
+                {
+                    MostrarMensaje("El precio no puede ser negativo.", "warning");
+                    return;
+                }
+
+                Producto producto = new Producto
+                {
+                    ProductoId = int.Parse(hfProductoId.Value),
+                    Nombre = nombre,
+                    Stock = cantidad,
+                    Precio = precio,
+                    CategoriaId = categoriaId,
+                    Disponible = true
+                };
 
                 ProductoService service = new ProductoService();
                 service.Modificar(producto);
@@ -220,13 +286,14 @@ namespace TukiGestor
                 LimpiarFormularioEditar();
                 CargarProductos();
                 MostrarTab("listado");
-                MostrarMensaje("Producto actualizado correctamente", "success");
+                MostrarMensaje("Producto actualizado correctamente.", "success");
             }
             catch (Exception ex)
             {
                 MostrarMensaje("Error al actualizar producto: " + ex.Message, "error");
             }
         }
+
 
         protected void btnCancelarEditar_Click(object sender, EventArgs e)
         {
@@ -243,10 +310,17 @@ namespace TukiGestor
             ddlCategoriasEditar.SelectedIndex = 0;
         }
 
-        
+
         protected void RepeaterProductos_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            if (e.CommandName == "Eliminar")
+            if (e.CommandName == "ConfirmarEliminarProducto")
+            {
+                hfIdEliminar.Value = e.CommandArgument.ToString();
+                hfTipoEliminar.Value = "producto";
+                lblConfirmarMensaje.Text = "¿Seguro que desea eliminar este producto?";
+                pnlConfirmarEliminar.Visible = true;
+            }
+            else if (e.CommandName == "Eliminar")
             {
                 try
                 {
@@ -291,7 +365,8 @@ namespace TukiGestor
             }
         }
 
-        
+
+
         protected void btnGuardarCategoria_Click(object sender, EventArgs e)
         {
             try
@@ -324,7 +399,14 @@ namespace TukiGestor
 
         protected void RepeaterCategorias_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            if (e.CommandName == "Eliminar")
+            if (e.CommandName == "ConfirmarEliminarCategoria")
+            {
+                hfIdEliminar.Value = e.CommandArgument.ToString();
+                hfTipoEliminar.Value = "categoria";
+                lblConfirmarMensaje.Text = "¿Seguro que desea eliminar esta categoría?";
+                pnlConfirmarEliminar.Visible = true;
+            }
+            else if (e.CommandName == "Eliminar")
             {
                 try
                 {
@@ -365,7 +447,6 @@ namespace TukiGestor
                 }
             }
         }
-
 
         protected void btnActualizarCategoria_Click(object sender, EventArgs e)
         {
@@ -410,6 +491,47 @@ namespace TukiGestor
             txtNombreCategoriaEditar.Text = "";
         }
 
+        protected void btnAceptarEliminar_Click(object sender, EventArgs e)
+        {
+            int id = int.Parse(hfIdEliminar.Value);
+            string tipo = hfTipoEliminar.Value;
 
+            if (tipo == "producto")
+            {
+                try
+                {
+                    ProductoService service = new ProductoService();
+                    service.Eliminar(id);
+                    CargarProductos();
+                    MostrarMensaje("Producto eliminado correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al eliminar producto: " + ex.Message, "error");
+                }
+            }
+            else if (tipo == "categoria")
+            {
+                try
+                {
+                    CategoriaService service = new CategoriaService();
+                    service.Eliminar(id);
+                    CargarCategorias();
+                    CargarCategoriasEditar();
+                    CargarListadoCategorias();
+                    MostrarMensaje("Categoría eliminada correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al eliminar categoría: " + ex.Message, "error");
+                }
+            }
+
+            pnlConfirmarEliminar.Visible = false;
+        }
+        protected void btnCancelarEliminar_Click(object sender, EventArgs e)
+        {
+            pnlConfirmarEliminar.Visible = false;
+        }
     }
 }
