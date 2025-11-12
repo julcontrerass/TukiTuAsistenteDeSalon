@@ -320,25 +320,44 @@ namespace TukiGestor
                 {
                     // Si está ocupada, verificar si tiene un pedido activo
                     AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorMesa(mesaId);
+
+                    // DEBUG: Mostrar información de la asignación
+                    System.Diagnostics.Debug.WriteLine($"=== DEBUG Mesa {numeroMesa} en {ubicacion} ===");
+                    System.Diagnostics.Debug.WriteLine($"MesaId: {mesaId}, Estado: {estado}");
+
                     if (asignacion != null)
                     {
+                        System.Diagnostics.Debug.WriteLine($"Asignación encontrada - AsignacionId: {asignacion.AsignacionId}");
+                        System.Diagnostics.Debug.WriteLine($"Asignación Activa: {asignacion.Activa}");
+
                         // Buscar pedido activo para esta asignacion
                         List<Pedido> pedidos = pedidoService.ObtenerPedidosActivos();
+                        System.Diagnostics.Debug.WriteLine($"Total pedidos activos en sistema: {pedidos.Count}");
+
+                        // DEBUG: Mostrar todos los pedidos activos
+                        foreach (var p in pedidos)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"  - Pedido #{p.PedidoId}, AsignacionId: {p.AsignacionId}, EsMostrador: {p.EsMostrador}");
+                        }
+
                         Pedido pedidoActivo = pedidos.FirstOrDefault(p => p.AsignacionId == asignacion.AsignacionId);
 
                         if (pedidoActivo != null)
                         {
+                            System.Diagnostics.Debug.WriteLine($"✓ Pedido activo encontrado: #{pedidoActivo.PedidoId}");
                             // Tiene pedido activo, mostrar resumen
                             MostrarResumenPedido(pedidoActivo.PedidoId, numeroMesa, ubicacion);
                         }
                         else
                         {
+                            System.Diagnostics.Debug.WriteLine($"✗ NO se encontró pedido activo para AsignacionId: {asignacion.AsignacionId}");
                             // No tiene pedido, abrir modal de orden para agregar productos
                             AbrirModalOrden(numeroMesa);
                         }
                     }
                     else
                     {
+                        System.Diagnostics.Debug.WriteLine($"✗ NO se encontró asignación activa para MesaId: {mesaId}");
                         // No tiene asignacion activa, abrir modal de orden para agregar productos
                         AbrirModalOrden(numeroMesa);
                     }

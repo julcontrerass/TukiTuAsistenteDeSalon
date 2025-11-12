@@ -296,6 +296,19 @@
         .modal-body {
             padding: 30px;
             background-color: #F6EFE0;
+            border-radius: 0 0 15px 15px;
+        }
+
+        /* Modal de Orden con altura fija y scroll completo */
+        #modalOrden .modal-body {
+            max-height: 75vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Asegurar que el resumen tenga altura fija y scroll independiente */
+        #modalOrden .orden-resumen {
+            max-height: 350px;
         }
 
         .form-label {
@@ -409,6 +422,27 @@
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
+            max-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .orden-resumen h6 {
+            flex-shrink: 0;
+            margin-bottom: 15px;
+        }
+
+        .orden-resumen #resumenOrden {
+            overflow-y: auto;
+            flex-grow: 1;
+            max-height: 280px;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+
+        .orden-resumen .orden-total {
+            flex-shrink: 0;
+            margin-top: auto;
         }
 
         .orden-total {
@@ -603,8 +637,9 @@
         }
 
         .productos-lista {
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
+            margin-bottom: 15px;
         }
 
         /* Notificaciones flotantes */
