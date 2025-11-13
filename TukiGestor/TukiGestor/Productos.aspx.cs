@@ -241,10 +241,6 @@ namespace TukiGestor
 
 
 
-
-
-
-
         protected void btnActualizar_Click(object sender, EventArgs e)
         {
             try
@@ -292,6 +288,15 @@ namespace TukiGestor
                 };
 
                 ProductoService service = new ProductoService();
+
+                // VALIDAMOS SI YA EXISTE OTRO PRODUCTO CON ESE NOMBRE
+                if (service.ExisteNombre(producto.Nombre, producto.ProductoId))
+                {
+                    MostrarMensaje("Ya existe un producto con ese nombre. Por favor elija otro.", "warning");
+                    return;
+                }
+
+                //Si pasa la validación, se actualiza
                 service.Modificar(producto);
 
                 LimpiarFormularioEditar();
@@ -468,6 +473,7 @@ namespace TukiGestor
             }
         }
 
+      
         protected void btnActualizarCategoria_Click(object sender, EventArgs e)
         {
             try
@@ -476,16 +482,21 @@ namespace TukiGestor
                 categoria.CategoriaId = int.Parse(hfCategoriaId.Value);
                 categoria.Nombre = txtNombreCategoriaEditar.Text.Trim();
                 categoria.Activa = true;
-
+                // Validación: el nombre no puede estar vacío
                 if (string.IsNullOrEmpty(categoria.Nombre))
                 {
                     MostrarMensaje("Por favor ingrese un nombre para la categoría", "warning");
                     return;
                 }
-
                 CategoriaService service = new CategoriaService();
+                // validación: evitar nombres duplicados
+                if (service.ExisteNombreCategoria(categoria.Nombre, categoria.CategoriaId))
+                {
+                    MostrarMensaje("Ya existe una categoría con ese nombre. Por favor elija otro.", "warning");
+                    return;
+                }
+                //  Si pasa las validaciones, actualiza la categoría
                 service.Modificar(categoria);
-
                 LimpiarFormularioEditarCategoria();
                 CargarCategorias();
                 CargarCategoriasEditar();

@@ -186,5 +186,26 @@ namespace Service
             }
         }
 
+        public bool ExisteNombre(string nombre, int idExcluir)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT COUNT(*) FROM PRODUCTO WHERE Nombre = @Nombre AND ProductoId <> @idExcluir AND Disponible = 1");
+                datos.setearParametro("@Nombre", nombre);
+                datos.setearParametro("@idExcluir", idExcluir);
+                int cantidad = Convert.ToInt32(datos.ejecutarScalar());
+                return cantidad > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al verificar existencia del producto: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
     }
 }
