@@ -1301,7 +1301,7 @@
                         Nombre: p.getAttribute('data-nombre')
                     } : null;
                 })
-                .filter(p => p !== null);c
+                .filter(p => p !== null);
 
             if (productos.length === 0) {
                 alert('Por favor selecciona al menos un producto');
