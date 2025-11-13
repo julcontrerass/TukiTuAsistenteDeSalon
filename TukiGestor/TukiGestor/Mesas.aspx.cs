@@ -489,9 +489,6 @@ namespace TukiGestor
             // Abrir modal de orden para una NUEVA orden (no agregar más productos)
             string script = $@"
                 setTimeout(function() {{
-                    // Restaurar tab activo
-                    restaurarTab();
-
                     // Limpiar variables globales de productos existentes
                     window.productosExistentesOrden = [];
                     window.totalExistenteOrden = 0;
@@ -568,9 +565,6 @@ namespace TukiGestor
                 // Abrir el modal con JavaScript
                 string script = $@"
                     setTimeout(function() {{
-                        // Restaurar tab activo
-                        restaurarTab();
-
                         // Establecer datos del modal
                         document.getElementById('modal-numero-orden').textContent = '{pedidoId}';
                         document.getElementById('modal-resumen-mesa-numero').textContent = '{numeroMesa}';
@@ -613,7 +607,6 @@ namespace TukiGestor
                 // Abrir modal de confirmación
                 string script = @"
                     setTimeout(function() {
-                        restaurarTab();
                         document.getElementById('modalEliminarNumero').textContent = '" + numeroMesa + @"';
                         var modal = new bootstrap.Modal(document.getElementById('modalEliminarMesa'));
                         modal.show();
@@ -1232,7 +1225,6 @@ namespace TukiGestor
                 // IMPORTANTE: Mostrar productos existentes en el RESUMEN DE LA ORDEN
                 System.Text.StringBuilder scriptProductos = new System.Text.StringBuilder();
                 scriptProductos.Append("setTimeout(function() {");
-                scriptProductos.Append("restaurarTab();");
 
                 // Limpiar todos los inputs (ponerlos en 0) para agregar solo productos NUEVOS
                 scriptProductos.Append(@"
