@@ -5,6 +5,7 @@
 </asp:Content>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
+
     <div class="reporte-container">
 
         <div class="tabs-container">
@@ -12,47 +13,76 @@
                 <i class="bi bi-graph-up"></i>
                 Reporte 
             </h2>
-
+            <asp:UpdatePanel ID="UpdatePanelMensajes"  runat="server" UpdateMode="Conditional">
+                <ContentTemplate>
+                    <asp:Panel ID="pnlMensaje" ClientIDMode="Static" runat="server" Style="display:none;" CssClass="alert-custom">
+                        <asp:Label ID="lblMensaje" runat="server"></asp:Label>
+                    </asp:Panel>
+                </ContentTemplate>
+            </asp:UpdatePanel>
             <div>
                 <ul class="nav nav-tabs" role="tablist">
+
                     <li class="nav-item">
-                        <button class="nav-link active" id="mesas-tab" data-bs-toggle="tab" data-bs-target="#mesas" type="button" role="tab"><i class="bi bi-fork-knife"></i>Mesas</button>
+                        <asp:LinkButton ID="btnTabMesas" runat="server" CssClass="nav-link active"
+                            OnClick="btnTabMesas_Click">
+            <i class="bi bi-fork-knife"></i> Mesas
+                        </asp:LinkButton>
                     </li>
+
                     <li class="nav-item">
-                        <button class="nav-link" id="mozos-tab" data-bs-toggle="tab" data-bs-target="#meseros" type="button" role="tab"><i class="bi bi-person-circle"></i>Meseros</button>
+                        <asp:LinkButton ID="btnTabMeseros" runat="server" CssClass="nav-link"
+                            OnClick="btnTabMeseros_Click">
+            <i class="bi bi-person-circle"></i> Meseros
+                        </asp:LinkButton>
                     </li>
+
                     <li class="nav-item">
-                        <button class="nav-link" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos" type="button" role="tab"><i class="bi bi-cup-straw"></i>Productos</button>
+                        <asp:LinkButton ID="btnTabProductos" runat="server" CssClass="nav-link"
+                            OnClick="btnTabProductos_Click">
+            <i class="bi bi-cup-straw"></i> Productos
+                        </asp:LinkButton>
                     </li>
+
                     <li class="nav-item">
-                        <button class="nav-link" id="ventas-tab" data-bs-toggle="tab" data-bs-target="#ventas" type="button" role="tab"><i class="bi bi-receipt"></i>Ventas</button>
+                        <asp:LinkButton ID="btnTabVentas" runat="server" CssClass="nav-link"
+                            OnClick="btnTabVentas_Click">
+            <i class="bi bi-receipt"></i> Ventas
+                        </asp:LinkButton>
                     </li>
+
                     <li class="nav-item">
-                        <button class="nav-link" id="balance-tab" data-bs-toggle="tab" data-bs-target="#balance" type="button" role="tab"><i class="bi bi-book"></i>Balance</button>
+                        <asp:LinkButton ID="btnTabBalance" runat="server" CssClass="nav-link"
+                            OnClick="btnTabBalance_Click">
+            <i class="bi bi-book"></i> Balance
+                        </asp:LinkButton>
                     </li>
+
                 </ul>
+
             </div>
+
 
             <div class="options-container">
                 <i class="bi bi-calendar-date calendario"></i>
-                <div class="separador"></div>              
+                <div class="separador"></div>
 
-                  <!-- TURNO -->
+                <!-- TURNO -->
                 <div class="dropdown">
-                <asp:DropDownList ID="ddlTurno" CssClass="btn btn-secondary dropdown-toggle boton-turno" runat="server">
-                    <asp:ListItem Text="Todos" Value="Todos" CssClass="dropdown-item items-turno"></asp:ListItem>
-                    <asp:ListItem Text="Almuerzo" CssClass="dropdown-item items-turno" Value="Almuerzo"></asp:ListItem>
-                    <asp:ListItem Text="Cena" CssClass="dropdown-item items-turno" Value="Cena"></asp:ListItem>
-                </asp:DropDownList>
+                    <asp:DropDownList ID="ddlTurno" CssClass="btn btn-secondary dropdown-toggle boton-turno" runat="server">
+                        <asp:ListItem Text="Todos" Value="Todos" CssClass="dropdown-item items-turno"></asp:ListItem>
+                        <asp:ListItem Text="Almuerzo" CssClass="dropdown-item items-turno" Value="Almuerzo"></asp:ListItem>
+                        <asp:ListItem Text="Cena" CssClass="dropdown-item items-turno" Value="Cena"></asp:ListItem>
+                    </asp:DropDownList>
                 </div>
 
                 <!-- RANGO -->
-                <asp:DropDownList ID="ddlRango"  CssClass="btn btn-secondary dropdown-toggle boton-rango"
+                <asp:DropDownList ID="ddlRango" CssClass="btn btn-secondary dropdown-toggle boton-rango"
                     runat="server" ClientIDMode="Static">
-                    <asp:ListItem Text="Hoy" Value="Hoy"  />
-                    <asp:ListItem Text="Esta semana" Value="Semana"  />
-                    <asp:ListItem Text="Este Mes" Value="Mes"  />
-                    <asp:ListItem Text="Este Año" Value="Año"  />
+                    <asp:ListItem Text="Hoy" Value="Hoy" />
+                    <asp:ListItem Text="Esta semana" Value="Semana" />
+                    <asp:ListItem Text="Este Mes" Value="Mes" />
+                    <asp:ListItem Text="Este Año" Value="Año" />
                     <asp:ListItem Text="Fechas personalizadas" Value="Personalizado" />
                 </asp:DropDownList>
 
@@ -80,38 +110,171 @@
             </div>
 
 
+            <asp:Panel ID="pnlMesas" runat="server" CssClass="tab-pane fade active show">
+
+                <!--   Pestaña Mesas -->
+
+                    <div class="options-container-pestañas">
+
+                        <!-- 1. Ranking (siempre es uno solo, pero mantenemos la UI) -->
+                        <div class="dropdown">
+                            <asp:DropDownList ID="ddlRankingMesas"
+                                runat="server"
+                                CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                                ClientIDMode="Static">
+                                <asp:ListItem Text="Ranking de mesas" Value="Ranking" />
+                            </asp:DropDownList>
+                        </div>
+
+                        <!-- Ubicación-->
+                        <div class="dropdown">
+                            <asp:DropDownList ID="ddlUbicacionMesas"
+                                runat="server"
+                                CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                                ClientIDMode="Static">
+                                <asp:ListItem Text="Mesas" Value="Todos" Disabled="True" ></asp:ListItem>
+
+                                <asp:ListItem Text="Todas" Value="Todos" />
+                                <asp:ListItem Text="Salón" Value="Salon" />
+                                <asp:ListItem Text="Patio" Value="Patio" />
+                            </asp:DropDownList>
+                        </div>
+
+                        <!-- Con más / Con menos -->
+                        <div class="dropdown">
+                            <asp:DropDownList ID="ddlCriterioOrdenMesas"
+                                runat="server"
+                                CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                                ClientIDMode="Static">
+                                <asp:ListItem Text="Con más" Value="Mas" />
+                                <asp:ListItem Text="Con menos" Value="Menos" />
+                            </asp:DropDownList>
+                        </div>
+
+                        <!--  Facturación / Ocupación -->
+                        <div class="dropdown">
+                            <asp:DropDownList ID="ddlTipoBusqueda"
+                                runat="server"
+                                CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                                ClientIDMode="Static">
+                                <asp:ListItem Text="Facturación" Value="Facturacion" />
+                                <asp:ListItem Text="Ocupación" Value="Ocupacion" />
+                            </asp:DropDownList>
+                        </div>
 
 
-            <!--   Pestaña Mesas -->           
+                        <!-- buscar -->
+                        <asp:Button ID="btnBuscarMesas"
+                            runat="server"
+                            Text="🔍 Buscar"
+                            CssClass="btn btn-secondary boton-buscar"
+                            OnClick="btnBuscarMesas_Click" />
 
-            <div class="tab-pane fade active show pestaña-mesas" id="mesas" role="tabpanel">
+                    </div>
+
+            </asp:Panel>
+
+            <asp:Panel ID="pnlMeseros" runat="server" CssClass="tab-pane fade">
+
+                <!--  > Pestaña Meseros <!-->
+                    <div class="options-container-pestañas">
+                        <div class="dropdown">
+                            <asp:DropDownList ID="ddlRankingMeseros"
+                                runat="server"
+                                CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                                ClientIDMode="Static">
+                                <asp:ListItem Text="Ranking de meseros" Value="Ranking" />
+                            </asp:DropDownList>
+                        </div>
+
+                        <!-- Ubicación-->
+                        <div class="dropdown">
+                            <asp:DropDownList ID="ddlUbicacionMeseros"
+                                runat="server"
+                                CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                                ClientIDMode="Static">
+                                <asp:ListItem Text="Mesas" Value="Todos" Disabled="True" Selected="True"></asp:ListItem>
+
+                                <asp:ListItem Text="Todas" Value="Todos" />
+                                <asp:ListItem Text="Salón" Value="Salon" />
+                                <asp:ListItem Text="Patio" Value="Patio" />
+                            </asp:DropDownList>
+                        </div>
+
+                        <div class="dropdown">
+                            <asp:DropDownList ID="ddlCriterioOrdenMeseros"
+                                runat="server"
+                                CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                                ClientIDMode="Static">
+                                <asp:ListItem Text="Con más" Value="Mas" />
+                                <asp:ListItem Text="Con menos" Value="Menos" />
+                            </asp:DropDownList>
+                        </div>
+
+                        <div class="dropdown">
+                            <asp:DropDownList ID="ddlCriterioBusquedaMeseros"
+                                runat="server"
+                                CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                                ClientIDMode="Static">
+                                <asp:ListItem Text="Facturación" Value="Facturacion" />
+                                <asp:ListItem Text="Mesas atendidas" Value="Mesas atendidas" />
+                            </asp:DropDownList>
+                        </div>
+                        <asp:Button ID="btnMeserosBuscar"
+                            runat="server"
+                            Text="🔍 Buscar"
+                            CssClass="btn btn-secondary boton-buscar"
+                            OnClick="btnMeserosBuscar_Click" />
+
+
+                    </div>
+                
+
+
+            </asp:Panel>
+
+            <asp:Panel ID="pnlProductos" runat="server" CssClass="tab-pane fade ">
+
                 <div class="options-container-pestañas">
 
-                    <!-- 1. Ranking (siempre es uno solo, pero mantenemos la UI) -->
+                    <!-- 1. Ranking -->
                     <div class="dropdown">
-                        <asp:DropDownList ID="ddlRankingMesas"
+                        <asp:DropDownList ID="ddlRankingProductos"
                             runat="server"
                             CssClass="btn btn-secondary dropdown-toggle boton-ranking"
                             ClientIDMode="Static">
-                            <asp:ListItem Text="Ranking de mesas" Value="Ranking" />
+                            <asp:ListItem Text="Ranking productos" Value="Ranking" />
                         </asp:DropDownList>
                     </div>
 
-                    <!-- Ubicación-->
+                     <div class="dropdown">
+     <asp:DropDownList ID="ddlUbicacionProductos"
+         runat="server"
+         CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+         ClientIDMode="Static">
+         <asp:ListItem Text="Mesas" Value="Todos" Disabled="True" Selected="True"></asp:ListItem>
+
+         <asp:ListItem Text="Todas" Value="Todos" />
+         <asp:ListItem Text="Salón" Value="Salon" />
+         <asp:ListItem Text="Patio" Value="Patio" />
+     </asp:DropDownList>
+ </div>
+
                     <div class="dropdown">
-                        <asp:DropDownList ID="ddlUbicacion"
+                        <asp:DropDownList ID="ddlCantidadProductos"
                             runat="server"
                             CssClass="btn btn-secondary dropdown-toggle boton-ranking"
                             ClientIDMode="Static">
-                            <asp:ListItem Text="Todas" Value="Todos" />
-                            <asp:ListItem Text="Salón" Value="Salon" />
-                            <asp:ListItem Text="Patio" Value="Patio" />
+                            <asp:ListItem Text="10 Productos" Value="10" />
+                            <asp:ListItem Text="20 Productos" Value="20" />
+                            <asp:ListItem Text="30 Productos" Value="30" />
+                            <asp:ListItem Text="40 Productos" Value="40" />
+                            <asp:ListItem Text="50 Productos" Value="50" />
                         </asp:DropDownList>
                     </div>
 
-                    <!-- Con más / Con menos -->
                     <div class="dropdown">
-                        <asp:DropDownList ID="ddlCriterioOrdenMesas"
+                        <asp:DropDownList ID="ddlCriterioOrdenProductos"
                             runat="server"
                             CssClass="btn btn-secondary dropdown-toggle boton-ranking"
                             ClientIDMode="Static">
@@ -120,143 +283,43 @@
                         </asp:DropDownList>
                     </div>
 
-                    <!--  Facturación / Ocupación -->
                     <div class="dropdown">
-                        <asp:DropDownList ID="ddlTipoBusqueda"
+                        <asp:DropDownList ID="ddlCriterioBusquedaProductos"
                             runat="server"
                             CssClass="btn btn-secondary dropdown-toggle boton-ranking"
                             ClientIDMode="Static">
                             <asp:ListItem Text="Facturación" Value="Facturacion" />
-                            <asp:ListItem Text="Ocupación" Value="Ocupacion" />
+                            <asp:ListItem Text="Ventas" Value="Ventas" />
                         </asp:DropDownList>
                     </div>
 
-
-                    <!-- buscar -->                                       
-                        <asp:Button ID="btnBuscarMesas"
+                    <div class="dropdown">
+                        <asp:DropDownList ID="ddlCategoriaProductos"
                             runat="server"
-                            Text="🔍 Buscar"
-                            CssClass="btn btn-secondary boton-buscar"
-                            OnClick="btnBuscarMesas_Click" />                   
-                    
-                </div>
-            </div>
+                            CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                            ClientIDMode="Static">
+                            <asp:ListItem Text="Categoria" Value="Todos" Disabled="True" />
+                             <asp:ListItem Text="Todas" Value="Todos"/>
+                            <asp:ListItem Text="Platos Principales" Value="Comida" />
+                            <asp:ListItem Text="Bebidas" Value="Bebidas" />
+                            <asp:ListItem Text="Postres" Value="Postres" />
+                            
+                        </asp:DropDownList>
+                    </div>
 
-            <!--  > Pestaña Meseros <!-->
-            <div class="tab-pane fade pestaña-meseros" id="meseros" role="tabpanel">
-                <div class="options-container-pestañas">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Ranking de meseros</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Ranking de meseros</button>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Con más</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Con más</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Con menos</button>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Facturación</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Facturación</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Mesas atendidas</button>
-                            </li>
-                        </ul>
-                    </div>
+                    <asp:Button
+                        ID="btnBuscarProductos"
+                        runat="server"
+                        Text="🔍 Buscar"
+                        CssClass="btn btn-secondary boton-buscar"
+                        onclick="btnBuscarProductos_Click" />
                 </div>
-            </div>
 
-            <!--  > Pestaña productos <!-->
-            <div class="tab-pane fade pestaña-productos" id="productos" role="tabpanel">
-                <div class="options-container-pestañas">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Ranking</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Ranking</button>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">10 Productos</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-productos" type="button">10 Productos</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-productos" type="button">20 Productos</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-productos" type="button">30 Productos</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-productos" type="button">40 Productos</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-productos" type="button">50 Productos</button>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Con más</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-productos" type="button">Con más</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-productos" type="button">Con menos</button>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Facturación</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Facturación</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Ventas</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Margen</button>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Categoría</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Categoría</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Bebidas</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Platos Principales</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Postres</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-mesas" type="button">Adicionales</button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade pestaña-ventas" id="ventas" role="tabpanel">
+            </asp:Panel>
+
+                        <asp:Panel ID="pnlVentas" runat="server" CssClass="tab-pane fade">
+
+                            
                 <div class="options-container-pestañas">
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Tipo de pago</button>
@@ -273,38 +336,164 @@
                         </ul>
                     </div>
                 </div>
-            </div>
+
+                        </asp:Panel>
+
+                        <asp:Panel ID="pnlBalance" runat="server" CssClass="tab-pane fade"></asp:Panel>
+
+
+            <asp:Panel ID="pnlResultadoMesas" runat="server" ClientIDMode="Static" Visible="false" UpdateMode="Conditional">
+
+                <asp:GridView ID="gvMesas" runat="server"
+                    AutoGenerateColumns="False"
+                    CssClass="table table-striped table-hover text-center shadow-lg"
+                    HeaderStyle-CssClass="table-dark"
+                    EmptyDataText="No hay resultados para mostrar."
+                    GridLines="None">
+                    <Columns>
+                        <asp:BoundField
+                            DataField="NumeroMesa"
+                            HeaderText="Mesa"
+                            SortExpression="NumeroMesa" />
+
+                        <asp:BoundField
+                            DataField="Ubicacion"
+                            HeaderText="Ubicación"
+                            SortExpression="Ubicacion" />
+
+                        <asp:BoundField
+                            DataField="Facturacion"
+                            HeaderText="Facturación"
+                            DataFormatString="{0:C}"
+                            HtmlEncode="false"
+                            SortExpression="Facturacion" />
+
+                        <asp:BoundField
+                            DataField="Ocupacion"
+                            HeaderText="Ocupación"
+                            SortExpression="Ocupacion" />
+
+                    </Columns>
+                </asp:GridView>
+              </asp:Panel>
+
+            <asp:Panel ID="PnlResultadoMeseros" runat="server" ClientIDMode="Static" Visible="false" UpdateMode="Conditional">
+                <asp:GridView ID="gvMeseros" runat="server"
+                    AutoGenerateColumns="False"
+                    CssClass="table table-striped table-hover text-center shadow-lg"
+                    HeaderStyle-CssClass="table-dark"
+                    EmptyDataText="No hay resultados para mostrar."
+                    GridLines="None">
+                    <Columns>
+                        <asp:BoundField
+                            DataField="NombreApellido"
+                            HeaderText="Mesero"
+                            SortExpression="NumeroMesa" />
+
+                        <asp:BoundField
+                            DataField="Facturacion"
+                            HeaderText="Facturación"
+                            DataFormatString="{0:C}"
+                            HtmlEncode="false"
+                            SortExpression="Facturacion" />
+
+                        <asp:BoundField
+                            DataField="MesasAtendidas"
+                            HeaderText="Mesas Atendidas"
+                            SortExpression="MesasAtendidas" />
+
+                    </Columns>
+                </asp:GridView>
+            </asp:Panel>
+
+
+            <asp:Panel ID="pnlResultadosProductos" runat="server" ClientIDMode="Static" Visible="false" UpdateMode="Conditional">
+                <asp:GridView ID="gvProductos" runat="server"
+                    AutoGenerateColumns="False"
+                    CssClass="table table-striped table-hover text-center shadow-lg"
+                    HeaderStyle-CssClass="table-dark"
+                    EmptyDataText="No hay resultados para mostrar."
+                    GridLines="None">
+                    <Columns>
+                        <asp:BoundField
+                            DataField="NombreProducto"
+                            HeaderText="Producto"
+                            SortExpression="NombreProducto" />
+                        <asp:BoundField
+                            DataField="Categoria"
+                            HeaderText="Categoría"
+                            SortExpression="Categoria" />
+
+                        <asp:BoundField
+                            DataField="Facturacion"
+                            HeaderText="Facturación"
+                            DataFormatString="{0:C}"
+                            HtmlEncode="false"
+                            SortExpression="Facturacion" />
+
+                        <asp:BoundField
+                            DataField="CantidadVendida"
+                            HeaderText="Cantidad vendida"
+                            SortExpression="CantidadVendida" />
+
+                    </Columns>
+                </asp:GridView>
+            </asp:Panel>
+
+
         </div>
     </div>
 
 
+
+
     <script>     
-                
+
         const ddlRango = document.getElementById('ddlRango');
         const itemsTurno = document.querySelectorAll(".items-turno");
         const botonTurno = document.querySelector('.boton-turno');
         const botonRango = document.querySelector('.boton-rango');
-        const selectorRango = document.querySelector(".selector-rango");  
+        const selectorRango = document.querySelector(".selector-rango");
 
         ddlRango.addEventListener("change", function () {
 
             const rangoElegido = ddlRango.value;
 
             switch (rangoElegido) {
-                
+
 
                 case "Personalizado":
-                    
+
                     selectorRango.style.display = "flex";
                     break;
 
-                default:                   
+                default:
                     selectorRango.style.display = "none";
                     break;
             }
         })
 
-  
+
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+            tab.addEventListener("shown.bs.tab", ()=> {
+                // Oculta todos los resultados de reportes
+                document.getElementById("pnlResultadoMesas").style.display = "none";                
+                //document.getElementById("panelMeseros").style.display = "none";
+                //document.getElementById("panelProductos").style.display = "none";
+                //document.getElementById("panelVentas").style.display = "none";
+                //document.getElementById("panelBalance").style.display = "none";       
+
+                const panel = document.getElementById("pnlMensaje");
+                console.log("la concha tu madre", panel);
+                if (panel) {
+                    panel.style.display = "none";
+                    panel.classList.remove("alert-show");
+                }
+
+
+            });
+        });
+
 
 
     </script>

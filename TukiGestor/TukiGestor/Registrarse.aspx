@@ -1,5 +1,7 @@
 ﻿<%@ Page Title="Registrarse" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Registrarse.aspx.cs" Inherits="TukiGestor.Registrarse" %>
-
+<asp:Content ContentPlaceHolderID="HeadContent" runat="server">
+    <%: Styles.Render("~/Content/registrarse") %>
+</asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <main class="d-flex align-items-center justify-content-center vh-100 bg-light">
         <div class="card shadow-lg p-4 border-0" style="width: 22rem; border-radius: 1rem;">
@@ -33,58 +35,5 @@
             </div>
         </div>
     </main>
-
-
-    <style>
-
-
-         body {
-     background: linear-gradient(to right, #e3f2fd, #ffffff);
- }
-
- /* Centrado del bloque label+input+botón */
- .field-wrapper {
-     display: flex;
-     flex-direction: column;
-     align-items: center;
- }
-
- /* Ancho común para campos y botón */
- .field-control {
-     max-width: 16.5rem;
-     width: 100%;
- }
-
- .input-focus:focus {
-     border-color: #0d6efd !important;
-     box-shadow: 0 0 6px rgba(13, 110, 253, 0.35) !important;
-     transition: all 0.2s ease-in-out;
- }
-
- .form-control {
-     border-radius: 0.5rem;
- }
-
- .btn-primary {
-     border-radius: 0.5rem;
- }
-
- .btn-primary:hover {
-     background-color: #0b5ed7 !important;
-     box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25);
-     transition: all 0.15s ease-in-out;
- }
-
- /* Borde colorido por defecto */
- .form-control {
-     border-radius: 0.5rem;
-     border: 2px solid #90caf9;
-     background-color: #ffffff;
-     transition: all 0.25s ease-in-out;
- }
-
-
-
-    </style>
-
+       
 </asp:Content>

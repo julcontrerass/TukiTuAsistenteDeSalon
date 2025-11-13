@@ -37,8 +37,18 @@ namespace TukiGestor
                             "~/Scripts/modernizr-*"));
 
             bundles.Add(new StyleBundle("~/Content/reportes").Include("~/Styles/reportes.css"));
+            bundles.Add(new StyleBundle("~/Content/home").Include("~/Styles/home.css"));
+            bundles.Add(new StyleBundle("~/Content/login").Include("~/Styles/login.css"));
+            bundles.Add(new StyleBundle("~/Content/productos").Include("~/Styles/productos.css"));
+            bundles.Add(new StyleBundle("~/Content/mesas").Include("~/Styles/mesas.css"));
+            bundles.Add(new StyleBundle("~/Content/registrarse").Include("~/Styles/registrarse.css"));
 
-             }
+
+
+
+
+
+        }
 
         public static void RegisterJQueryScriptManager()
         {
