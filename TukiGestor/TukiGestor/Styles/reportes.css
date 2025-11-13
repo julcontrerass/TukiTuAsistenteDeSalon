@@ -1,0 +1,171 @@
+﻿
+.reporte-container {
+    position: fixed;
+    left: calc(50vw + 140px);
+    transform: translateX(-50%);
+    top: 40px;
+    z-index: 100;
+    min-width: 80%;
+    max-width: 1400px;
+    padding: 20px;
+    padding-bottom: 120px;
+    min-height: 80vh;
+}
+
+.tabs-container {
+    background: #F6EFE0;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-height: 80vh;
+}
+
+.nav-tabs {
+    border-bottom: 2px solid #E7D9C2;
+    margin-bottom: 10px;
+}
+
+    .nav-tabs .nav-link {
+        color: #333;
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        transition: all 0.3s ease;
+    }
+
+        .nav-tabs .nav-link:hover {
+            background-color: #E7D9C2;
+            color: #333;
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: #E7D9C2;
+            color: #333;
+            border: none;
+        }
+
+.dropdown-color {
+    background-color: #E7D9C2;
+}
+
+
+
+.calendario::before {
+    font-size: 2rem;
+    align-self: center
+}
+
+.options-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background-color: #E7D9C2;
+}
+
+.separador {
+    width: 1px;
+    min-height: 45px;
+    height: 100%;
+    background-color: #a9a7a7;
+}
+
+
+.date.date-selector-container {
+    display: flex;
+}
+
+
+
+.custom-datepicker {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: none;
+    background-color: #E7D9C2;
+    color: #333;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+    cursor: pointer;
+}
+
+
+    .custom-datepicker:hover,
+    .custom-datepicker:focus {
+        background-color: #d9cbb0;
+        color: #333;
+    }
+
+    .custom-datepicker::-webkit-calendar-picker-indicator {
+        filter: invert(0.4);
+        cursor: pointer;
+    }
+
+    .custom-datepicker::-moz-focus-inner {
+        border: 0;
+    }
+
+.fecha-hasta {
+    font-size: 1rem;
+}
+
+.selector-rango {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.selector-mes {
+    display: none;
+    align-items: center;
+}
+
+.selector-año {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.selector-año-label {
+    font-weight: 600;
+}
+
+.boton-rango, .boton-turno {
+    background-color: #646464;
+    border: none;
+    min-width: 100px;
+}
+
+.options-container-pestañas {
+    display: flex;
+    padding-block: 10px;
+    gap: .75rem;
+}
+
+.boton-ranking {
+    background-color: #E7D9C2;
+    color: #333;
+    border: none;
+}
+
+.tab-pane {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+    .tab-pane.active.show {
+        display: block;
+        opacity: 1;
+    }
+
+.boton-buscar {
+    background-color: #E7D9C2;
+    color: #333;
+    border: none;
+    font-size: 1rem;
+    font-weight:600;
+    margin-left: 1rem;
+}

@@ -36,6 +36,8 @@ namespace TukiGestor
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                             "~/Scripts/modernizr-*"));
 
+            bundles.Add(new StyleBundle("~/Content/reportes").Include("~/Styles/reportes.css"));
+
              }
 
         public static void RegisterJQueryScriptManager()
