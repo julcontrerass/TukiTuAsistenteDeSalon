@@ -205,6 +205,14 @@ namespace TukiGestor
                     return;
                 }
 
+                // validacion de nombre duplicado
+                ProductoService service = new ProductoService();
+                if (service.ExisteNombre(nombre))
+                {
+                    MostrarMensaje("Ya existe un producto con ese nombre. Ingrese otro.", "danger");
+                    return;
+                }
+
                 Producto nuevo = new Producto
                 {
                     Nombre = nombre,
@@ -214,7 +222,6 @@ namespace TukiGestor
                     CategoriaId = categoriaId
                 };
 
-                ProductoService service = new ProductoService();
                 service.Agregar(nuevo);
 
                 // limpiamos los campos
@@ -231,6 +238,10 @@ namespace TukiGestor
                 MostrarMensaje("Error al agregar producto: " + ex.Message, "error");
             }
         }
+
+
+
+
 
 
 
@@ -382,6 +393,14 @@ namespace TukiGestor
                 }
 
                 CategoriaService service = new CategoriaService();
+
+                // VALIDACIÓN: nombre repetido
+                if (service.ExisteNombreCategoria(nueva.Nombre))
+                {
+                    MostrarMensaje("Ya existe una categoría con ese nombre. Ingrese otro.", "danger");
+                    return;
+                }
+
                 service.Agregar(nueva);
 
                 txtNombreCategoria.Text = "";
@@ -395,6 +414,7 @@ namespace TukiGestor
                 MostrarMensaje("Error al agregar categoría: " + ex.Message, "error");
             }
         }
+
 
 
         protected void RepeaterCategorias_ItemCommand(object source, RepeaterCommandEventArgs e)

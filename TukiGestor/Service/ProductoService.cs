@@ -64,6 +64,28 @@ namespace Service
             }
         }
 
+        public bool ExisteNombre(string nombre)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT COUNT(*) FROM PRODUCTO WHERE Nombre = @Nombre AND Disponible = 1");
+                datos.setearParametro("@Nombre", nombre);
+                int cantidad = Convert.ToInt32(datos.ejecutarScalar());
+                return cantidad > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al verificar existencia del producto: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+
+
         public void Modificar(Producto producto)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -135,13 +157,7 @@ namespace Service
                 {
                     return Listar();
                 }
-
-                // Buscar productos por nombre usando LIKE
-                datos.SetearConsulta(@"SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock
-                                      FROM PRODUCTO
-                                      WHERE Disponible = 1
-                                      AND Nombre LIKE @texto");
-
+                datos.SetearConsulta(@"SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock FROM PRODUCTO WHERE Disponible = 1 AND Nombre LIKE @texto");
                 datos.setearParametro("@texto", "%" + textoBusqueda + "%");
                 datos.ejecutarLectura();
 

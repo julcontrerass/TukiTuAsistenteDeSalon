@@ -57,6 +57,27 @@ namespace Service
                 datos.cerrarConexion();
             }
         }
+        public bool ExisteNombreCategoria(string nombre)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT COUNT(*) FROM CATEGORIA WHERE Nombre = @Nombre AND Activa = 1");
+                datos.setearParametro("@Nombre", nombre);
+                int cantidad = Convert.ToInt32(datos.ejecutarScalar());
+                return cantidad > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al verificar existencia de la categoría: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+
 
         public void Modificar(Categoria categoria)
         {
