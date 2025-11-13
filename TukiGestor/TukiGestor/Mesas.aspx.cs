@@ -51,6 +51,10 @@ namespace TukiGestor
         {
             // SIEMPRE cargar desde la base de datos (incluso en postbacks y refresh)
             // Esto asegura que los datos estén actualizados en todo momento
+
+            // Sincronizar el estado de las mesas con los pedidos activos
+            mesaService.SincronizarEstadoMesasConPedidos();
+
             CargarMesasEnRepeaters();
             CargarCategoriasYProductos();
             CargarOrdenesActivas();
@@ -69,11 +73,45 @@ namespace TukiGestor
                 Session.Remove("TabActivo");
             }
 
+            // Si el HdnTabActivo tiene un valor, asegurarse de que se use ese tab
+            // Esto es importante después de postbacks para mantener el tab activo
+            if (!string.IsNullOrEmpty(HdnTabActivo.Value))
+            {
+                // El tab activo se mantendrá por el JavaScript, pero registramos el valor en el servidor
+                System.Diagnostics.Debug.WriteLine($"Tab activo en Page_Load: {HdnTabActivo.Value}");
+            }
+
             // Abrir modal de orden si se acaba de abrir una mesa
             if (!IsPostBack && Session["MesaAbrir"] != null)
             {
                 string numeroMesa = Session["MesaAbrir"].ToString();
+
+                // IMPORTANTE: Restaurar TODOS los datos de la mesa desde Session al ViewState
+                if (Session["MesaIdAbrir"] != null)
+                {
+                    ViewState["MesaIdSeleccionada"] = (int)Session["MesaIdAbrir"];
+                    ViewState["NumeroMesaSeleccionada"] = numeroMesa;
+                    ViewState["UbicacionSeleccionada"] = Session["UbicacionAbrir"]?.ToString();
+                    ViewState["EsMostrador"] = false;
+
+                    if (Session["AsignacionIdAbrir"] != null)
+                    {
+                        ViewState["AsignacionIdActual"] = (int)Session["AsignacionIdAbrir"];
+                    }
+
+                    if (Session["MeseroIdAbrir"] != null)
+                    {
+                        ViewState["MeseroIdSeleccionado"] = (int)Session["MeseroIdAbrir"];
+                    }
+                }
+
+                // Limpiar Session después de restaurar
                 Session.Remove("MesaAbrir");
+                Session.Remove("MesaIdAbrir");
+                Session.Remove("AsignacionIdAbrir");
+                Session.Remove("UbicacionAbrir");
+                Session.Remove("MeseroIdAbrir");
+
                 AbrirModalOrden(numeroMesa);
             }
         }
@@ -161,11 +199,11 @@ namespace TukiGestor
                 ViewState["NumeroMesaSeleccionada"] = "Mostrador";
                 ViewState["UbicacionSeleccionada"] = "mostrador";
 
-                // Guardar tab activo
+                // IMPORTANTE: Guardar tab activo como "mostrador"
                 HdnTabActivo.Value = "mostrador";
 
-                // Mostrar resumen del pedido
-                MostrarResumenPedido(pedidoId, numeroMesa, ubicacion);
+                // Mostrar resumen del pedido - siempre usar "mostrador" como ubicacion
+                MostrarResumenPedido(pedidoId, numeroMesa, "mostrador");
             }
             catch (Exception ex)
             {
@@ -404,12 +442,24 @@ namespace TukiGestor
                 // Actualizar estado de la mesa a "ocupada"
                 mesaService.ActualizarEstadoMesa(mesaId, "ocupada");
 
-                // TODO: Aquí debería crear la asignación de mesa y el pedido en la BD
-                // Por ahora solo actualizamos el estado de la mesa
+                // Crear la asignación de mesa
+                AsignacionMesa nuevaAsignacion = new AsignacionMesa
+                {
+                    MesaId = mesaId,
+                    MeseroId = meseroId,
+                    FechaAsignacion = DateTime.Now,
+                    Activa = true
+                };
 
-                // Guardar datos en Session para el patrón Post-Redirect-Get
+                int asignacionId = asignacionService.CrearAsignacion(nuevaAsignacion);
+
+                // IMPORTANTE: Guardar TODOS los datos en Session para que sobrevivan el redirect
                 Session["TabActivo"] = ubicacion;
                 Session["MesaAbrir"] = numeroMesa;
+                Session["MesaIdAbrir"] = mesaId;
+                Session["AsignacionIdAbrir"] = asignacionId;
+                Session["UbicacionAbrir"] = ubicacion;
+                Session["MeseroIdAbrir"] = meseroId;
                 Session["MensajeExito"] = "Mesa " + numeroMesa + " abierta exitosamente.";
 
                 // Redireccionar para evitar el problema de reenvío de formulario
@@ -477,6 +527,10 @@ namespace TukiGestor
         {
             try
             {
+                // IMPORTANTE: Establecer el tab activo ANTES de abrir el modal
+                HdnTabActivo.Value = ubicacion;
+                ViewState["UbicacionSeleccionada"] = ubicacion;
+
                 // Obtener el pedido
                 Pedido pedido = pedidoService.ObtenerPedidoPorId(pedidoId);
                 if (pedido == null)
@@ -908,9 +962,23 @@ namespace TukiGestor
                 }
 
                 int pedidoId;
+
+                // Obtener ubicación del HiddenField (fuente de verdad) en lugar de ViewState
+                string ubicacion = !string.IsNullOrEmpty(HdnTabActivo.Value) ? HdnTabActivo.Value : "salon";
+
                 bool esMostrador = ViewState["EsMostrador"] != null && (bool)ViewState["EsMostrador"];
+
+                // Si el ViewState no tiene la ubicación, usarla del HiddenField
+                if (ViewState["UbicacionSeleccionada"] == null || string.IsNullOrEmpty(ViewState["UbicacionSeleccionada"].ToString()))
+                {
+                    ViewState["UbicacionSeleccionada"] = ubicacion;
+                }
+                else
+                {
+                    ubicacion = ViewState["UbicacionSeleccionada"].ToString();
+                }
+
                 string numeroMesa = ViewState["NumeroMesaSeleccionada"]?.ToString() ?? "Mostrador";
-                string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "mostrador";
 
                 // Verificar si es una actualización de pedido existente (agregar más productos)
                 if (!string.IsNullOrEmpty(HdnPedidoIdActual.Value))
@@ -943,38 +1011,48 @@ namespace TukiGestor
                 else
                 {
                     // Es un pedido nuevo
-                    // Crear asignación de mesa (si no es mostrador)
+                    // Obtener asignación de mesa (si no es mostrador)
                     int asignacionId = 0;
 
                     if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
                     {
-                        int mesaId = (int)ViewState["MesaIdSeleccionada"];
-
-                        // Verificar si ya existe una asignación activa
-                        AsignacionMesa asignacionExistente = asignacionService.ObtenerAsignacionPorMesa(mesaId);
-
-                        if (asignacionExistente != null)
+                        // PRIMERO: Intentar usar el AsignacionId que fue guardado al abrir la mesa
+                        if (ViewState["AsignacionIdActual"] != null)
                         {
-                            asignacionId = asignacionExistente.AsignacionId;
+                            asignacionId = (int)ViewState["AsignacionIdActual"];
+                            System.Diagnostics.Debug.WriteLine($"✓ Usando AsignacionId del ViewState: {asignacionId}");
                         }
                         else
                         {
-                            // Si no existe, crear nueva asignación (usar el mesero seleccionado previamente)
-                            int meseroId = 1; // Por defecto
-                            if (ViewState["MeseroIdSeleccionado"] != null)
+                            // SEGUNDO: Si no está en ViewState, buscar en la BD
+                            int mesaId = (int)ViewState["MesaIdSeleccionada"];
+                            AsignacionMesa asignacionExistente = asignacionService.ObtenerAsignacionPorMesa(mesaId);
+
+                            if (asignacionExistente != null)
                             {
-                                meseroId = (int)ViewState["MeseroIdSeleccionado"];
+                                asignacionId = asignacionExistente.AsignacionId;
+                                System.Diagnostics.Debug.WriteLine($"✓ Asignación encontrada en BD: {asignacionId}");
                             }
-
-                            AsignacionMesa nuevaAsignacion = new AsignacionMesa
+                            else
                             {
-                                MesaId = mesaId,
-                                MeseroId = meseroId,
-                                FechaAsignacion = DateTime.Now,
-                                Activa = true
-                            };
+                                // TERCERO: Si no existe, crear nueva asignación
+                                int meseroId = 1; // Por defecto
+                                if (ViewState["MeseroIdSeleccionado"] != null)
+                                {
+                                    meseroId = (int)ViewState["MeseroIdSeleccionado"];
+                                }
 
-                            asignacionId = asignacionService.CrearAsignacion(nuevaAsignacion);
+                                AsignacionMesa nuevaAsignacion = new AsignacionMesa
+                                {
+                                    MesaId = mesaId,
+                                    MeseroId = meseroId,
+                                    FechaAsignacion = DateTime.Now,
+                                    Activa = true
+                                };
+
+                                asignacionId = asignacionService.CrearAsignacion(nuevaAsignacion);
+                                System.Diagnostics.Debug.WriteLine($"✓ Nueva asignación creada: {asignacionId}");
+                            }
                         }
                     }
 
@@ -984,7 +1062,8 @@ namespace TukiGestor
                         FechaPedido = DateTime.Now,
                         EstadoPedido = true,
                         Total = total,
-                        AsignacionId = asignacionId
+                        AsignacionId = asignacionId > 0 ? asignacionId : 0,
+                        EsMostrador = esMostrador
                     };
 
                     pedidoId = pedidoService.CrearPedido(nuevoPedido);
@@ -1051,9 +1130,11 @@ namespace TukiGestor
                 // Finalizar el pedido
                 pedidoService.FinalizarPedido(pedidoId);
 
+                // Obtener ubicación del HiddenField (fuente de verdad)
+                string ubicacion = !string.IsNullOrEmpty(HdnTabActivo.Value) ? HdnTabActivo.Value : "salon";
+
                 // Liberar la mesa (si no es mostrador)
                 bool esMostrador = ViewState["EsMostrador"] != null && (bool)ViewState["EsMostrador"];
-                string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "mostrador";
 
                 if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
                 {
@@ -1252,9 +1333,11 @@ namespace TukiGestor
                 // Cancelar el pedido (elimina pedido y detalles)
                 pedidoService.CancelarPedido(pedidoId);
 
+                // Obtener ubicación del HiddenField (fuente de verdad)
+                string ubicacion = !string.IsNullOrEmpty(HdnTabActivo.Value) ? HdnTabActivo.Value : "salon";
+
                 // Liberar la mesa (si no es mostrador)
                 bool esMostrador = ViewState["EsMostrador"] != null && (bool)ViewState["EsMostrador"];
-                string ubicacion = ViewState["UbicacionSeleccionada"]?.ToString() ?? "mostrador";
 
                 if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
                 {

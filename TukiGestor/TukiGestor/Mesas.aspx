@@ -871,30 +871,36 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </asp:Panel>
 
-            <!-- Tabs Navigation -->
+            <!-- Tabs Navigation - Clases CSS generadas desde C# -->
             <asp:HiddenField ID="HdnTabActivo" runat="server" Value="salon" />
             <ul class="nav nav-tabs" id="mesasTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="salon-tab" data-bs-toggle="tab" data-bs-target="#salon" type="button" role="tab" onclick="guardarTab('salon')">
+                    <button class="nav-link <%= HdnTabActivo.Value == "salon" || string.IsNullOrEmpty(HdnTabActivo.Value) ? "active" : "" %>"
+                            id="salon-tab" data-bs-toggle="tab" data-bs-target="#salon" type="button" role="tab"
+                            onclick="document.getElementById('<%= HdnTabActivo.ClientID %>').value='salon'">
                         <i class="bi bi-house-door"></i> Salon
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="patio-tab" data-bs-toggle="tab" data-bs-target="#patio" type="button" role="tab" onclick="guardarTab('patio')">
+                    <button class="nav-link <%= HdnTabActivo.Value == "patio" ? "active" : "" %>"
+                            id="patio-tab" data-bs-toggle="tab" data-bs-target="#patio" type="button" role="tab"
+                            onclick="document.getElementById('<%= HdnTabActivo.ClientID %>').value='patio'">
                         <i class="bi bi-tree"></i> Patio
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="mostrador-tab" data-bs-toggle="tab" data-bs-target="#mostrador" type="button" role="tab" onclick="guardarTab('mostrador')">
+                    <button class="nav-link <%= HdnTabActivo.Value == "mostrador" ? "active" : "" %>"
+                            id="mostrador-tab" data-bs-toggle="tab" data-bs-target="#mostrador" type="button" role="tab"
+                            onclick="document.getElementById('<%= HdnTabActivo.ClientID %>').value='mostrador'">
                         <i class="bi bi-shop"></i> Mostrador
                     </button>
                 </li>
             </ul>
 
-            <!-- Tabs Content -->
+            <!-- Tabs Content - Clases CSS generadas desde C# -->
             <div class="tab-content" id="mesasTabContent">
                 <!-- Salón Tab -->
-                <div class="tab-pane fade show active" id="salon" role="tabpanel">
+                <div class="tab-pane fade <%= (HdnTabActivo.Value == "salon" || string.IsNullOrEmpty(HdnTabActivo.Value)) ? "show active" : "" %>" id="salon" role="tabpanel">
                     <div class="section-header">
                         <div class="section-title">Mesas del Salon</div>
                     </div>
@@ -927,7 +933,7 @@
                 </div>
 
                 <!-- Patio Tab -->
-                <div class="tab-pane fade" id="patio" role="tabpanel">
+                <div class="tab-pane fade <%= HdnTabActivo.Value == "patio" ? "show active" : "" %>" id="patio" role="tabpanel">
                     <div class="section-header">
                         <div class="section-title">Mesas del Patio</div>
                     </div>
@@ -960,7 +966,7 @@
                 </div>
 
                 <!-- Mostrador Tab -->
-                <div class="tab-pane fade" id="mostrador" role="tabpanel">
+                <div class="tab-pane fade <%= HdnTabActivo.Value == "mostrador" ? "show active" : "" %>" id="mostrador" role="tabpanel">
                     <div class="section-header">
                         <div class="section-title">Mostrador</div>
                         <div class="action-buttons">
@@ -1231,246 +1237,130 @@
     </div>
 
     <script>
-        // ========================================
-        // FUNCIONES PARA MANEJO DE PRODUCTOS
-        // ========================================
+        // Función helper para formatear números
+        const formatearPrecio = (num) => '$' + Math.round(num).toLocaleString('es-AR');
 
-        // Cambiar cantidad de un producto
+        // ===== MANEJO DE PRODUCTOS =====
         function cambiarCantidad(boton, incremento, event) {
             event.preventDefault();
             event.stopPropagation();
-
-            const productoItem = boton.closest('.producto-item');
-            const input = productoItem.querySelector('input[type="number"]');
-            let cantidad = parseInt(input.value) || 0;
-
-            // Actualizar cantidad
-            cantidad += incremento;
-            if (cantidad < 0) cantidad = 0;
-
-            input.value = cantidad;
-
-            // Actualizar resumen de la orden
+            const input = boton.closest('.producto-item').querySelector('input[type="number"]');
+            input.value = Math.max(0, (parseInt(input.value) || 0) + incremento);
             actualizarResumenOrden();
         }
 
-        // Actualizar el resumen de la orden
         function actualizarResumenOrden() {
             const resumenDiv = document.getElementById('resumenOrden');
             const totalSpan = document.getElementById('totalOrden');
-
-            // Verificar si hay productos existentes (cuando estamos agregando más productos)
-            const tieneExistentes = resumenDiv && resumenDiv.getAttribute('data-tiene-existentes') === 'true';
+            const tieneExistentes = resumenDiv?.getAttribute('data-tiene-existentes') === 'true';
             const productosExistentes = window.productosExistentesOrden || [];
-            const totalExistente = window.totalExistenteOrden || 0;
 
-            // Obtener todos los productos NUEVOS con cantidad > 0
-            const todosProductos = document.querySelectorAll('.producto-item');
-            const productosNuevos = [];
-
-            todosProductos.forEach(producto => {
-                const input = producto.querySelector('input[type="number"]');
-                const cantidad = parseInt(input.value) || 0;
-
-                if (cantidad > 0) {
-                    const nombre = producto.getAttribute('data-nombre');
-                    const precio = parseFloat(producto.getAttribute('data-precio'));
-                    const productoId = producto.getAttribute('data-productoid');
-
-                    productosNuevos.push({
-                        id: productoId,
-                        nombre: nombre,
-                        precio: precio,
+            // Recolectar productos nuevos
+            const productosNuevos = Array.from(document.querySelectorAll('.producto-item'))
+                .map(p => {
+                    const cantidad = parseInt(p.querySelector('input[type="number"]').value) || 0;
+                    return cantidad > 0 ? {
+                        nombre: p.getAttribute('data-nombre'),
+                        precio: parseFloat(p.getAttribute('data-precio')),
                         cantidad: cantidad,
-                        subtotal: precio * cantidad
-                    });
-                }
-            });
+                        subtotal: parseFloat(p.getAttribute('data-precio')) * cantidad
+                    } : null;
+                })
+                .filter(p => p !== null);
 
-            // Construir HTML del resumen
+            // Construir HTML
             let html = '';
             let total = 0;
 
-            // Si hay productos existentes, mostrarlos primero
-            if (tieneExistentes && productosExistentes.length > 0) {
-                productosExistentes.forEach(prod => {
-                    total += prod.subtotal;
-                    html += `
-                        <div class="resumen-item" data-tipo="existente">
-                            <div class="resumen-item-info">
-                                <div class="resumen-item-nombre">${prod.nombre}</div>
-                                <div class="resumen-item-cantidad">Cantidad: ${prod.cantidad} x $${prod.precio.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
-                            </div>
-                            <div class="resumen-item-precio">$${prod.subtotal.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
-                        </div>
-                    `;
-                });
-            }
+            const generarItemHTML = (prod, tipo) => {
+                total += prod.subtotal;
+                return `<div class="resumen-item" data-tipo="${tipo}">
+                    <div class="resumen-item-info">
+                        <div class="resumen-item-nombre">${prod.nombre}</div>
+                        <div class="resumen-item-cantidad">Cantidad: ${prod.cantidad} x ${formatearPrecio(prod.precio)}</div>
+                    </div>
+                    <div class="resumen-item-precio">${formatearPrecio(prod.subtotal)}</div>
+                </div>`;
+            };
 
-            // Agregar productos nuevos
-            if (productosNuevos.length > 0) {
-                productosNuevos.forEach(prod => {
-                    total += prod.subtotal;
-                    html += `
-                        <div class="resumen-item" data-tipo="nuevo">
-                            <div class="resumen-item-info">
-                                <div class="resumen-item-nombre">${prod.nombre}</div>
-                                <div class="resumen-item-cantidad">Cantidad: ${prod.cantidad} x $${prod.precio.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
-                            </div>
-                            <div class="resumen-item-precio">$${prod.subtotal.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
-                        </div>
-                    `;
-                });
-            }
+            if (tieneExistentes) html += productosExistentes.map(p => generarItemHTML(p, 'existente')).join('');
+            html += productosNuevos.map(p => generarItemHTML(p, 'nuevo')).join('');
 
-            // Actualizar HTML del resumen
-            if (html === '') {
-                resumenDiv.innerHTML = '<p style="color: #999; font-style: italic;">No hay productos seleccionados</p>';
-                totalSpan.textContent = '$0';
-            } else {
-                resumenDiv.innerHTML = html;
-                totalSpan.textContent = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-            }
+            resumenDiv.innerHTML = html || '<p style="color: #999; font-style: italic;">No hay productos seleccionados</p>';
+            totalSpan.textContent = html ? formatearPrecio(total) : '$0';
         }
 
-        // Confirmar orden - Recolectar datos y enviar al servidor
         function confirmarOrden() {
-            const todosProductos = document.querySelectorAll('.producto-item');
-            const productosSeleccionados = [];
-
-            todosProductos.forEach(producto => {
-                const input = producto.querySelector('input[type="number"]');
-                const cantidad = parseInt(input.value) || 0;
-
-                if (cantidad > 0) {
-                    const productoId = producto.getAttribute('data-productoid');
-                    const precio = parseFloat(producto.getAttribute('data-precio'));
-                    const nombre = producto.getAttribute('data-nombre');
-
-                    productosSeleccionados.push({
-                        ProductoId: parseInt(productoId),
+            const productos = Array.from(document.querySelectorAll('.producto-item'))
+                .map(p => {
+                    const cantidad = parseInt(p.querySelector('input[type="number"]').value) || 0;
+                    return cantidad > 0 ? {
+                        ProductoId: parseInt(p.getAttribute('data-productoid')),
                         Cantidad: cantidad,
-                        PrecioUnitario: precio,
-                        Nombre: nombre
-                    });
-                }
-            });
+                        PrecioUnitario: parseFloat(p.getAttribute('data-precio')),
+                        Nombre: p.getAttribute('data-nombre')
+                    } : null;
+                })
+                .filter(p => p !== null);c
 
-            if (productosSeleccionados.length === 0) {
+            if (productos.length === 0) {
                 alert('Por favor selecciona al menos un producto');
                 return;
             }
 
-            // Guardar productos en HiddenField y hacer PostBack
-            document.getElementById('<%= HdnProductosOrden.ClientID %>').value = JSON.stringify(productosSeleccionados);
+            document.getElementById('<%= HdnProductosOrden.ClientID %>').value = JSON.stringify(productos);
             <%= Page.ClientScript.GetPostBackEventReference(BtnConfirmarOrdenHidden, "") %>;
         }
 
-        // Agregar mas productos - vuelve al modal de orden
+        // ===== MANEJO DE MODALS =====
         function agregarMasProductos() {
-            const modalResumen = bootstrap.Modal.getInstance(document.getElementById('modalResumenPago'));
-            if (modalResumen) {
-                modalResumen.hide();
-            }
-
-            setTimeout(function() {
-                var numeroMesa = document.getElementById('modal-resumen-mesa-numero').textContent;
-                document.getElementById('modal-orden-mesa-numero').textContent = numeroMesa;
-                const modalOrden = new bootstrap.Modal(document.getElementById('modalOrden'));
-                modalOrden.show();
+            bootstrap.Modal.getInstance(document.getElementById('modalResumenPago'))?.hide();
+            setTimeout(() => {
+                document.getElementById('modal-orden-mesa-numero').textContent =
+                    document.getElementById('modal-resumen-mesa-numero').textContent;
+                new bootstrap.Modal(document.getElementById('modalOrden')).show();
             }, 300);
         }
 
-        function guardarTab(tab) {
-            var hdnTabActivo = document.getElementById('<%= HdnTabActivo.ClientID %>');
-            if (hdnTabActivo) {
-                hdnTabActivo.value = tab;
-            }
-        }
-
-        // Restaurar tab activo después del PostBack
-        function restaurarTab() {
-            var hdnTabActivo = document.getElementById('<%= HdnTabActivo.ClientID %>');
-            if (hdnTabActivo && hdnTabActivo.value) {
-                var tabActivo = hdnTabActivo.value;
-
-                // Remover clase active de todos los tabs
-                document.querySelectorAll('#mesasTabs .nav-link').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('#mesasTabContent .tab-pane').forEach(p => {
-                    p.classList.remove('show', 'active');
-                });
-
-                // Activar el tab correcto
-                var tabBtn = document.getElementById(tabActivo + '-tab');
-                var tabPane = document.getElementById(tabActivo);
-
-                if (tabBtn && tabPane) {
-                    tabBtn.classList.add('active');
-                    tabPane.classList.add('show', 'active');
-                }
-            }
-        }
-
-        // Manejar Enter en el textbox de búsqueda
+        // ===== BÚSQUEDA =====
         function handleEnterBusqueda(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
-                // Hacer PostBack del TextBox para ejecutar búsqueda
                 __doPostBack('<%= TxtBuscarProducto.UniqueID %>', '');
                 return false;
             }
             return true;
         }
 
-        // Mantener foco en el textbox después del PostBack
-        var Sys = Sys || {};
-        Sys.WebForms = Sys.WebForms || {};
-        Sys.WebForms.PageRequestManager = Sys.WebForms.PageRequestManager || {};
-
         function mantenerFocoEnBusqueda() {
-            var prm = Sys.WebForms.PageRequestManager.getInstance();
+            const prm = Sys?.WebForms?.PageRequestManager?.getInstance();
             if (prm) {
-                prm.add_endRequest(function (sender, args) {
-                    // Después del PostBack, devolver el foco al textbox
-                    var txtBuscar = document.getElementById('<%= TxtBuscarProducto.ClientID %>');
+                prm.add_endRequest(() => {
+                    const txtBuscar = document.getElementById('<%= TxtBuscarProducto.ClientID %>');
                     if (txtBuscar) {
-                        setTimeout(function() {
+                        setTimeout(() => {
                             txtBuscar.focus();
-                            // Colocar cursor al final del texto
-                            var len = txtBuscar.value.length;
-                            if (txtBuscar.setSelectionRange) {
-                                txtBuscar.setSelectionRange(len, len);
-                            }
+                            txtBuscar.setSelectionRange?.(txtBuscar.value.length, txtBuscar.value.length);
                         }, 100);
                     }
                 });
             }
         }
 
-        // Limpiar búsqueda al cerrar modal
         function limpiarBusquedaAlCerrarModal() {
-            var txtBuscar = document.getElementById('<%= TxtBuscarProducto.ClientID %>');
-            if (txtBuscar && txtBuscar.value.trim()) {
-                // Hacer click en el botón de limpiar
-                var btnLimpiar = document.getElementById('<%= BtnLimpiarBusqueda.ClientID %>');
-                if (btnLimpiar && btnLimpiar.style.display !== 'none') {
-                    btnLimpiar.click();
-                }
+            const txtBuscar = document.getElementById('<%= TxtBuscarProducto.ClientID %>');
+            const btnLimpiar = document.getElementById('<%= BtnLimpiarBusqueda.ClientID %>');
+            if (txtBuscar?.value.trim() && btnLimpiar?.style.display !== 'none') {
+                btnLimpiar.click();
             }
         }
 
+        // ===== INICIALIZACIÓN =====
         document.addEventListener('DOMContentLoaded', () => {
-            // Restaurar tab activo
-            restaurarTab();
-
-            // Inicializar mantener foco en búsqueda después de UpdatePanel
             mantenerFocoEnBusqueda();
 
-            // Agregar evento al cerrar modal de orden
-            const modalOrden = document.getElementById('modalOrden');
-            if (modalOrden) {
-                modalOrden.addEventListener('hidden.bs.modal', limpiarBusquedaAlCerrarModal);
-            }
+            // Event listeners de modales
+            document.getElementById('modalOrden')?.addEventListener('hidden.bs.modal', limpiarBusquedaAlCerrarModal);
         });
     </script>
 </asp:Content>

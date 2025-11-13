@@ -92,9 +92,27 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("DELETE FROM PRODUCTO WHERE ProductoId = @id");
+                // Verificar si el producto tiene detalles de pedido asociados
+                datos.SetearConsulta("SELECT COUNT(*) FROM DETALLEPEDIDO WHERE ProductoId = @id");
                 datos.setearParametro("@id", id);
-                datos.ejecutarAccion();
+                int cantidadDetalles = Convert.ToInt32(datos.ejecutarScalar());
+
+                if (cantidadDetalles > 0)
+                {
+                    // Si tiene detalles de pedido, marcar como NO disponible en lugar de eliminar
+                    datos.SetearConsulta("UPDATE PRODUCTO SET Disponible = 0 WHERE ProductoId = @id");
+                    datos.setearParametro("@id", id);
+                    datos.ejecutarAccion();
+
+                    throw new Exception("El producto tiene pedidos asociados y ha sido marcado como NO DISPONIBLE en lugar de eliminarse. Esto preserva el historial de ventas.");
+                }
+                else
+                {
+                    // Si no tiene detalles, permitir eliminarlo
+                    datos.SetearConsulta("DELETE FROM PRODUCTO WHERE ProductoId = @id");
+                    datos.setearParametro("@id", id);
+                    datos.ejecutarAccion();
+                }
             }
             catch (Exception ex)
             {

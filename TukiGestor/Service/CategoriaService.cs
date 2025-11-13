@@ -83,9 +83,27 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("DELETE FROM CATEGORIA WHERE CategoriaId = @id");
+                // Verificar si la categoría tiene productos asociados
+                datos.SetearConsulta("SELECT COUNT(*) FROM PRODUCTO WHERE CategoriaId = @id");
                 datos.setearParametro("@id", id);
-                datos.ejecutarAccion();
+                int cantidadProductos = Convert.ToInt32(datos.ejecutarScalar());
+
+                if (cantidadProductos > 0)
+                {
+                    // Si tiene productos, marcar como inactiva en lugar de eliminar
+                    datos.SetearConsulta("UPDATE CATEGORIA SET Activa = 0 WHERE CategoriaId = @id");
+                    datos.setearParametro("@id", id);
+                    datos.ejecutarAccion();
+
+                    throw new Exception("La categoría tiene productos asociados y ha sido marcada como INACTIVA en lugar de eliminarse. Por favor, reasigne o elimine primero los productos de esta categoría.");
+                }
+                else
+                {
+                    // Si no tiene productos, permitir eliminarla
+                    datos.SetearConsulta("DELETE FROM CATEGORIA WHERE CategoriaId = @id");
+                    datos.setearParametro("@id", id);
+                    datos.ejecutarAccion();
+                }
             }
             catch (Exception ex)
             {

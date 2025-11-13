@@ -29,7 +29,7 @@ namespace Service
                 datos.setearParametro("@Total", pedido.Total);
                 datos.setearParametro("@AsignacionId", pedido.AsignacionId == 0 ? (object)DBNull.Value : pedido.AsignacionId);
                 datos.setearParametro("@CantidadPersonas", 1);
-                datos.setearParametro("@EsMostrador", pedido.AsignacionId == 0);
+                datos.setearParametro("@EsMostrador", pedido.EsMostrador);
 
                 object resultado = datos.ejecutarScalar();
                 return Convert.ToInt32(resultado);
@@ -64,10 +64,18 @@ namespace Service
         {
             try
             {
+                // Actualizar el estado del pedido a 0 (cerrado)
                 datos.SetearConsulta(@"UPDATE PEDIDO
                                       SET Estado = 0, FechaCierre = @FechaCierre
                                       WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@FechaCierre", DateTime.Now);
+                datos.setearParametro("@PedidoId", pedidoId);
+                datos.ejecutarAccion();
+
+                // Actualizar el estado de todos los detalles del pedido a 0 (cerrado)
+                datos.SetearConsulta(@"UPDATE DETALLEPEDIDO
+                                      SET Estado = 0
+                                      WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
             }
@@ -81,13 +89,18 @@ namespace Service
         {
             try
             {
-                // Primero eliminamos los detalles del pedido
-                datos.SetearConsulta("DELETE FROM DETALLEPEDIDO WHERE PedidoId = @PedidoId");
+                // Actualizar el estado del pedido a 0 (cancelado)
+                datos.SetearConsulta(@"UPDATE PEDIDO
+                                      SET Estado = 0, FechaCierre = @FechaCierre
+                                      WHERE PedidoId = @PedidoId");
+                datos.setearParametro("@FechaCierre", DateTime.Now);
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
 
-                // Luego eliminamos el pedido
-                datos.SetearConsulta("DELETE FROM PEDIDO WHERE PedidoId = @PedidoId");
+                // Actualizar el estado de todos los detalles del pedido a 0 (cancelado)
+                datos.SetearConsulta(@"UPDATE DETALLEPEDIDO
+                                      SET Estado = 0
+                                      WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
             }

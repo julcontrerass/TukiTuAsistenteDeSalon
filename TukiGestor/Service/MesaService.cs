@@ -167,15 +167,40 @@ namespace Service
                     throw new Exception("No se encontró la mesa a eliminar");
                 }
 
+                // Verificar si la mesa está ocupada (tiene pedidos activos)
+                if (mesaEliminar.Estado.ToLower() == "ocupada")
+                {
+                    throw new Exception("No se puede eliminar una mesa ocupada. Por favor, cierre primero todos los pedidos activos.");
+                }
+
                 string ubicacion = mesaEliminar.Ubicacion;
                 int numeroMesaEliminar = int.Parse(mesaEliminar.NumeroMesa);
 
-                // Eliminar la mesa
+                // PASO 1: Desasociar todos los pedidos (activos y cerrados) de las asignaciones de esta mesa
+                // Esto preserva el historial de ventas pero rompe el vínculo con la mesa específica
+                datos.SetearConsulta(@"
+                    UPDATE PEDIDO
+                    SET AsignacionId = NULL, EsMostrador = 1
+                    WHERE AsignacionId IN (
+                        SELECT AsignacionId
+                        FROM ASIGNACIONMESA
+                        WHERE MesaId = @mesaId
+                    )
+                ");
+                datos.setearParametro("@mesaId", mesaId);
+                datos.ejecutarAccion();
+
+                // PASO 2: Ahora eliminar todas las asignaciones de esta mesa (ya no tienen pedidos vinculados)
+                datos.SetearConsulta("DELETE FROM ASIGNACIONMESA WHERE MesaId = @mesaId");
+                datos.setearParametro("@mesaId", mesaId);
+                datos.ejecutarAccion();
+
+                // PASO 3: Eliminar la mesa
                 datos.SetearConsulta("DELETE FROM MESA WHERE MesaId = @mesaId");
                 datos.setearParametro("@mesaId", mesaId);
                 datos.ejecutarAccion();
 
-                // Renumerar las mesas siguientes en la misma ubicación
+                // PASO 4: Renumerar las mesas siguientes en la misma ubicación
                 RenumerarMesasDespuesDeEliminar(ubicacion, numeroMesaEliminar);
             }
             catch (Exception ex)
@@ -237,6 +262,33 @@ namespace Service
             catch (Exception ex)
             {
                 throw new Exception("Error al contar las mesas: " + ex.Message, ex);
+            }
+        }
+
+        public void SincronizarEstadoMesasConPedidos()
+        {
+            try
+            {
+                // Primero, marcar todas las mesas como libres
+                datos.SetearConsulta("UPDATE MESA SET Estado = 'libre'");
+                datos.ejecutarAccion();
+
+                // Luego, marcar como ocupadas las mesas que tienen asignaciones activas
+                // (independientemente de si tienen pedidos o no, porque la mesa se ocupa al asignar mesero)
+                datos.SetearConsulta(@"
+                    UPDATE MESA
+                    SET Estado = 'ocupada'
+                    WHERE MesaId IN (
+                        SELECT DISTINCT MesaId
+                        FROM ASIGNACIONMESA
+                        WHERE Activa = 1
+                    )
+                ");
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al sincronizar estado de mesas: " + ex.Message, ex);
             }
         }
     }
