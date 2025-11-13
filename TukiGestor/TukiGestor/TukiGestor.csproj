@@ -184,7 +184,12 @@
     <Content Include="Scripts\WebForms\WebUIValidation.js" />
     <Content Include="Site.Master" />
     <Content Include="Productos.aspx" />
+    <Content Include="Styles\home.css" />
+    <Content Include="Styles\mesas.css" />
     <Content Include="Styles\reportes.css" />
+    <Content Include="Styles\login.css" />
+    <Content Include="Styles\productos.css" />
+    <Content Include="Styles\registrarse.css" />
     <Content Include="ViewSwitcher.ascx" />
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />

@@ -55,7 +55,7 @@ CREATE TABLE [dbo].[MESA](
 	[MesaId] [int] IDENTITY (1,1) NOT NULL,
 	[NumeroMesa] [varchar](50) NULL,
 	[Ubicacion] [varchar](50) NULL,
-	[Estado] [varchar](50) NULL, -- CHECK (Estado IN ('Libre', 'Ocupada', 'Reservada'))
+	[Estado] [varchar](50) NULL, 
 	--[Capacidad] [int] NOT NULL,
 CONSTRAINT [PK_MESA] PRIMARY KEY CLUSTERED
 (
@@ -234,23 +234,6 @@ select * from PEDIDO
 select * from PRODUCTO
 select * from USUARIO
 
-DELETE FROM MESA
-
-select * from PEDIDO
-
-select * from DETALLEPEDIDO DP
-join PRODUCTO P on DP.ProductoId = p.ProductoId
-
-
-select * from PEDIDO where PedidoId = 1
-select * from DETALLEPEDIDO
-select * from ASIGNACIONMESA
-select * from VENTA
-select * from PEDIDO
-
-select * from MESA where mesaId = 13
-
-
 CREATE FUNCTION dbo.fn_CalcularTurno (@Fecha DATETIME)
 RETURNS VARCHAR(20)
 AS
@@ -273,7 +256,6 @@ BEGIN
 END
 GO
 
-SELECT * FROM MEsa
 
 
 CREATE PROCEDURE sp_ReporteMesas(
@@ -286,11 +268,22 @@ CREATE PROCEDURE sp_ReporteMesas(
 )
 AS
 BEGIN
+	IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena') 
+	OR @Cantidad NOT in ('Mas', 'Menos')
+	OR @FechaDesde IS NULL 
+	OR @FechaHasta IS NULL 
+	OR @OrdenPor NOT IN ('Facturacion', 'Ocupacion')
+	or @Ubicacion NOT IN('Todos', 'Salon', 'Patio')
+	)
+BEGIN
+    RAISERROR('Faltan parámetros obligatorios', 16, 1);
+    RETURN;
+END
 	SELECT
 		M.MesaId,
 		M.NumeroMesa,
 		M.Ubicacion,
-		SUM(DP.Subtotal) AS Total,
+		SUM(DP.Subtotal) AS Facturacion,
 		COUNT(DISTINCT PE.PedidoId) AS Ocupacion
 	FROM MESA M
 		INNER JOIN ASIGNACIONMESA AM ON AM.MesaId = M.MesaId
@@ -320,12 +313,128 @@ BEGIN
 END
 GO
 
-drop PROCEDURE sp_FiltrarPorMesas
 
-EXEC sp_FiltrarPorMesas 'Todos', 
+CREATE PROCEDURE sp_ReporteMeseros(
+	@Turno VARCHAR(20) = 'Todos',
+	@Cantidad VARCHAR(10) = 'Mas',
+	@FechaDesde DATE,
+	@FechaHasta DATE,
+	@Ubicacion VARCHAR(20) = 'Todos',
+	@OrdenPor VARCHAR(20)
+)
+AS
+BEGIN
+	IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena') 
+	OR @Cantidad NOT in ('Mas', 'Menos')
+	OR @FechaDesde IS NULL 
+	OR @FechaHasta IS NULL 
+	OR @OrdenPor NOT IN ('Facturacion', 'Mesas Atendidas')
+	or @Ubicacion NOT IN('Todos', 'Salon', 'Patio')
+	)
+BEGIN
+    RAISERROR('Faltan parámetros obligatorios', 16, 1);
+    RETURN;
+END
+	SELECT			
+		ME.Nombre + ' ' + ME.Apellido AS NombreApellido,		
+		Me.MeseroId,	
+		SUM(DP.Subtotal) AS Facturacion,
+		COUNT(DISTINCT PE.PedidoId) AS MesasAtendidas
+		FROM MESA M
+		INNER JOIN ASIGNACIONMESA AM ON AM.MesaId = M.MesaId
+		INNER JOIN PEDIDO PE ON PE.AsignacionId = AM.AsignacionId
+		INNER JOIN DETALLEPEDIDO DP ON PE.PedidoId = DP.PedidoId
+		INNER JOIN MESERO ME on ME.MeseroId = AM.MeseroId		
+	WHERE
+		PE.FechaApertura >= @FechaDesde
+		AND PE.FechaApertura < DATEADD(DAY, 1, @FechaHasta)
+		AND (
+        @Turno = 'Todos'
+		OR dbo.fn_CalcularTurno(PE.FechaApertura) = @Turno
+    )
+		AND (
+        @Ubicacion = 'Todos'
+		OR M.Ubicacion = @Ubicacion
+    )
+	GROUP BY
+		ME.Nombre,
+		ME.Apellido,
+		ME.MeseroId	
+	ORDER BY
+	CASE 
+            WHEN @Cantidad = 'Mas' AND @OrdenPor = 'Facturacion' THEN SUM(DP.Subtotal)
+            WHEN @Cantidad = 'Mas' AND @OrdenPor = 'Mesas Atendidas'   THEN COUNT(DISTINCT PE.PedidoId)
+        END DESC,
+        CASE 
+            WHEN @Cantidad = 'Menos' AND @OrdenPor = 'Facturacion' THEN SUM(DP.Subtotal)
+            WHEN @Cantidad = 'Menos' AND @OrdenPor = 'Mesas Atendidas'   THEN COUNT(DISTINCT PE.PedidoId)
+        END ASC;
+END
+GO
+
+CREATE PROCEDURE sp_ReporteProducto(
+	@Turno VARCHAR(20) = 'Todos',
+	@FechaDesde DATE,
+	@FechaHasta DATE,
+	@Ubicacion VARCHAR(20) = 'Todos',
+	@CantidadProductos INT = 10,
+	@MasOMenos VARCHAR(10) = 'Mas',
+	@OrdenPor VARCHAR(20),
+	@CategoriaProducto VARCHAR(50)
+)
+AS
+BEGIN
+	IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena') 
+	OR @MasOMenos NOT in ('Mas', 'Menos')
+	OR @FechaDesde IS NULL 
+	OR @FechaHasta IS NULL 
+	OR @CantidadProductos IS NULL
+	OR @OrdenPor NOT IN ('Facturacion', 'Ventas')
+	OR @Ubicacion NOT IN('Todos', 'Salon', 'Patio')
+	OR @CategoriaProducto IS NULL
+	)
+BEGIN
+    RAISERROR('Faltan parámetros obligatorios', 16, 1);
+    RETURN;
+END
+	 Select TOP (@CantidadProductos)	
+		P.Nombre,
+		C.Nombre AS Categoria,		
+ 		SUM(DP.Subtotal) AS Facturacion,
+		SUM(DP.Cantidad) AS CantidadVendida
+		FROM DETALLEPEDIDO DP		
+		INNER JOIN PEDIDO PE ON PE.PedidoId = DP.PedidoId
+		INNER JOIN ASIGNACIONMESA AM ON AM.AsignacionId = PE.AsignacionId
+		INNER JOIN MESA M ON M.MesaId = AM.MesaId
+		INNER JOIN PRODUCTO P ON P.ProductoId = DP.ProductoId	
+		INNER JOIN CATEGORIA C ON C.CategoriaId = P.CategoriaId
+	WHERE
+		PE.FechaApertura >= @FechaDesde
+		AND PE.FechaApertura < DATEADD(DAY, 1, @FechaHasta)
+		AND (
+        @Turno = 'Todos'
+		OR dbo.fn_CalcularTurno(PE.FechaApertura) = @Turno
+    )
+		AND (
+        @Ubicacion = 'Todos'
+		OR M.Ubicacion = @Ubicacion
+    )AND(
+		@CategoriaProducto = 'Todos'
+		OR C.Nombre = @CategoriaProducto
+	)
+	GROUP BY
+	P.Nombre, 
+	C.Nombre
+	ORDER BY
+	CASE 
+            WHEN @MasOMenos = 'Mas' AND @OrdenPor = 'Facturacion' THEN SUM(DP.Subtotal)
+            WHEN @MasOMenos = 'Mas' AND @OrdenPor = 'Ventas'   THEN SUM(DP.Cantidad)
+        END DESC,
+        CASE 
+            WHEN @MasOMenos = 'Menos' AND @OrdenPor = 'Facturacion' THEN SUM(DP.Subtotal)
+            WHEN @MasOMenos = 'Menos' AND @OrdenPor = 'Ventas'   THEN SUM(DP.Cantidad)
+        END ASC;
+END
+GO
 
 
-SELECT  M.NumeroMesa, M.Ubicacion, COUNT(PE.PedidoId) AS Ocupacion FROM PEDIDO PE 
-INNER JOIN ASIGNACIONMESA AM ON AM.AsignacionId = PE.AsignacionId
-INNER JOIN MESA M ON M.MesaId = AM.MesaId
-GROUP BY M.NumeroMesa, M.Ubicacion
