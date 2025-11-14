@@ -926,16 +926,13 @@ namespace TukiGestor
         {
             try
             {
-                // Obtener los datos del HiddenField
                 string productosJson = HdnProductosOrden.Value;
-
                 if (string.IsNullOrEmpty(productosJson))
                 {
                     MostrarMensaje("No se recibieron productos en la orden", "warning");
                     return;
                 }
 
-                // Deserializar el JSON a una lista de objetos
                 var productosSeleccionados = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(
                     productosJson,
                     new[] { new { ProductoId = 0, Cantidad = 0, PrecioUnitario = 0m, Nombre = "" } }
@@ -947,43 +944,54 @@ namespace TukiGestor
                     return;
                 }
 
-                // Calcular el total
-                decimal total = 0;
-                foreach (var producto in productosSeleccionados)
+                // Instancias de servicios
+                PedidoService pedidoService = this.pedidoService ?? new PedidoService();
+                MesaService mesaService = this.mesaService ?? new MesaService();
+                ProductoService productoService = new ProductoService();
+                AsignacionMesaService asignacionService = new AsignacionMesaService();
+
+                // VALIDAMOS STOCK PARA TODOS los productos antes de insertar nada
+                foreach (var p in productosSeleccionados)
                 {
-                    total += producto.Cantidad * producto.PrecioUnitario;
+                    int stock = productoService.ObtenerStock(p.ProductoId);
+                    if (stock < p.Cantidad)
+                    {
+                        MostrarMensaje($"No hay stock suficiente para {p.Nombre} (Id {p.ProductoId}). Stock: {stock}, Pedido: {p.Cantidad}", "warning");
+                        return;
+                    }
                 }
+
+                // CALCULAR TOTAL
+                decimal total = 0m;
+                foreach (var producto in productosSeleccionados)
+                    total += producto.Cantidad * producto.PrecioUnitario;
 
                 int pedidoId;
 
-                // Obtener ubicación del HiddenField (fuente de verdad) en lugar de ViewState
+                // Ubicación / mostrador
                 string ubicacion = !string.IsNullOrEmpty(HdnTabActivo.Value) ? HdnTabActivo.Value : "salon";
-
                 bool esMostrador = ViewState["EsMostrador"] != null && (bool)ViewState["EsMostrador"];
-
-                // Si el ViewState no tiene la ubicación, usarla del HiddenField
                 if (ViewState["UbicacionSeleccionada"] == null || string.IsNullOrEmpty(ViewState["UbicacionSeleccionada"].ToString()))
-                {
                     ViewState["UbicacionSeleccionada"] = ubicacion;
-                }
                 else
-                {
                     ubicacion = ViewState["UbicacionSeleccionada"].ToString();
-                }
 
                 string numeroMesa = ViewState["NumeroMesaSeleccionada"]?.ToString() ?? "Mostrador";
 
-                // Verificar si es una actualización de pedido existente (agregar más productos)
+                
                 if (!string.IsNullOrEmpty(HdnPedidoIdActual.Value))
                 {
-                    // Es una actualización - agregar productos al pedido existente
                     pedidoId = int.Parse(HdnPedidoIdActual.Value);
 
                     // Obtener el pedido actual para sumar al total existente
                     Pedido pedidoActual = pedidoService.ObtenerPedidoPorId(pedidoId);
+                    if (pedidoActual == null)
+                    {
+                        MostrarMensaje("No se encontró el pedido existente.", "danger");
+                        return;
+                    }
                     decimal totalAnterior = pedidoActual.Total;
 
-                    // Agregar los nuevos detalles del pedido
                     foreach (var producto in productosSeleccionados)
                     {
                         DetallePedido detalle = new DetallePedido
@@ -994,46 +1002,41 @@ namespace TukiGestor
                             PrecioUnitario = producto.PrecioUnitario,
                             Subtotal = producto.Cantidad * producto.PrecioUnitario
                         };
+
                         pedidoService.AgregarDetallePedido(detalle);
+
+                        // DESCONTAR STOCK
+                        productoService.DescontarStock(detalle.ProductoId, detalle.Cantidad);
                     }
 
-                    // Actualizar el total del pedido sumando el nuevo total al anterior
+                    // Actualizar total del pedido
                     decimal totalNuevo = totalAnterior + total;
                     pedidoService.ActualizarTotalPedido(pedidoId, totalNuevo);
                 }
                 else
                 {
-                    // Es un pedido nuevo
-                    // Obtener asignación de mesa (si no es mostrador)
+                    // Pedido nuevo
                     int asignacionId = 0;
-
                     if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
                     {
-                        // PRIMERO: Intentar usar el AsignacionId que fue guardado al abrir la mesa
                         if (ViewState["AsignacionIdActual"] != null)
                         {
                             asignacionId = (int)ViewState["AsignacionIdActual"];
-                            System.Diagnostics.Debug.WriteLine($"✓ Usando AsignacionId del ViewState: {asignacionId}");
                         }
                         else
                         {
-                            // SEGUNDO: Si no está en ViewState, buscar en la BD
                             int mesaId = (int)ViewState["MesaIdSeleccionada"];
                             AsignacionMesa asignacionExistente = asignacionService.ObtenerAsignacionPorMesa(mesaId);
-
                             if (asignacionExistente != null)
                             {
                                 asignacionId = asignacionExistente.AsignacionId;
-                                System.Diagnostics.Debug.WriteLine($"✓ Asignación encontrada en BD: {asignacionId}");
+                                ViewState["AsignacionIdActual"] = asignacionId;
                             }
                             else
                             {
-                                // TERCERO: Si no existe, crear nueva asignación
-                                int meseroId = 1; // Por defecto
+                                int meseroId = 1;
                                 if (ViewState["MeseroIdSeleccionado"] != null)
-                                {
                                     meseroId = (int)ViewState["MeseroIdSeleccionado"];
-                                }
 
                                 AsignacionMesa nuevaAsignacion = new AsignacionMesa
                                 {
@@ -1042,14 +1045,13 @@ namespace TukiGestor
                                     FechaAsignacion = DateTime.Now,
                                     Activa = true
                                 };
-
                                 asignacionId = asignacionService.CrearAsignacion(nuevaAsignacion);
-                                System.Diagnostics.Debug.WriteLine($"✓ Nueva asignación creada: {asignacionId}");
+                                ViewState["AsignacionIdActual"] = asignacionId;
                             }
                         }
                     }
 
-                    // Crear el pedido
+                    // Crear pedido (usa tu método existente)
                     Pedido nuevoPedido = new Pedido
                     {
                         FechaPedido = DateTime.Now,
@@ -1061,7 +1063,7 @@ namespace TukiGestor
 
                     pedidoId = pedidoService.CrearPedido(nuevoPedido);
 
-                    // Agregar los detalles del pedido
+                    // Agregar detalles y descontar stock
                     foreach (var producto in productosSeleccionados)
                     {
                         DetallePedido detalle = new DetallePedido
@@ -1072,10 +1074,14 @@ namespace TukiGestor
                             PrecioUnitario = producto.PrecioUnitario,
                             Subtotal = producto.Cantidad * producto.PrecioUnitario
                         };
+
                         pedidoService.AgregarDetallePedido(detalle);
+
+                        // DESCONTAR STOCK
+                        productoService.DescontarStock(detalle.ProductoId, detalle.Cantidad);
                     }
 
-                    // Si NO es mostrador, actualizar estado de la mesa a ocupada
+                    // Si no es mostrador, marcar mesa ocupada
                     if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
                     {
                         int mesaId = (int)ViewState["MesaIdSeleccionada"];
@@ -1083,22 +1089,15 @@ namespace TukiGestor
                     }
                 }
 
-                // Guardar el pedidoId para el modal de resumen
+                // Guardar y limpiar
                 HdnPedidoIdActual.Value = pedidoId.ToString();
-
-                // Limpiar el HiddenField de productos
                 HdnProductosOrden.Value = string.Empty;
-
-                // Recargar las órdenes de mostrador si es una orden de mostrador
-                if (esMostrador)
-                {
-                    CargarOrdenesActivas();
-                }
-
-                // Guardar tab activo
                 HdnTabActivo.Value = ubicacion;
 
-                // Mostrar el modal de resumen usando el método del servidor
+                // Actualizaciones de UI / resumen
+                if (esMostrador)
+                    CargarOrdenesActivas();
+
                 MostrarResumenPedido(pedidoId, numeroMesa, ubicacion);
             }
             catch (Exception ex)
@@ -1106,6 +1105,10 @@ namespace TukiGestor
                 MostrarMensaje("Error al confirmar la orden: " + ex.Message, "danger");
             }
         }
+
+
+
+
 
         protected void RealizarPago_Click(object sender, EventArgs e)
         {

@@ -207,5 +207,54 @@ namespace Service
             }
         }
 
+
+        public void DescontarStock(int productoId, int cantidad)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("UPDATE PRODUCTO SET Stock = Stock - @cantidad WHERE ProductoId = @id");
+                datos.setearParametro("@cantidad", cantidad);
+                datos.setearParametro("@id", productoId);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al descontar stock: " + ex.Message, ex);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public int ObtenerStock(int productoId)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT Stock FROM PRODUCTO WHERE ProductoId = @id");
+                datos.setearParametro("@id", productoId);
+                datos.ejecutarLectura();
+
+                if (datos.Lector.Read())
+                    return (int)datos.Lector["Stock"];
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener stock: " + ex.Message, ex);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+
+
+
+
     }
 }
