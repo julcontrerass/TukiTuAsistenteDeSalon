@@ -113,55 +113,7 @@ namespace TukiGestor
             OcultarMensaje();
         }
 
-        private void MostrarTab(string tab)
-        {
-            // ocultamos todos los paneles
-            pnlListado.CssClass = "tab-pane fade";
-            pnlNuevo.CssClass = "tab-pane fade";
-            pnlEditar.CssClass = "tab-pane fade";
-            pnlEditar.Visible = false;
-            pnlCategorias.CssClass = "tab-pane fade";
-            pnlCategoriaNueva.CssClass = "tab-pane fade";
-            pnlEditarCategoria.CssClass = "tab-pane fade";
-            pnlEditarCategoria.Visible = false;
-
-            // reseteamos las clases de los botones
-            btnTabListado.CssClass = "nav-link";
-            btnTabNuevo.CssClass = "nav-link";
-            btnTabCategorias.CssClass = "nav-link";
-            btnTabCategoriaNueva.CssClass = "nav-link";
-
-            // mostramos el panel correspondiente
-            switch (tab)
-            {
-                case "listado":
-                    pnlListado.CssClass = "tab-pane fade active show";
-                    btnTabListado.CssClass = "nav-link active";
-                    break;
-                case "nuevo":
-                    pnlNuevo.CssClass = "tab-pane fade active show";
-                    btnTabNuevo.CssClass = "nav-link active";
-                    break;
-                case "editar":
-                    pnlEditar.CssClass = "tab-pane fade active show";
-                    pnlEditar.Visible = true;
-                    break;
-                case "categorias":
-                    pnlCategorias.CssClass = "tab-pane fade active show";
-                    btnTabCategorias.CssClass = "nav-link active";
-                    break;
-                case "categoriaNueva":
-                    pnlCategoriaNueva.CssClass = "tab-pane fade active show";
-                    btnTabCategoriaNueva.CssClass = "nav-link active";
-                    break;
-                case "editarCategoria":
-                    pnlEditarCategoria.CssClass = "tab-pane fade active show";
-                    pnlEditarCategoria.Visible = true;
-                    break;
-            }
-
-            UpdatePanelContenido.Update();
-        }
+        
 
 
         protected void btnGuardar_Click(object sender, EventArgs e)
@@ -399,7 +351,7 @@ namespace TukiGestor
 
                 CategoriaService service = new CategoriaService();
 
-                // VALIDACIÓN: nombre repetido
+                // validación de nombre repetido
                 if (service.ExisteNombreCategoria(nueva.Nombre))
                 {
                     MostrarMensaje("Ya existe una categoría con ese nombre. Ingrese otro.", "danger");
@@ -482,14 +434,14 @@ namespace TukiGestor
                 categoria.CategoriaId = int.Parse(hfCategoriaId.Value);
                 categoria.Nombre = txtNombreCategoriaEditar.Text.Trim();
                 categoria.Activa = true;
-                // Validación: el nombre no puede estar vacío
+                // Validación para que el nombre no pueda estar vacío
                 if (string.IsNullOrEmpty(categoria.Nombre))
                 {
                     MostrarMensaje("Por favor ingrese un nombre para la categoría", "warning");
                     return;
                 }
                 CategoriaService service = new CategoriaService();
-                // validación: evitar nombres duplicados
+                // validación para evitar nombres duplicados
                 if (service.ExisteNombreCategoria(categoria.Nombre, categoria.CategoriaId))
                 {
                     MostrarMensaje("Ya existe una categoría con ese nombre. Por favor elija otro.", "warning");
@@ -522,6 +474,108 @@ namespace TukiGestor
             txtNombreCategoriaEditar.Text = "";
         }
 
+        
+        protected void btnCancelarEliminar_Click(object sender, EventArgs e)
+        {
+            pnlConfirmarEliminar.Visible = false;
+        }
+
+
+        private void CargarProductosEliminados()
+        {
+            ProductoService productoService = new ProductoService();
+            List<Producto> listaEliminados = productoService.ListarEliminados();
+            RepeaterProductosEliminados.DataSource = listaEliminados;
+            RepeaterProductosEliminados.DataBind();
+        }
+
+        protected void btnTabEliminados_Click(object sender, EventArgs e)
+        {
+            CargarProductosEliminados(); // Cargar los datos al mostrar la solapa
+            MostrarTab("eliminados");
+            OcultarMensaje();
+        }
+
+        private void MostrarTab(string tab)
+        {
+            // ocultamos todos los paneles
+            pnlListado.CssClass = "tab-pane fade";
+            pnlNuevo.CssClass = "tab-pane fade";
+            pnlEditar.CssClass = "tab-pane fade";
+            pnlEditar.Visible = false;
+            pnlCategorias.CssClass = "tab-pane fade";
+            pnlCategoriaNueva.CssClass = "tab-pane fade";
+            pnlEditarCategoria.CssClass = "tab-pane fade";
+            pnlEditarCategoria.Visible = false;
+            pnlEliminados.CssClass = "tab-pane fade"; 
+
+            // reseteamos las clases de los botones
+            btnTabListado.CssClass = "nav-link";
+            btnTabNuevo.CssClass = "nav-link";
+            btnTabCategorias.CssClass = "nav-link";
+            btnTabCategoriaNueva.CssClass = "nav-link";
+            btnTabEliminados.CssClass = "nav-link"; 
+
+            // mostramos el panel correspondiente
+            switch (tab)
+            {
+                case "listado":
+                    pnlListado.CssClass = "tab-pane fade active show";
+                    btnTabListado.CssClass = "nav-link active";
+                    break;
+                case "nuevo":
+                    pnlNuevo.CssClass = "tab-pane fade active show";
+                    btnTabNuevo.CssClass = "nav-link active";
+                    break;
+                case "editar":
+                    pnlEditar.CssClass = "tab-pane fade active show";
+                    pnlEditar.Visible = true;
+                    break;
+                case "categorias":
+                    pnlCategorias.CssClass = "tab-pane fade active show";
+                    btnTabCategorias.CssClass = "nav-link active";
+                    break;
+                case "categoriaNueva":
+                    pnlCategoriaNueva.CssClass = "tab-pane fade active show";
+                    btnTabCategoriaNueva.CssClass = "nav-link active";
+                    break;
+                case "editarCategoria":
+                    pnlEditarCategoria.CssClass = "tab-pane fade active show";
+                    pnlEditarCategoria.Visible = true;
+                    break;
+                case "eliminados": 
+                    pnlEliminados.CssClass = "tab-pane fade active show";
+                    btnTabEliminados.CssClass = "nav-link active";
+                    break;
+            }
+
+            UpdatePanelContenido.Update();
+        }
+
+        protected void RepeaterProductosEliminados_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "Reactivar")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    ProductoService service = new ProductoService();
+                    service.Reactivar(id);
+
+                    // Recargamos ambas listas
+                    CargarProductosEliminados();
+                    CargarProductos();
+
+                    MostrarMensaje("Producto reactivado correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al reactivar producto: " + ex.Message, "error");
+                }
+            }
+        }
+
+        
         protected void btnAceptarEliminar_Click(object sender, EventArgs e)
         {
             int id = int.Parse(hfIdEliminar.Value);
@@ -534,11 +588,16 @@ namespace TukiGestor
                     ProductoService service = new ProductoService();
                     service.Eliminar(id);
                     CargarProductos();
+                    // Si estamos en la solapa de eliminados, la recargamos también
+                    if (pnlEliminados.CssClass.Contains("active"))
+                    {
+                        CargarProductosEliminados();
+                    }
                     MostrarMensaje("Producto eliminado correctamente.", "success");
                 }
                 catch (Exception ex)
                 {
-                    MostrarMensaje("Error al eliminar producto: " + ex.Message, "error");
+                    MostrarMensaje(ex.Message, "warning"); 
                 }
             }
             else if (tipo == "categoria")
@@ -560,9 +619,8 @@ namespace TukiGestor
 
             pnlConfirmarEliminar.Visible = false;
         }
-        protected void btnCancelarEliminar_Click(object sender, EventArgs e)
-        {
-            pnlConfirmarEliminar.Visible = false;
-        }
+
+
+
     }
 }

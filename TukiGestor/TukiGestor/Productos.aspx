@@ -40,8 +40,12 @@
                         <i class="bi bi-plus-circle"></i> Categoría nueva
                     </asp:LinkButton>
                 </li>
+                <li class="nav-item">
+                    <asp:LinkButton ID="btnTabEliminados" runat="server" CssClass="nav-link" OnClick="btnTabEliminados_Click">
+                        <i class="bi bi-archive"></i> Productos Eliminados
+                    </asp:LinkButton>
+                </li>
             </ul>
-
             <!-- contenido de las solapas -->
             <asp:UpdatePanel ID="UpdatePanelContenido" runat="server" UpdateMode="Conditional">
                 <ContentTemplate>
@@ -217,6 +221,44 @@
                             </div>
                        </div>
                    </asp:Panel>
+                    <!-- Productos Eliminados -->
+                    <asp:Panel ID="pnlEliminados" runat="server" CssClass="tab-pane fade">
+                        <div class="p-4">
+                            <h4 class="mb-3 text-center">Productos Eliminados</h4>
+                            <asp:Repeater ID="RepeaterProductosEliminados" runat="server" OnItemCommand="RepeaterProductosEliminados_ItemCommand">
+                                <HeaderTemplate>
+                                    <div class="tabla-scroll">
+                                        <table class="table table-striped table-hover text-center shadow-lg">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Nombre</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Precio</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                </HeaderTemplate>
+                                <ItemTemplate>
+                                    <tr>
+                                        <td><%# Eval("Nombre") %></td>
+                                        <td><%# Eval("Stock") %></td>
+                                        <td>$<%# Eval("Precio") %></td>
+                                        <td>
+                                            <asp:LinkButton runat="server" CssClass="btn btn-link text-success" CommandName="Reactivar" CommandArgument='<%# Eval("ProductoId") %>' ToolTip="Reactivar producto">
+                                                <i class="bi bi-arrow-clockwise"></i> Reactivar
+                                            </asp:LinkButton>
+                                        </td>
+                                    </tr>
+                                </ItemTemplate>
+                                <FooterTemplate>
+                                    </tbody>
+                                    </table>
+                                    </div>
+                                </FooterTemplate>
+                            </asp:Repeater>
+                        </div>
+                    </asp:Panel>
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>

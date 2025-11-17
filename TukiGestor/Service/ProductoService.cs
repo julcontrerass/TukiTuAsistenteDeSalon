@@ -114,31 +114,65 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                // Verificar si el producto tiene detalles de pedido asociados
-                datos.SetearConsulta("SELECT COUNT(*) FROM DETALLEPEDIDO WHERE ProductoId = @id");
+                // Siempre hacer baja lógica
+                datos.SetearConsulta("UPDATE PRODUCTO SET Disponible = 0 WHERE ProductoId = @id");
                 datos.setearParametro("@id", id);
-                int cantidadDetalles = Convert.ToInt32(datos.ejecutarScalar());
-
-                if (cantidadDetalles > 0)
-                {
-                    // Si tiene detalles de pedido, marcar como NO disponible en lugar de eliminar
-                    datos.SetearConsulta("UPDATE PRODUCTO SET Disponible = 0 WHERE ProductoId = @id");
-                    datos.setearParametro("@id", id);
-                    datos.ejecutarAccion();
-
-                    throw new Exception("El producto tiene pedidos asociados y ha sido marcado como NO DISPONIBLE en lugar de eliminarse. Esto preserva el historial de ventas.");
-                }
-                else
-                {
-                    // Si no tiene detalles, permitir eliminarlo
-                    datos.SetearConsulta("DELETE FROM PRODUCTO WHERE ProductoId = @id");
-                    datos.setearParametro("@id", id);
-                    datos.ejecutarAccion();
-                }
+                datos.ejecutarAccion();
             }
             catch (Exception ex)
             {
                 throw new Exception("Error al eliminar producto: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+        // listamos solo productos eliminados
+        public List<Producto> ListarEliminados()
+        {
+            List<Producto> lista = new List<Producto>();
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock FROM PRODUCTO WHERE Disponible = 0");
+                datos.ejecutarLectura();
+                while (datos.Lector.Read())
+                {
+                    Producto prod = new Producto();
+                    prod.ProductoId = (int)datos.Lector["ProductoId"];
+                    prod.Nombre = (string)datos.Lector["Nombre"];
+                    prod.Precio = (decimal)datos.Lector["Precio"];
+                    prod.Disponible = (bool)datos.Lector["Disponible"];
+                    prod.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    prod.Stock = (int)datos.Lector["Stock"];
+                    lista.Add(prod);
+                }
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al listar productos eliminados: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // reactivamos un producto eliminado
+        public void Reactivar(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("UPDATE PRODUCTO SET Disponible = 1 WHERE ProductoId = @id");
+                datos.setearParametro("@id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al reactivar producto: " + ex.Message);
             }
             finally
             {
