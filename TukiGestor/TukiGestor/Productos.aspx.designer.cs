@@ -87,6 +87,15 @@ namespace TukiGestor
         protected global::System.Web.UI.WebControls.LinkButton btnTabEliminados;
 
         /// <summary>
+        /// Control btnTabCategoriasEliminadas.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnTabCategoriasEliminadas;
+
+        /// <summary>
         /// Control UpdatePanelContenido.
         /// </summary>
         /// <remarks>
@@ -409,5 +418,23 @@ namespace TukiGestor
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater RepeaterProductosEliminados;
+
+        /// <summary>
+        /// Control pnlCategoriasEliminadas.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlCategoriasEliminadas;
+
+        /// <summary>
+        /// Control RepeaterCategoriasEliminadas.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater RepeaterCategoriasEliminadas;
     }
 }

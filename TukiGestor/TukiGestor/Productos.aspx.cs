@@ -491,7 +491,7 @@ namespace TukiGestor
 
         protected void btnTabEliminados_Click(object sender, EventArgs e)
         {
-            CargarProductosEliminados(); // Cargar los datos al mostrar la solapa
+            CargarProductosEliminados(); // cargamos los datos al mostrar la solapa
             MostrarTab("eliminados");
             OcultarMensaje();
         }
@@ -507,14 +507,16 @@ namespace TukiGestor
             pnlCategoriaNueva.CssClass = "tab-pane fade";
             pnlEditarCategoria.CssClass = "tab-pane fade";
             pnlEditarCategoria.Visible = false;
-            pnlEliminados.CssClass = "tab-pane fade"; 
+            pnlEliminados.CssClass = "tab-pane fade";
+            pnlCategoriasEliminadas.CssClass = "tab-pane fade"; 
 
             // reseteamos las clases de los botones
             btnTabListado.CssClass = "nav-link";
             btnTabNuevo.CssClass = "nav-link";
             btnTabCategorias.CssClass = "nav-link";
             btnTabCategoriaNueva.CssClass = "nav-link";
-            btnTabEliminados.CssClass = "nav-link"; 
+            btnTabEliminados.CssClass = "nav-link";
+            btnTabCategoriasEliminadas.CssClass = "nav-link"; 
 
             // mostramos el panel correspondiente
             switch (tab)
@@ -543,9 +545,13 @@ namespace TukiGestor
                     pnlEditarCategoria.CssClass = "tab-pane fade active show";
                     pnlEditarCategoria.Visible = true;
                     break;
-                case "eliminados": 
+                case "eliminados":
                     pnlEliminados.CssClass = "tab-pane fade active show";
                     btnTabEliminados.CssClass = "nav-link active";
+                    break;
+                case "categoriasEliminadas":
+                    pnlCategoriasEliminadas.CssClass = "tab-pane fade active show";
+                    btnTabCategoriasEliminadas.CssClass = "nav-link active";
                     break;
             }
 
@@ -576,6 +582,48 @@ namespace TukiGestor
         }
 
         
+        private void CargarCategoriasEliminadas()
+        {
+            CategoriaService categoriaService = new CategoriaService();
+            List<Categoria> listaEliminadas = categoriaService.ListarEliminadas();
+            RepeaterCategoriasEliminadas.DataSource = listaEliminadas;
+            RepeaterCategoriasEliminadas.DataBind();
+        }
+
+        protected void btnTabCategoriasEliminadas_Click(object sender, EventArgs e)
+        {
+            CargarCategoriasEliminadas();
+            MostrarTab("categoriasEliminadas");
+            OcultarMensaje();
+        }
+
+        protected void RepeaterCategoriasEliminadas_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "ReactivarCategoria")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    CategoriaService service = new CategoriaService();
+                    service.Reactivar(id);
+
+                    // recargamos todas las listas de categorías
+                    CargarCategoriasEliminadas();
+                    CargarCategorias();
+                    CargarCategoriasEditar();
+                    CargarListadoCategorias();
+
+                    MostrarMensaje("Categoría reactivada correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al reactivar categoría: " + ex.Message, "error");
+                }
+            }
+        }
+
+
+
         protected void btnAceptarEliminar_Click(object sender, EventArgs e)
         {
             int id = int.Parse(hfIdEliminar.Value);
@@ -588,7 +636,6 @@ namespace TukiGestor
                     ProductoService service = new ProductoService();
                     service.Eliminar(id);
                     CargarProductos();
-                    // Si estamos en la solapa de eliminados, la recargamos también
                     if (pnlEliminados.CssClass.Contains("active"))
                     {
                         CargarProductosEliminados();
@@ -597,7 +644,7 @@ namespace TukiGestor
                 }
                 catch (Exception ex)
                 {
-                    MostrarMensaje(ex.Message, "warning"); 
+                    MostrarMensaje(ex.Message, "warning");
                 }
             }
             else if (tipo == "categoria")
@@ -609,6 +656,11 @@ namespace TukiGestor
                     CargarCategorias();
                     CargarCategoriasEditar();
                     CargarListadoCategorias();
+                    // Si estamos en la solapa de eliminadas, la recargamos también
+                    if (pnlCategoriasEliminadas.CssClass.Contains("active"))
+                    {
+                        CargarCategoriasEliminadas();
+                    }
                     MostrarMensaje("Categoría eliminada correctamente.", "success");
                 }
                 catch (Exception ex)
@@ -619,7 +671,6 @@ namespace TukiGestor
 
             pnlConfirmarEliminar.Visible = false;
         }
-
 
 
     }

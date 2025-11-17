@@ -104,31 +104,61 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                // Verificar si la categoría tiene productos asociados
-                datos.SetearConsulta("SELECT COUNT(*) FROM PRODUCTO WHERE CategoriaId = @id");
+                // Siempre hacer baja lógica
+                datos.SetearConsulta("UPDATE CATEGORIA SET Activa = 0 WHERE CategoriaId = @id");
                 datos.setearParametro("@id", id);
-                int cantidadProductos = Convert.ToInt32(datos.ejecutarScalar());
-
-                if (cantidadProductos > 0)
-                {
-                    // Si tiene productos, marcar como inactiva en lugar de eliminar
-                    datos.SetearConsulta("UPDATE CATEGORIA SET Activa = 0 WHERE CategoriaId = @id");
-                    datos.setearParametro("@id", id);
-                    datos.ejecutarAccion();
-
-                    throw new Exception("La categoría tiene productos asociados y ha sido marcada como INACTIVA en lugar de eliminarse. Por favor, reasigne o elimine primero los productos de esta categoría.");
-                }
-                else
-                {
-                    // Si no tiene productos, permitir eliminarla
-                    datos.SetearConsulta("DELETE FROM CATEGORIA WHERE CategoriaId = @id");
-                    datos.setearParametro("@id", id);
-                    datos.ejecutarAccion();
-                }
+                datos.ejecutarAccion();
             }
             catch (Exception ex)
             {
                 throw new Exception("Error al eliminar categoría: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public List<Categoria> ListarEliminadas()
+        {
+            List<Categoria> lista = new List<Categoria>();
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT CategoriaId, Nombre, Activa FROM CATEGORIA WHERE Activa = 0");
+                datos.ejecutarLectura();
+                while (datos.Lector.Read())
+                {
+                    Categoria cat = new Categoria();
+                    cat.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    cat.Nombre = (string)datos.Lector["Nombre"];
+                    cat.Activa = (bool)datos.Lector["Activa"];
+                    lista.Add(cat);
+                }
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al listar categorías eliminadas: " + ex.Message, ex);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public void Reactivar(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("UPDATE CATEGORIA SET Activa = 1 WHERE CategoriaId = @id");
+                datos.setearParametro("@id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al reactivar categoría: " + ex.Message);
             }
             finally
             {
