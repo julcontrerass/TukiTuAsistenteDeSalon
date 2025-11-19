@@ -22,13 +22,25 @@ namespace TukiGestor
             }
         }
 
-        private void CargarProductos()
+       /* private void CargarProductos()
         {
             ProductoService productoService = new ProductoService();
             List<Producto> listaProductos = productoService.Listar();
             RepeaterProductos.DataSource = listaProductos;
             RepeaterProductos.DataBind();
         }
+       */
+        private void CargarProductos()
+        {
+            ProductoService productoService = new ProductoService();
+            string textoBusqueda = txtBuscarProducto.Text.Trim();
+            string ordenamiento = ddlOrdenamiento.SelectedValue;
+
+            List<Producto> listaProductos = productoService.BuscarYFiltrar(textoBusqueda, ordenamiento);
+            RepeaterProductos.DataSource = listaProductos;
+            RepeaterProductos.DataBind();
+        }
+
 
         private void CargarCategorias()
         {
@@ -670,6 +682,24 @@ namespace TukiGestor
             }
 
             pnlConfirmarEliminar.Visible = false;
+        }
+
+
+        protected void txtBuscarProducto_TextChanged(object sender, EventArgs e)
+        {
+            CargarProductos();
+        }
+
+        protected void ddlOrdenamiento_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CargarProductos();
+        }
+
+        protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
+        {
+            txtBuscarProducto.Text = string.Empty;
+            ddlOrdenamiento.SelectedIndex = 0;
+            CargarProductos();
         }
 
 

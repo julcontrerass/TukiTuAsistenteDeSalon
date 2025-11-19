@@ -46,23 +46,39 @@
                     </asp:LinkButton>
                 </li>
                 <li class="nav-item">
-    <asp:LinkButton ID="btnTabCategoriasEliminadas" runat="server" CssClass="nav-link" OnClick="btnTabCategoriasEliminadas_Click">
-        <i class="bi bi-archive"></i> Categorías Eliminadas
-    </asp:LinkButton>
-</li>
+                    <asp:LinkButton ID="btnTabCategoriasEliminadas" runat="server" CssClass="nav-link" OnClick="btnTabCategoriasEliminadas_Click">
+                        <i class="bi bi-archive"></i> Categorías Eliminadas
+                    </asp:LinkButton>
+                </li>
             </ul>
             <!-- contenido de las solapas -->
             <asp:UpdatePanel ID="UpdatePanelContenido" runat="server" UpdateMode="Conditional">
                 <ContentTemplate>
                     <div class="tab-content mt-3">
-
                         <!-- listado -->
                         <asp:Panel ID="pnlListado" runat="server" CssClass="tab-pane fade active show">
-                            <div class="d-flex justify-content-center mb-4">
+                            <div class="d-flex justify-content-center align-items-center mb-4 gap-3">
+                                <!-- Buscador -->
                                 <div class="input-group" style="width: 400px;">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <asp:TextBox ID="TextBox1" runat="server" CssClass="form-control" placeholder="Buscar producto..."></asp:TextBox>
+                                    <asp:TextBox ID="txtBuscarProducto" runat="server" CssClass="form-control"  placeholder="Buscar producto..." AutoPostBack="true" OnTextChanged="txtBuscarProducto_TextChanged"></asp:TextBox>
                                 </div>
+                                <!-- Filtro de ordenamiento -->
+                                <div style="width: 250px;">
+                                    <asp:DropDownList ID="ddlOrdenamiento" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlOrdenamiento_SelectedIndexChanged">
+                                        <asp:ListItem Value="reciente" Text="Más recientes primero" Selected="True"></asp:ListItem>
+                                        <asp:ListItem Value="nombre_asc" Text="Nombre (A-Z)"></asp:ListItem>
+                                        <asp:ListItem Value="nombre_desc" Text="Nombre (Z-A)"></asp:ListItem>
+                                        <asp:ListItem Value="precio_asc" Text="Precio (Menor a Mayor)"></asp:ListItem>
+                                        <asp:ListItem Value="precio_desc" Text="Precio (Mayor a Menor)"></asp:ListItem>
+                                        <asp:ListItem Value="stock_asc" Text="Stock (Menor a Mayor)"></asp:ListItem>
+                                        <asp:ListItem Value="stock_desc" Text="Stock (Mayor a Menor)"></asp:ListItem>
+                                    </asp:DropDownList>
+                                </div>
+                                <!-- Botón limpiar filtros -->
+                                <asp:LinkButton ID="btnLimpiarFiltros" runat="server" CssClass="btn btn-outline-secondary"  OnClick="btnLimpiarFiltros_Click" ToolTip="Limpiar filtros">
+                                    <i class="bi bi-x-circle"></i>
+                                </asp:LinkButton>
                             </div>
                             <asp:Repeater ID="RepeaterProductos" runat="server" OnItemCommand="RepeaterProductos_ItemCommand">
                                 <HeaderTemplate>
@@ -96,7 +112,7 @@
                                 <FooterTemplate>
                                             </tbody>
                                         </table>
-                                    </div>
+                                     </div>
                                 </FooterTemplate>
                             </asp:Repeater>
                         </asp:Panel>

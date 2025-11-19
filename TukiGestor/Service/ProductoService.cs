@@ -114,7 +114,6 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                // Siempre hacer baja lógica
                 datos.SetearConsulta("UPDATE PRODUCTO SET Disponible = 0 WHERE ProductoId = @id");
                 datos.setearParametro("@id", id);
                 datos.ejecutarAccion();
@@ -128,7 +127,7 @@ namespace Service
                 datos.cerrarConexion();
             }
         }
-        // listamos solo productos eliminados
+        // listamos productos eliminados
         public List<Producto> ListarEliminados()
         {
             List<Producto> lista = new List<Producto>();
@@ -288,6 +287,81 @@ namespace Service
 
 
 
+        public List<Producto> BuscarYFiltrar(string textoBusqueda, string ordenamiento)
+        {
+            List<Producto> lista = new List<Producto>();
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                string consulta = @"SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock FROM PRODUCTO WHERE Disponible = 1";
+
+                if (!string.IsNullOrWhiteSpace(textoBusqueda))
+                {
+                    consulta += " AND Nombre LIKE @texto";
+                }
+
+                //orden
+                switch (ordenamiento)
+                {
+                    case "reciente":
+                        consulta += " ORDER BY ProductoId DESC";
+                        break;
+                    case "nombre_asc":
+                        consulta += " ORDER BY Nombre ASC";
+                        break;
+                    case "nombre_desc":
+                        consulta += " ORDER BY Nombre DESC";
+                        break;
+                    case "precio_asc":
+                        consulta += " ORDER BY Precio ASC";
+                        break;
+                    case "precio_desc":
+                        consulta += " ORDER BY Precio DESC";
+                        break;
+                    case "stock_asc":
+                        consulta += " ORDER BY Stock ASC";
+                        break;
+                    case "stock_desc":
+                        consulta += " ORDER BY Stock DESC";
+                        break;
+                    default:
+                        consulta += " ORDER BY Nombre ASC";
+                        break;
+                }
+
+                datos.SetearConsulta(consulta);
+
+                if (!string.IsNullOrWhiteSpace(textoBusqueda))
+                {
+                    datos.setearParametro("@texto", "%" + textoBusqueda + "%");
+                }
+
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    Producto prod = new Producto();
+                    prod.ProductoId = (int)datos.Lector["ProductoId"];
+                    prod.Nombre = (string)datos.Lector["Nombre"];
+                    prod.Precio = (decimal)datos.Lector["Precio"];
+                    prod.Disponible = (bool)datos.Lector["Disponible"];
+                    prod.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    prod.Stock = (int)datos.Lector["Stock"];
+                    lista.Add(prod);
+                }
+
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al buscar y filtrar productos: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
 
 
     }
