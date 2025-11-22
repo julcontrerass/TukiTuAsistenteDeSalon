@@ -123,6 +123,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Mesas.aspx" />
+    <Content Include="Meseros.aspx" />
     <Content Include="Registrarse.aspx" />
     <Content Include="Scripts\BDD\TUKI__BDD.sql" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -228,6 +229,13 @@
     </Compile>
     <Compile Include="Mesas.aspx.designer.cs">
       <DependentUpon>Mesas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Meseros.aspx.cs">
+      <DependentUpon>Meseros.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Meseros.aspx.designer.cs">
+      <DependentUpon>Meseros.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registrarse.aspx.cs">

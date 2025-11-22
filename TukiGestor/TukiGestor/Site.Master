@@ -372,6 +372,7 @@
                 <li><a runat="server" id="linkInicio" href="~/Home.aspx"><i class="bi bi-house-door"></i><span> Inicio</span></a></li>
                 <li><a runat="server" id="linkMesas" href="~/Mesas.aspx"><i class="bi bi-grid-3x3"></i><span> Mesas</span></a></li>
                 <li><a runat="server" id="linkStock" href="~/Productos.aspx"><i class="bi bi-box-seam"></i><span> Productos</span></a></li>
+                <li><a runat="server" id="linkMeseros" href="~/Meseros.aspx"><i class="bi bi-person"></i><span> Meseros</span></a></li>
                 <li><a runat="server" id="linkReporte" href="~/Reporte.aspx"><i class="bi bi-graph-up"></i><span> Reporte</span></a></li>
             </ul>
 

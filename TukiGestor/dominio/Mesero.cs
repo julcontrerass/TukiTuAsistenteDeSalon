@@ -9,8 +9,8 @@ namespace dominio
     public class Mesero:Usuario
     {
         public int MeseroId { get; set; }
-        public string NombreMesero { get; set; }
-        public string ApellidoMesero { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
         public bool Activo { get; set; }
     }
 }

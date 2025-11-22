@@ -44,6 +44,7 @@
     <Compile Include="AsignacionMesaService.cs" />
     <Compile Include="CategoriaService.cs" />
     <Compile Include="MesaService.cs" />
+    <Compile Include="MeseroService.cs" />
     <Compile Include="PedidoService.cs" />
     <Compile Include="ProductoService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

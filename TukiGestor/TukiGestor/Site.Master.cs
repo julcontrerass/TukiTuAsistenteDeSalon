@@ -34,6 +34,10 @@ namespace TukiGestor
             {
                 linkStock.Attributes["class"] = "active";
             }
+            else if (fileName.Contains("meseros") || currentPage.Contains("/meseros"))
+            {
+                linkMeseros.Attributes["class"] = "active";
+            }
             else if (fileName.Contains("reporte"))
             {
                 linkReporte.Attributes["class"] = "active";
