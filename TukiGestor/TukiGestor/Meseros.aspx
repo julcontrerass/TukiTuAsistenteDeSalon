@@ -5,12 +5,13 @@
     <!-- SOLAPAS -->
     <ul class="nav nav-tabs" id="tabsMeseros" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="tab-listado" data-bs-toggle="tab" href="#contenidoListado" role="tab">Meseros Activos
-            </a>
+            <a class="nav-link active" id="tab-listado" data-bs-toggle="tab" href="#contenidoListado" role="tab">Meseros Activos</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="tab-nuevo" data-bs-toggle="tab" href="#contenidoNuevo" role="tab">Nuevo Mesero
-            </a>
+            <a class="nav-link" id="tab-nuevo" data-bs-toggle="tab" href="#contenidoNuevo" role="tab">Nuevo Mesero</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab-inactivos" data-bs-toggle="tab" href="#contenidoInactivos" role="tab">Meseros Inactivos</a>
         </li>
     </ul>
     <div class="tab-content mt-3">
@@ -74,6 +75,36 @@
                 <asp:Button ID="btnGuardarMesero" runat="server" CssClass="btn btn-primary mt-3" Text="Guardar Mesero" OnClick="btnGuardarMesero_Click" />
                 <asp:Label ID="lblMensaje" runat="server" CssClass="d-block mt-3"></asp:Label>
             </div>
+        </div>
+        <!-- MESEROS INACTIVOS -->
+        <div class="tab-pane fade" id="contenidoInactivos" role="tabpanel">
+            <h4>Meseros Inactivos</h4>
+            <asp:Repeater ID="RepeaterMeserosInactivos" runat="server">
+                <HeaderTemplate>
+                    <table class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre Completo</th>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                </HeaderTemplate>
+                <ItemTemplate>
+                    <tr>
+                        <td><%# Eval("MeseroId") %></td>
+                        <td><%# Eval("Nombre") + " " + Eval("Apellido") %></td>
+                        <td><%# Eval("NombreUsuario") %></td>
+                        <td><%# Eval("Email") %></td>
+                    </tr>
+                </ItemTemplate>
+                <FooterTemplate>
+                    </tbody>
+            </table>
+                </FooterTemplate>
+            </asp:Repeater>
         </div>
     </div>
 </asp:Content>

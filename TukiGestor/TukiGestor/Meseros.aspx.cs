@@ -14,7 +14,9 @@ namespace TukiGestor
             if (!IsPostBack)
             {
                 CargarMeseros();
+                CargarMeserosInactivos();
             }
+
         }
 
         private void CargarMeseros()
@@ -57,6 +59,14 @@ namespace TukiGestor
                 lblMensaje.CssClass = "text-danger";
             }
         }
+
+        private void CargarMeserosInactivos()
+        {
+            List<Mesero> lista = meseroService.ListarInactivos();
+            RepeaterMeserosInactivos.DataSource = lista;
+            RepeaterMeserosInactivos.DataBind();
+        }
+
 
     }
 }

@@ -120,5 +120,26 @@ namespace Service
                 datos.cerrarConexion();
             }
         }
+
+        public List<Mesero> ListarInactivos()
+        {
+            AccesoDatos datos = new AccesoDatos();
+            List<Mesero> lista = new List<Mesero>();
+
+            datos.SetearConsulta("SELECT m.MeseroId, m.Nombre, m.Apellido, u.NombreUsuario, u.Email " + "FROM Mesero m INNER JOIN Usuario u ON m.UsuarioId = u.UsuarioId " + "WHERE m.Activo = 0");
+            datos.ejecutarLectura();
+            while (datos.Lector.Read())
+            {
+                Mesero aux = new Mesero();
+                aux.MeseroId = (int)datos.Lector["MeseroId"];
+                aux.Nombre = datos.Lector["Nombre"].ToString();
+                aux.Apellido = datos.Lector["Apellido"].ToString();
+                aux.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
+                aux.Email = datos.Lector["Email"].ToString();
+                lista.Add(aux);
+            }
+            datos.cerrarConexion();
+            return lista;
+        }
     }
 }
