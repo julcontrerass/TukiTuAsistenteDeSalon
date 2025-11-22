@@ -91,14 +91,19 @@ namespace Service
             }
         }
 
-        public void Eliminar(int meseroId)
+
+        public void Desactivar(int meseroId)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("UPDATE MESERO SET Activo = 0 WHERE MeseroId = @id");
+                datos.SetearConsulta("UPDATE Mesero SET Activo = 0 WHERE MeseroId = @id");
                 datos.setearParametro("@id", meseroId);
                 datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {
@@ -106,20 +111,28 @@ namespace Service
             }
         }
 
+
+
         public void Reactivar(int meseroId)
         {
             AccesoDatos datos = new AccesoDatos();
+
             try
             {
-                datos.SetearConsulta("UPDATE MESERO SET Activo = 1 WHERE MeseroId = @id");
+                datos.SetearConsulta("UPDATE Mesero SET Activo = 1 WHERE MeseroId = @id");
                 datos.setearParametro("@id", meseroId);
                 datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {
                 datos.cerrarConexion();
             }
         }
+
 
         public List<Mesero> ListarInactivos()
         {

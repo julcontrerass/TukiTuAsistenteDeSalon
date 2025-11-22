@@ -1,7 +1,8 @@
-﻿using Service;
-using dominio;
+﻿using dominio;
+using Service;
 using System;
 using System.Collections.Generic;
+using System.Web.UI.WebControls;
 
 namespace TukiGestor
 {
@@ -66,6 +67,33 @@ namespace TukiGestor
             RepeaterMeserosInactivos.DataSource = lista;
             RepeaterMeserosInactivos.DataBind();
         }
+
+
+        protected void RepeaterMeserosInactivos_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "Reactivar")
+            {
+                int idMesero = int.Parse(e.CommandArgument.ToString());
+                meseroService.Reactivar(idMesero);
+
+                // recargamos las listas
+                CargarMeseros();
+                CargarMeserosInactivos();
+            }
+        }
+
+        protected void RepeaterMeseros_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "Desactivar")
+            {
+                int meseroId = int.Parse(e.CommandArgument.ToString());
+                meseroService.Desactivar(meseroId);
+                // recargamos ambas listas
+                CargarMeseros();
+                CargarMeserosInactivos();
+            }
+        }
+
 
 
     }

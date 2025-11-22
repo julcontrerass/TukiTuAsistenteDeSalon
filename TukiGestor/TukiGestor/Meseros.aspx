@@ -17,7 +17,7 @@
     <div class="tab-content mt-3">
         <!-- LISTADO -->
         <div class="tab-pane fade show active" id="contenidoListado" role="tabpanel">
-            <asp:Repeater ID="RepeaterMeseros" runat="server">
+            <asp:Repeater ID="RepeaterMeseros" runat="server" OnItemCommand="RepeaterMeseros_ItemCommand">
                 <HeaderTemplate>
                     <table class="table table-striped">
                         <thead>
@@ -26,6 +26,7 @@
                                 <th>Nombre Completo</th>
                                 <th>Usuario</th>
                                 <th>Email</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,6 +37,9 @@
                         <td><%# Eval("Nombre") + " " + Eval("Apellido") %></td>
                         <td><%# Eval("NombreUsuario") %></td>
                         <td><%# Eval("Email") %></td>
+                        <td>
+                            <asp:Button ID="btnDesactivar" runat="server" CssClass="btn btn-danger btn-sm" Text="Desactivar" CommandName="Desactivar" CommandArgument='<%# Eval("MeseroId") %>' />
+                        </td>
                     </tr>
                 </ItemTemplate>
                 <FooterTemplate>
@@ -79,7 +83,7 @@
         <!-- MESEROS INACTIVOS -->
         <div class="tab-pane fade" id="contenidoInactivos" role="tabpanel">
             <h4>Meseros Inactivos</h4>
-            <asp:Repeater ID="RepeaterMeserosInactivos" runat="server">
+            <asp:Repeater ID="RepeaterMeserosInactivos" runat="server" OnItemCommand="RepeaterMeserosInactivos_ItemCommand">
                 <HeaderTemplate>
                     <table class="table table-striped mt-3">
                         <thead>
@@ -88,6 +92,7 @@
                                 <th>Nombre Completo</th>
                                 <th>Usuario</th>
                                 <th>Email</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -98,6 +103,9 @@
                         <td><%# Eval("Nombre") + " " + Eval("Apellido") %></td>
                         <td><%# Eval("NombreUsuario") %></td>
                         <td><%# Eval("Email") %></td>
+                        <td>
+                            <asp:Button ID="btnReactivar" runat="server" Text="Reactivar" CssClass="btn btn-success btn-sm" CommandName="Reactivar" CommandArgument='<%# Eval("MeseroId") %>' />
+                        </td>
                     </tr>
                 </ItemTemplate>
                 <FooterTemplate>
