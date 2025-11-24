@@ -189,5 +189,104 @@ namespace Service
         }
 
 
+
+        public Mesero ObtenerPorId(int meseroId)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT M.MeseroId, M.Nombre, M.Apellido, M.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " + "FROM MESERO M " + "INNER JOIN USUARIO U ON U.UsuarioId = M.UsuarioId " + "WHERE M.MeseroId = @id");
+                datos.setearParametro("@id", meseroId);
+                datos.ejecutarLectura();
+                if (datos.Lector.Read())
+                {
+                    Mesero mesero = new Mesero();
+                    mesero.MeseroId = (int)datos.Lector["MeseroId"];
+                    mesero.Nombre = datos.Lector["Nombre"].ToString();
+                    mesero.Apellido = datos.Lector["Apellido"].ToString();
+                    mesero.Activo = (bool)datos.Lector["Activo"];
+                    mesero.Id = (int)datos.Lector["UsuarioId"];
+                    mesero.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
+                    mesero.Contraseña = datos.Lector["Contrasenia"].ToString();
+                    mesero.Email = datos.Lector["Email"].ToString();
+                    return mesero;
+                }
+                return null;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // validamos si existe el nombre de usuario (excluyendo el usuario actual)
+        public bool ExisteNombreUsuarioParaOtro(string nombreUsuario, int usuarioIdActual)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT COUNT(*) FROM USUARIO WHERE NombreUsuario = @user AND UsuarioId != @id");
+                datos.setearParametro("@user", nombreUsuario);
+                datos.setearParametro("@id", usuarioIdActual);
+                int count = (int)datos.ejecutarScalar();
+                return count > 0;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // validamos si existe el email (excluyendo el usuario actual)
+        public bool ExisteEmailParaOtro(string email, int usuarioIdActual)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT COUNT(*) FROM USUARIO WHERE Email = @mail AND UsuarioId != @id");
+                datos.setearParametro("@mail", email);
+                datos.setearParametro("@id", usuarioIdActual);
+                int count = (int)datos.ejecutarScalar();
+                return count > 0;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // Actualizar mesero
+        public void Modificar(Mesero mesero, bool cambiarContrasenia)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                // Actualizar Usuario
+                if (cambiarContrasenia)
+                {
+                    datos.SetearConsulta("UPDATE USUARIO SET NombreUsuario = @user, Contrasenia = @pass, Email = @mail " + "WHERE UsuarioId = @id");
+                    datos.setearParametro("@pass", mesero.Contraseña);
+                }
+                else
+                {
+                    datos.SetearConsulta("UPDATE USUARIO SET NombreUsuario = @user, Email = @mail " + "WHERE UsuarioId = @id");
+                }
+                datos.setearParametro("@user", mesero.NombreUsuario);
+                datos.setearParametro("@mail", mesero.Email);
+                datos.setearParametro("@id", mesero.Id);
+                datos.ejecutarAccion();
+                // Actualizar Mesero
+                datos.SetearConsulta("UPDATE MESERO SET Nombre = @nom, Apellido = @ape " + "WHERE MeseroId = @meseroId");
+                datos.setearParametro("@nom", mesero.Nombre);
+                datos.setearParametro("@ape", mesero.Apellido);
+                datos.setearParametro("@meseroId", mesero.MeseroId);
+                datos.ejecutarAccion();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
     }
 }

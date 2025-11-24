@@ -31,6 +31,11 @@
                     </asp:LinkButton>
                 </li>
                 <li class="nav-item">
+                    <asp:LinkButton ID="btnTabModificar" runat="server" CssClass="nav-link" OnClick="btnTabModificar_Click" Visible="false">
+                        <i class="bi bi-pencil-square"></i> Modificar Mesero
+                    </asp:LinkButton>
+                </li>
+                <li class="nav-item">
                     <asp:LinkButton ID="btnTabInactivos" runat="server" CssClass="nav-link" OnClick="btnTabInactivos_Click">
                         <i class="bi bi-archive"></i> Meseros Inactivos
                     </asp:LinkButton>
@@ -65,6 +70,9 @@
                                         <td><%# Eval("NombreUsuario") %></td>
                                         <td><%# Eval("Email") %></td>
                                         <td>
+                                            <asp:LinkButton runat="server" CssClass="btn btn-link text-primary me-2" CommandName="Editar" CommandArgument='<%# Eval("MeseroId") %>' ToolTip="Editar mesero">
+                                                <i class="bi bi-pencil-fill"></i>
+                                            </asp:LinkButton>
                                             <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="Desactivar" CommandArgument='<%# Eval("MeseroId") %>'>
                                                 <i class="bi bi-trash-fill"></i>
                                             </asp:LinkButton>
@@ -110,6 +118,51 @@
                                     <asp:RequiredFieldValidator ID="rfvApellidoMesero" runat="server" ControlToValidate="txtApellidoMesero" ErrorMessage="El apellido es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"> </asp:RequiredFieldValidator>
                                 </div>
                                 <asp:Button ID="btnGuardarMesero" runat="server" Text="Guardar" CssClass="btn btn-custom mt-3" OnClick="btnGuardarMesero_Click" ValidationGroup="NuevoMesero" />
+                            </div>
+                        </asp:Panel>
+                        <!-- modificar mesero -->
+                        <asp:Panel ID="pnlModificar" runat="server" CssClass="tab-pane fade">
+                            <div class="p-4">
+                                <h4 class="mb-3">Modificar Mesero</h4>
+                                <asp:HiddenField ID="hfMeseroId" runat="server" />
+                                <asp:HiddenField ID="hfUsuarioId" runat="server" />
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">ID Mesero</label>
+                                    <p class="form-control-plaintext">
+                                        <asp:Label ID="lblMeseroIdMod" runat="server"></asp:Label></p>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="txtNombreUsuarioMod" class="form-label">Nombre de Usuario *</label>
+                                    <asp:TextBox ID="txtNombreUsuarioMod" runat="server" CssClass="form-control"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvNombreUsuarioMod" runat="server" ControlToValidate="txtNombreUsuarioMod" ErrorMessage="El nombre de usuario es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="ModificarMesero">
+                                    </asp:RequiredFieldValidator>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="txtContraseniaMod" class="form-label">Contraseña</label>
+                                    <asp:TextBox ID="txtContraseniaMod" runat="server" TextMode="Password" CssClass="form-control" placeholder="Dejar en blanco para no cambiar"></asp:TextBox>
+                                    <asp:RegularExpressionValidator ID="revContraseniaMod" runat="server" ControlToValidate="txtContraseniaMod" ValidationExpression="^.{6,}$" ErrorMessage="La contraseña debe tener al menos 6 caracteres." CssClass="text-danger small" Display="Dynamic" ValidationGroup="ModificarMesero"> </asp:RegularExpressionValidator>
+                                    <small class="text-muted">Si no desea cambiar la contraseña, deje este campo vacío.</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="txtEmailMod" class="form-label">Email *</label>
+                                    <asp:TextBox ID="txtEmailMod" runat="server" CssClass="form-control"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvEmailMod" runat="server" ControlToValidate="txtEmailMod" ErrorMessage="El email es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="ModificarMesero"> </asp:RequiredFieldValidator>
+                                    <asp:RegularExpressionValidator ID="revEmailMod" runat="server" ControlToValidate="txtEmailMod" ValidationExpression="^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$" ErrorMessage="El formato del email no es válido." CssClass="text-danger small" Display="Dynamic" ValidationGroup="ModificarMesero"></asp:RegularExpressionValidator>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="txtNombreMeseroMod" class="form-label">Nombre *</label>
+                                    <asp:TextBox ID="txtNombreMeseroMod" runat="server" CssClass="form-control"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvNombreMeseroMod" runat="server" ControlToValidate="txtNombreMeseroMod" ErrorMessage="El nombre es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="ModificarMesero"> </asp:RequiredFieldValidator>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="txtApellidoMeseroMod" class="form-label">Apellido *</label>
+                                    <asp:TextBox ID="txtApellidoMeseroMod" runat="server" CssClass="form-control"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvApellidoMeseroMod" runat="server" ControlToValidate="txtApellidoMeseroMod" ErrorMessage="El apellido es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="ModificarMesero"> </asp:RequiredFieldValidator>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <asp:Button ID="btnActualizarMesero" runat="server" Text="Guardar Cambios" CssClass="btn btn-custom" OnClick="btnActualizarMesero_Click" ValidationGroup="ModificarMesero" />
+                                    <asp:Button ID="btnCancelarMod" runat="server" Text="Cancelar" CssClass="btn btn-secondary" OnClick="btnCancelarMod_Click" CausesValidation="false" />
+                                </div>
                             </div>
                         </asp:Panel>
                         <!-- meseros inactivos -->

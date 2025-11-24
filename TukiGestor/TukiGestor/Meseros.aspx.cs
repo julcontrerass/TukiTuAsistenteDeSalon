@@ -61,18 +61,20 @@ namespace TukiGestor
             OcultarMensaje();
         }
 
+        
+
         private void MostrarTab(string tab)
         {
             // ocultamos todos los paneles
             pnlListado.CssClass = "tab-pane fade";
             pnlNuevo.CssClass = "tab-pane fade";
+            pnlModificar.CssClass = "tab-pane fade";
             pnlInactivos.CssClass = "tab-pane fade";
-
             // reseteamos las clases de los botones
             btnTabListado.CssClass = "nav-link";
             btnTabNuevo.CssClass = "nav-link";
+            btnTabModificar.CssClass = "nav-link";
             btnTabInactivos.CssClass = "nav-link";
-
             // mostramos el panel correspondiente
             switch (tab)
             {
@@ -84,6 +86,11 @@ namespace TukiGestor
                     pnlNuevo.CssClass = "tab-pane fade active show";
                     btnTabNuevo.CssClass = "nav-link active";
                     break;
+                case "modificar":
+                    pnlModificar.CssClass = "tab-pane fade active show";
+                    btnTabModificar.CssClass = "nav-link active";
+                    btnTabModificar.Visible = true;
+                    break;
                 case "inactivos":
                     pnlInactivos.CssClass = "tab-pane fade active show";
                     btnTabInactivos.CssClass = "nav-link active";
@@ -91,6 +98,139 @@ namespace TukiGestor
             }
 
             UpdatePanelContenido.Update();
+        }
+
+        // Evento click de la solapa modificar
+        protected void btnTabModificar_Click(object sender, EventArgs e)
+        {
+            MostrarTab("modificar");
+            OcultarMensaje();
+        }
+
+        // Modificar el RepeaterMeseros_ItemCommand para agregar el caso "Editar"
+        protected void RepeaterMeseros_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "Editar")
+            {
+                try
+                {
+                    int meseroId = int.Parse(e.CommandArgument.ToString());
+                    CargarDatosMeseroParaEditar(meseroId);
+                    MostrarTab("modificar");
+                    OcultarMensaje();
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al cargar mesero: " + ex.Message, "error");
+                }
+            }
+            else if (e.CommandName == "Desactivar")
+            {
+                try
+                {
+                    int meseroId = int.Parse(e.CommandArgument.ToString());
+                    meseroService.Desactivar(meseroId);
+                    // recargamos ambas listas
+                    CargarMeseros();
+                    CargarMeserosInactivos();
+                    MostrarMensaje("Mesero desactivado correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al desactivar mesero: " + ex.Message, "error");
+                }
+            }
+        }
+
+        // cargar datos del mesero en el formulario de edición
+        private void CargarDatosMeseroParaEditar(int meseroId)
+        {
+            Mesero mesero = meseroService.ObtenerPorId(meseroId);
+
+            if (mesero != null)
+            {
+                hfMeseroId.Value = mesero.MeseroId.ToString();
+                hfUsuarioId.Value = mesero.Id.ToString();
+                lblMeseroIdMod.Text = mesero.MeseroId.ToString();
+                txtNombreUsuarioMod.Text = mesero.NombreUsuario;
+                txtEmailMod.Text = mesero.Email;
+                txtNombreMeseroMod.Text = mesero.Nombre;
+                txtApellidoMeseroMod.Text = mesero.Apellido;
+                txtContraseniaMod.Text = ""; // No mostramos la contraseña actual
+            }
+        }
+
+        // botón de actualizar mesero
+        protected void btnActualizarMesero_Click(object sender, EventArgs e)
+        {
+            if (!Page.IsValid)
+            {
+                return;
+            }
+            try
+            {
+                int meseroId = int.Parse(hfMeseroId.Value);
+                int usuarioId = int.Parse(hfUsuarioId.Value);
+                Mesero mesero = new Mesero();
+                mesero.MeseroId = meseroId;
+                mesero.Id = usuarioId;
+                mesero.NombreUsuario = txtNombreUsuarioMod.Text.Trim();
+                mesero.Email = txtEmailMod.Text.Trim().ToLower();
+                mesero.Nombre = txtNombreMeseroMod.Text.Trim();
+                mesero.Apellido = txtApellidoMeseroMod.Text.Trim();
+                mesero.Contraseña = txtContraseniaMod.Text;
+                // validaciones
+                if (string.IsNullOrEmpty(mesero.NombreUsuario) || string.IsNullOrEmpty(mesero.Email) || string.IsNullOrEmpty(mesero.Nombre) || string.IsNullOrEmpty(mesero.Apellido))
+                {
+                    MostrarMensaje("Por favor complete todos los campos obligatorios.", "warning");
+                    return;
+                }
+                // Validamos el formato de email
+                if (!System.Text.RegularExpressions.Regex.IsMatch(mesero.Email, @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
+                {
+                    MostrarMensaje("El formato del email no es válido.", "warning");
+                    return;
+                }
+                // Validamos si el nombre de usuario ya existe para otro usuario
+                if (meseroService.ExisteNombreUsuarioParaOtro(mesero.NombreUsuario, usuarioId))
+                {
+                    MostrarMensaje("El nombre de usuario ya está en uso por otro mesero.", "warning");
+                    return;
+                }
+                // Validar si el email ya existe para otro usuario
+                if (meseroService.ExisteEmailParaOtro(mesero.Email, usuarioId))
+                {
+                    MostrarMensaje("El email ya está registrado por otro mesero.", "warning");
+                    return;
+                }
+                // validamos contraseña si se ingresó una nueva
+                bool cambiarContrasenia = !string.IsNullOrEmpty(mesero.Contraseña);
+                if (cambiarContrasenia && mesero.Contraseña.Length < 6)
+                {
+                    MostrarMensaje("La contraseña debe tener al menos 6 caracteres.", "warning");
+                    return;
+                }
+                // actualizamos
+                meseroService.Modificar(mesero, cambiarContrasenia);
+                // recargamos y volvemos al listado
+                CargarMeseros();
+                MostrarTab("listado");
+                btnTabModificar.Visible = false;
+
+                MostrarMensaje($"Mesero '{mesero.Nombre} {mesero.Apellido}' actualizado correctamente.", "success");
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al actualizar mesero: " + ex.Message, "error");
+            }
+        }
+
+        // Botón de cancelar modificación
+        protected void btnCancelarMod_Click(object sender, EventArgs e)
+        {
+            MostrarTab("listado");
+            btnTabModificar.Visible = false;
+            OcultarMensaje();
         }
 
         private void CargarMeseros()
@@ -191,11 +331,9 @@ namespace TukiGestor
                 {
                     int idMesero = int.Parse(e.CommandArgument.ToString());
                     meseroService.Reactivar(idMesero);
-
                     // recargamos las listas
                     CargarMeseros();
                     CargarMeserosInactivos();
-
                     MostrarMensaje("Mesero reactivado correctamente.", "success");
                 }
                 catch (Exception ex)
@@ -205,27 +343,7 @@ namespace TukiGestor
             }
         }
 
-        protected void RepeaterMeseros_ItemCommand(object source, RepeaterCommandEventArgs e)
-        {
-            if (e.CommandName == "Desactivar")
-            {
-                try
-                {
-                    int meseroId = int.Parse(e.CommandArgument.ToString());
-                    meseroService.Desactivar(meseroId);
-
-                    // recargamos ambas listas
-                    CargarMeseros();
-                    CargarMeserosInactivos();
-
-                    MostrarMensaje("Mesero desactivado correctamente.", "success");
-                }
-                catch (Exception ex)
-                {
-                    MostrarMensaje("Error al desactivar mesero: " + ex.Message, "error");
-                }
-            }
-        }
+       
 
 
 
