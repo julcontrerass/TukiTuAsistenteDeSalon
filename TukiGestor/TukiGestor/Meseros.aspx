@@ -78,35 +78,40 @@
                                 </FooterTemplate>
                             </asp:Repeater>
                         </asp:Panel>
-
                         <!-- nuevo mesero -->
                         <asp:Panel ID="pnlNuevo" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">
                                 <h4 class="mb-3">Agregar nuevo mesero</h4>
                                 <div class="mb-3">
-                                    <label for="txtNombreUsuario" class="form-label">Nombre de Usuario</label>
+                                    <label for="txtNombreUsuario" class="form-label">Nombre de Usuario *</label>
                                     <asp:TextBox ID="txtNombreUsuario" runat="server" CssClass="form-control"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvNombreUsuario" runat="server" ControlToValidate="txtNombreUsuario" ErrorMessage="El nombre de usuario es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"></asp:RequiredFieldValidator>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="txtContrasenia" class="form-label">Contraseña</label>
+                                    <label for="txtContrasenia" class="form-label">Contraseña *</label>
                                     <asp:TextBox ID="txtContrasenia" runat="server" TextMode="Password" CssClass="form-control"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvContrasenia" runat="server" ControlToValidate="txtContrasenia" ErrorMessage="La contraseña es obligatoria." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"></asp:RequiredFieldValidator>
+                                    <asp:RegularExpressionValidator ID="revContrasenia" runat="server" ControlToValidate="txtContrasenia" ValidationExpression="^.{6,}$" ErrorMessage="La contraseña debe tener al menos 6 caracteres." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"> </asp:RegularExpressionValidator>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="txtEmail" class="form-label">Email</label>
+                                    <label for="txtEmail" class="form-label">Email *</label>
                                     <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="ejemplo@correo.com"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvEmail" runat="server" ControlToValidate="txtEmail" ErrorMessage="El email es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"> </asp:RequiredFieldValidator>
+                                    <asp:RegularExpressionValidator ID="revEmail" runat="server" ControlToValidate="txtEmail" ValidationExpression="^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$" ErrorMessage="El formato del email no es válido." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"></asp:RegularExpressionValidator>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="txtNombreMesero" class="form-label">Nombre</label>
+                                    <label for="txtNombreMesero" class="form-label">Nombre *</label>
                                     <asp:TextBox ID="txtNombreMesero" runat="server" CssClass="form-control" placeholder="Ej: Juan"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvNombreMesero" runat="server" ControlToValidate="txtNombreMesero" ErrorMessage="El nombre es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"> </asp:RequiredFieldValidator>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="txtApellidoMesero" class="form-label">Apellido</label>
+                                    <label for="txtApellidoMesero" class="form-label">Apellido *</label>
                                     <asp:TextBox ID="txtApellidoMesero" runat="server" CssClass="form-control" placeholder="Ej: Pérez"></asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfvApellidoMesero" runat="server" ControlToValidate="txtApellidoMesero" ErrorMessage="El apellido es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"> </asp:RequiredFieldValidator>
                                 </div>
-                                <asp:Button ID="btnGuardarMesero" runat="server" Text="Guardar" CssClass="btn btn-custom mt-3" OnClick="btnGuardarMesero_Click" />
+                                <asp:Button ID="btnGuardarMesero" runat="server" Text="Guardar" CssClass="btn btn-custom mt-3" OnClick="btnGuardarMesero_Click" ValidationGroup="NuevoMesero" />
                             </div>
                         </asp:Panel>
-
                         <!-- meseros inactivos -->
                         <asp:Panel ID="pnlInactivos" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">

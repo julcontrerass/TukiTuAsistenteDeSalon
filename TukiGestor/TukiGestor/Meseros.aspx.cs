@@ -99,48 +99,79 @@ namespace TukiGestor
             RepeaterMeseros.DataSource = lista;
             RepeaterMeseros.DataBind();
         }
-               
+
 
         protected void btnGuardarMesero_Click(object sender, EventArgs e)
         {
+            // Validación de servidor (por si acaso se bypasea el cliente)
+            if (!Page.IsValid)
+            {
+                return;
+            }
+
             MeseroService servicio = new MeseroService();
             Mesero nuevo = new Mesero();
 
             try
             {
-                // Datos de usuario
+                // Capturamos y limpiamos los datos
                 nuevo.NombreUsuario = txtNombreUsuario.Text.Trim();
                 nuevo.Contraseña = txtContrasenia.Text;
-                nuevo.Email = txtEmail.Text.Trim();
-                // Datos de mesero
+                nuevo.Email = txtEmail.Text.Trim().ToLower(); // email en minúsculas
                 nuevo.Nombre = txtNombreMesero.Text.Trim();
                 nuevo.Apellido = txtApellidoMesero.Text.Trim();
-
-                // Validaciones básicas
-                if (string.IsNullOrEmpty(nuevo.NombreUsuario) || string.IsNullOrEmpty(nuevo.Contraseña) ||
-                    string.IsNullOrEmpty(nuevo.Email) || string.IsNullOrEmpty(nuevo.Nombre) ||
+                // Validación de campos vacíos
+                if (string.IsNullOrEmpty(nuevo.NombreUsuario) ||
+                    string.IsNullOrEmpty(nuevo.Contraseña) ||
+                    string.IsNullOrEmpty(nuevo.Email) ||
+                    string.IsNullOrEmpty(nuevo.Nombre) ||
                     string.IsNullOrEmpty(nuevo.Apellido))
                 {
-                    MostrarMensaje("Por favor complete todos los campos.", "warning");
+                    MostrarMensaje("Por favor complete todos los campos obligatorios.", "warning");
+                    return;
+                }
+                // Validación de longitud de contraseña
+                if (nuevo.Contraseña.Length < 6)
+                {
+                    MostrarMensaje("La contraseña debe tener al menos 6 caracteres.", "warning");
                     return;
                 }
 
+                // Validación de formato de email
+                if (!System.Text.RegularExpressions.Regex.IsMatch(nuevo.Email,
+                    @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
+                {
+                    MostrarMensaje("El formato del email no es válido.", "warning");
+                    return;
+                }
+                // Validación de nombre de usuario existente
+                if (servicio.ExisteNombreUsuario(nuevo.NombreUsuario))
+                {
+                    MostrarMensaje("El nombre de usuario ya está en uso. Por favor elija otro.", "warning");
+                    return;
+                }
+                // Validación de email existente
+                if (servicio.ExisteEmail(nuevo.Email))
+                {
+                    MostrarMensaje("El email ya está registrado. Por favor use otro.", "warning");
+                    return;
+                }
+                // Si llegamos acá, todo está bien
                 servicio.Agregar(nuevo);
-
-                // Limpiamos campos
+                // Limpiamos los campos
                 txtNombreUsuario.Text = "";
                 txtContrasenia.Text = "";
                 txtEmail.Text = "";
                 txtNombreMesero.Text = "";
                 txtApellidoMesero.Text = "";
-
-                // recargamos listado
+                // Recargamos listado
                 CargarMeseros();
-                MostrarMensaje("Mesero creado correctamente.", "success");
+                // Mostramos mensaje de éxito
+                MostrarMensaje($"Mesero '{nuevo.Nombre} {nuevo.Apellido}' creado correctamente.", "success");
             }
             catch (Exception ex)
             {
-                MostrarMensaje("Error: " + ex.Message, "error");
+                MostrarMensaje("Error al crear el mesero: " + ex.Message, "error");
             }
         }
 

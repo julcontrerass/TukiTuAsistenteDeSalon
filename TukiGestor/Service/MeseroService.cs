@@ -154,5 +154,40 @@ namespace Service
             datos.cerrarConexion();
             return lista;
         }
+
+
+        public bool ExisteNombreUsuario(string nombreUsuario)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT COUNT(*) FROM USUARIO WHERE NombreUsuario = @user");
+                datos.setearParametro("@user", nombreUsuario);
+                int count = (int)datos.ejecutarScalar();
+                return count > 0;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public bool ExisteEmail(string email)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT COUNT(*) FROM USUARIO WHERE Email = @mail");
+                datos.setearParametro("@mail", email);
+                int count = (int)datos.ejecutarScalar();
+                return count > 0;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+
     }
 }
