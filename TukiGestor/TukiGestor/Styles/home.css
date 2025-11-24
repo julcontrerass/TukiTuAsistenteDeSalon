@@ -94,3 +94,142 @@
     margin-top: 5px;
     text-align: center;
 }
+
+
+
+.alertas-stock-container {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    width: 260px;
+    z-index: 1000;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+
+.alerta-stock {
+    background: #ffe5e5;
+    border-left: 5px solid #ff4d4d;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    color: #333;
+}
+
+    .alerta-stock strong {
+        font-weight: 600;
+    }
+
+.stock-numero {
+    color: #d20000;
+    font-weight: bold;
+}
+
+/* CARD PRINCIPAL DE ALERTAS */
+.alertas-card {
+    width: 350px;
+    margin-top: 20px;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
+}
+
+    /* Título del card */
+    .alertas-card .card-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+/* Cada alerta */
+.alerta-item {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #ffe5e5;
+    border-left: 5px solid #ff4d4d;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.alerta-nombre {
+    font-weight: 600;
+    font-size: 15px;
+    color: #444;
+}
+
+.alerta-stock {
+    font-size: 14px;
+    color: #333;
+}
+
+.alerta-numero {
+    color: #d20000;
+    font-weight: bold;
+}
+
+
+/* Contenedor del reloj */
+.reloj-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
+    width: 350px;
+    text-align: center;
+    margin-bottom: 20px; /*  separa el card del reloj */
+}
+
+/* CARD PRINCIPAL DE ALERTAS */
+.card-home.alertas-card {
+    width: 350px; /* mismo ancho que el reloj */
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
+}
+
+    /* Título del card */
+    .card-home.alertas-card .card-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+/* Cada alerta */
+.alerta-item {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #ffe5e5;
+    border-left: 5px solid #ff4d4d;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.alerta-nombre {
+    font-weight: 600;
+    font-size: 15px;
+    color: #444;
+}
+
+.alerta-stock {
+    font-size: 14px;
+    color: #333;
+}
+
+.alerta-numero {
+    color: #d20000;
+    font-weight: bold;
+}
+
+
+

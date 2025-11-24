@@ -291,16 +291,13 @@ namespace Service
         {
             List<Producto> lista = new List<Producto>();
             AccesoDatos datos = new AccesoDatos();
-
             try
             {
                 string consulta = @"SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock FROM PRODUCTO WHERE Disponible = 1";
-
                 if (!string.IsNullOrWhiteSpace(textoBusqueda))
                 {
                     consulta += " AND Nombre LIKE @texto";
                 }
-
                 //orden
                 switch (ordenamiento)
                 {
@@ -329,16 +326,12 @@ namespace Service
                         consulta += " ORDER BY Nombre ASC";
                         break;
                 }
-
                 datos.SetearConsulta(consulta);
-
                 if (!string.IsNullOrWhiteSpace(textoBusqueda))
                 {
                     datos.setearParametro("@texto", "%" + textoBusqueda + "%");
                 }
-
                 datos.ejecutarLectura();
-
                 while (datos.Lector.Read())
                 {
                     Producto prod = new Producto();
@@ -350,12 +343,43 @@ namespace Service
                     prod.Stock = (int)datos.Lector["Stock"];
                     lista.Add(prod);
                 }
-
                 return lista;
             }
             catch (Exception ex)
             {
                 throw new Exception("Error al buscar y filtrar productos: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public List<Producto> ListarStockBajo(int limite)
+        {
+            List<Producto> lista = new List<Producto>();
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock " + "FROM PRODUCTO " + "WHERE Disponible = 1 AND Stock <= @limite");
+                datos.setearParametro("@limite", limite);
+                datos.ejecutarLectura();
+                while (datos.Lector.Read())
+                {
+                    Producto p = new Producto();
+                    p.ProductoId = (int)datos.Lector["ProductoId"];
+                    p.Nombre = (string)datos.Lector["Nombre"];
+                    p.Precio = (decimal)datos.Lector["Precio"];
+                    p.Disponible = (bool)datos.Lector["Disponible"];
+                    p.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    p.Stock = (int)datos.Lector["Stock"];
+                    lista.Add(p);
+                }
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al listar productos con stock bajo: " + ex.Message);
             }
             finally
             {
