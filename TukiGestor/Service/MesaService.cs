@@ -22,7 +22,7 @@ namespace Service
             List<Mesa> mesas = new List<Mesa>();
             try
             {
-                datos.SetearConsulta("SELECT MesaId, NumeroMesa, Ubicacion, Estado FROM MESA");
+                datos.SetearConsulta("SELECT MesaId, NumeroMesa, Ubicacion, Estado, ISNULL(PosicionX, 0) AS PosicionX, ISNULL(PosicionY, 0) AS PosicionY, ISNULL(Activo, 1) AS Activo FROM MESA WHERE Activo = 1");
                 datos.ejecutarLectura();
 
                 while (datos.Lector.Read())
@@ -32,7 +32,10 @@ namespace Service
                         MesaId = (int)datos.Lector["MesaId"],
                         NumeroMesa = (string)datos.Lector["NumeroMesa"],
                         Ubicacion = (string)datos.Lector["Ubicacion"],
-                        Estado = (string)datos.Lector["Estado"]
+                        Estado = (string)datos.Lector["Estado"],
+                        PosicionX = (int)datos.Lector["PosicionX"],
+                        PosicionY = (int)datos.Lector["PosicionY"],
+                        Activo = (bool)datos.Lector["Activo"]
                     };
                     mesas.Add(mesa);
                 }
@@ -53,7 +56,7 @@ namespace Service
             List<Mesa> mesas = new List<Mesa>();
             try
             {
-                datos.SetearConsulta("SELECT MesaId, NumeroMesa, Ubicacion, Estado FROM MESA WHERE Ubicacion = @ubicacion");
+                datos.SetearConsulta("SELECT MesaId, NumeroMesa, Ubicacion, Estado, ISNULL(PosicionX, 0) AS PosicionX, ISNULL(PosicionY, 0) AS PosicionY, ISNULL(Activo, 1) AS Activo FROM MESA WHERE Ubicacion = @ubicacion AND Activo = 1");
                 datos.setearParametro("@ubicacion", ubicacion);
                 datos.ejecutarLectura();
 
@@ -64,7 +67,10 @@ namespace Service
                         MesaId = (int)datos.Lector["MesaId"],
                         NumeroMesa = (string)datos.Lector["NumeroMesa"],
                         Ubicacion = (string)datos.Lector["Ubicacion"],
-                        Estado = (string)datos.Lector["Estado"]
+                        Estado = (string)datos.Lector["Estado"],
+                        PosicionX = (int)datos.Lector["PosicionX"],
+                        PosicionY = (int)datos.Lector["PosicionY"],
+                        Activo = (bool)datos.Lector["Activo"]
                     };
                     mesas.Add(mesa);
                 }
@@ -85,7 +91,7 @@ namespace Service
             Mesa mesa = null;
             try
             {
-                datos.SetearConsulta("SELECT MesaId, NumeroMesa, Ubicacion, Estado FROM MESA WHERE MesaId = @mesaId");
+                datos.SetearConsulta("SELECT MesaId, NumeroMesa, Ubicacion, Estado, ISNULL(PosicionX, 0) AS PosicionX, ISNULL(PosicionY, 0) AS PosicionY, ISNULL(Activo, 1) AS Activo FROM MESA WHERE MesaId = @mesaId");
                 datos.setearParametro("@mesaId", mesaId);
                 datos.ejecutarLectura();
 
@@ -96,7 +102,10 @@ namespace Service
                         MesaId = (int)datos.Lector["MesaId"],
                         NumeroMesa = (string)datos.Lector["NumeroMesa"],
                         Ubicacion = (string)datos.Lector["Ubicacion"],
-                        Estado = (string)datos.Lector["Estado"]
+                        Estado = (string)datos.Lector["Estado"],
+                        PosicionX = (int)datos.Lector["PosicionX"],
+                        PosicionY = (int)datos.Lector["PosicionY"],
+                        Activo = (bool)datos.Lector["Activo"]
                     };
                 }
                 return mesa;
@@ -127,26 +136,50 @@ namespace Service
             }
         }
 
+        public void ActualizarPosicion(int mesaId, int posicionX, int posicionY)
+        {
+            try
+            {
+                datos.SetearConsulta("UPDATE MESA SET PosicionX = @posicionX, PosicionY = @posicionY WHERE MesaId = @mesaId");
+                datos.setearParametro("@posicionX", posicionX);
+                datos.setearParametro("@posicionY", posicionY);
+                datos.setearParametro("@mesaId", mesaId);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al actualizar la posicion de la mesa: " + ex.Message, ex);
+            }
+        }
+
 
         public void AgregarMesa(Mesa mesa)
         {
             try
             {
-                // Obtener el siguiente número de mesa disponible para la ubicación
+                // Obtener el siguiente número de mesa disponible para la ubicación (solo activas)
                 datos.SetearConsulta(@"SELECT ISNULL(MAX(CAST(NumeroMesa AS INT)), 0) + 1 AS ProximoNumero
                                       FROM MESA
-                                      WHERE Ubicacion = @ubicacion");
+                                      WHERE Ubicacion = @ubicacion AND Activo = 1");
                 datos.setearParametro("@ubicacion", mesa.Ubicacion);
 
                 object resultado = datos.ejecutarScalar();
                 int proximoNumero = Convert.ToInt32(resultado);
                 mesa.NumeroMesa = proximoNumero.ToString();
 
+                // Calcular posición inicial para la nueva mesa (evitar solapamiento)
+                // 150px de ancho + 20px de gap = 170px de separación
+                // 4 mesas por fila
+                int posicionX = 20 + ((proximoNumero - 1) % 4) * 170;
+                int posicionY = 20 + ((proximoNumero - 1) / 4) * 170;
+
                 // Insertar la nueva mesa
-                datos.SetearConsulta("INSERT INTO MESA (NumeroMesa, Ubicacion, Estado) VALUES (@numeroMesa, @ubicacion, @estado)");
+                datos.SetearConsulta("INSERT INTO MESA (NumeroMesa, Ubicacion, Estado, PosicionX, PosicionY, Activo) VALUES (@numeroMesa, @ubicacion, @estado, @posicionX, @posicionY, 1)");
                 datos.setearParametro("@numeroMesa", mesa.NumeroMesa);
                 datos.setearParametro("@ubicacion", mesa.Ubicacion);
                 datos.setearParametro("@estado", mesa.Estado);
+                datos.setearParametro("@posicionX", posicionX);
+                datos.setearParametro("@posicionY", posicionY);
                 datos.ejecutarAccion();
             }
             catch (Exception ex)
@@ -164,7 +197,7 @@ namespace Service
                 Mesa mesaEliminar = ObtenerMesaPorId(mesaId);
                 if (mesaEliminar == null)
                 {
-                    throw new Exception("No se encontró la mesa a eliminar");
+                    throw new Exception("No se encontro la mesa a eliminar");
                 }
 
                 // Verificar si la mesa está ocupada (tiene pedidos activos)
@@ -173,35 +206,10 @@ namespace Service
                     throw new Exception("No se puede eliminar una mesa ocupada. Por favor, cierre primero todos los pedidos activos.");
                 }
 
-                string ubicacion = mesaEliminar.Ubicacion;
-                int numeroMesaEliminar = int.Parse(mesaEliminar.NumeroMesa);
-
-                // PASO 1: Desasociar todos los pedidos (activos y cerrados) de las asignaciones de esta mesa
-                // Esto preserva el historial de ventas pero rompe el vínculo con la mesa específica
-                datos.SetearConsulta(@"
-                    UPDATE PEDIDO
-                    SET AsignacionId = NULL, EsMostrador = 1
-                    WHERE AsignacionId IN (
-                        SELECT AsignacionId
-                        FROM ASIGNACIONMESA
-                        WHERE MesaId = @mesaId
-                    )
-                ");
+                // Eliminación lógica: marcar como inactiva
+                datos.SetearConsulta("UPDATE MESA SET Activo = 0 WHERE MesaId = @mesaId");
                 datos.setearParametro("@mesaId", mesaId);
                 datos.ejecutarAccion();
-
-                // PASO 2: Ahora eliminar todas las asignaciones de esta mesa (ya no tienen pedidos vinculados)
-                datos.SetearConsulta("DELETE FROM ASIGNACIONMESA WHERE MesaId = @mesaId");
-                datos.setearParametro("@mesaId", mesaId);
-                datos.ejecutarAccion();
-
-                // PASO 3: Eliminar la mesa
-                datos.SetearConsulta("DELETE FROM MESA WHERE MesaId = @mesaId");
-                datos.setearParametro("@mesaId", mesaId);
-                datos.ejecutarAccion();
-
-                // PASO 4: Renumerar las mesas siguientes en la misma ubicación
-                RenumerarMesasDespuesDeEliminar(ubicacion, numeroMesaEliminar);
             }
             catch (Exception ex)
             {
@@ -209,50 +217,12 @@ namespace Service
             }
         }
 
-        private void RenumerarMesasDespuesDeEliminar(string ubicacion, int numeroEliminado)
-        {
-            try
-            {
-                // Obtener todas las mesas de la ubicación con número mayor al eliminado
-                datos.SetearConsulta(@"SELECT MesaId, NumeroMesa
-                                      FROM MESA
-                                      WHERE Ubicacion = @ubicacion
-                                      AND CAST(NumeroMesa AS INT) > @numeroEliminado
-                                      ORDER BY CAST(NumeroMesa AS INT)");
-                datos.setearParametro("@ubicacion", ubicacion);
-                datos.setearParametro("@numeroEliminado", numeroEliminado);
-                datos.ejecutarLectura();
-
-                List<int> mesasIds = new List<int>();
-                while (datos.Lector.Read())
-                {
-                    mesasIds.Add((int)datos.Lector["MesaId"]);
-                }
-                datos.cerrarConexion();
-
-                // Actualizar cada mesa restando 1 a su número
-                foreach (int id in mesasIds)
-                {
-                    AccesoDatos datosUpdate = new AccesoDatos();
-                    datosUpdate.SetearConsulta(@"UPDATE MESA
-                                                 SET NumeroMesa = CAST((CAST(NumeroMesa AS INT) - 1) AS VARCHAR(50))
-                                                 WHERE MesaId = @mesaId");
-                    datosUpdate.setearParametro("@mesaId", id);
-                    datosUpdate.ejecutarAccion();
-                    datosUpdate.cerrarConexion();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error al renumerar las mesas: " + ex.Message, ex);
-            }
-        }
 
         public int ContarMesasPorEstado(string ubicacion, string estado)
         {
             try
             {
-                datos.SetearConsulta("SELECT COUNT(*) FROM MESA WHERE Ubicacion = @ubicacion AND Estado = @estado");
+                datos.SetearConsulta("SELECT COUNT(*) FROM MESA WHERE Ubicacion = @ubicacion AND Estado = @estado AND Activo = 1");
                 datos.setearParametro("@ubicacion", ubicacion);
                 datos.setearParametro("@estado", estado);
 

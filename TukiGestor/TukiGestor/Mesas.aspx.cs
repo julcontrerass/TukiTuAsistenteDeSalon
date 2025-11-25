@@ -52,6 +52,35 @@ namespace TukiGestor
             // SIEMPRE cargar desde la base de datos (incluso en postbacks y refresh)
             // Esto asegura que los datos estén actualizados en todo momento
 
+            // Detectar postback de guardar posiciones
+            if (IsPostBack)
+            {
+                string eventTarget = Request.Form["__EVENTTARGET"];
+                string eventArgument = Request.Form["__EVENTARGUMENT"];
+
+                if (eventArgument == "SavePositions" && !string.IsNullOrEmpty(HdnPosicionesMesas.Value))
+                {
+                    GuardarPosicionesMesas();
+                    Session["MensajeExito"] = "Posiciones de mesas guardadas exitosamente";
+
+                    // Guardar tab activo en Session antes del redirect
+                    if (!string.IsNullOrEmpty(HdnTabActivo.Value))
+                    {
+                        Session["TabActivo"] = HdnTabActivo.Value;
+                    }
+
+                    // Redirigir para refrescar y salir del modo edicion
+                    Response.Redirect(Request.Url.AbsolutePath, false);
+                    Context.ApplicationInstance.CompleteRequest();
+                    return;
+                }
+                else if (!string.IsNullOrEmpty(HdnPosicionesMesas.Value))
+                {
+                    // Guardado automático legacy (por si acaso)
+                    GuardarPosicionesMesas();
+                }
+            }
+
             // Sincronizar el estado de las mesas con los pedidos activos
             mesaService.SincronizarEstadoMesasConPedidos();
 
@@ -71,6 +100,24 @@ namespace TukiGestor
             {
                 HdnTabActivo.Value = Session["TabActivo"].ToString();
                 Session.Remove("TabActivo");
+            }
+
+            // Restaurar modo edicion desde Session
+            if (!IsPostBack && Session["ModoEdicionActivo"] != null)
+            {
+                string ubicacion = Session["ModoEdicionActivo"].ToString();
+
+                // Registrar script para activar modo edicion
+                string script = $@"
+                    window.addEventListener('DOMContentLoaded', function() {{
+                        setTimeout(function() {{
+                            toggleEditMode('{ubicacion}');
+                        }}, 200);
+                    }});
+                ";
+                ClientScript.RegisterStartupScript(this.GetType(), "RestaurarModoEdicion", script, true);
+
+                Session.Remove("ModoEdicionActivo");
             }
 
             // Si el HdnTabActivo tiene un valor, asegurarse de que se use ese tab
@@ -636,9 +683,10 @@ namespace TukiGestor
 
                 mesaService.AgregarMesa(nuevaMesa);
 
-                // Guardar tab activo y mensaje en Session
+                // Guardar tab activo, mensaje y modo edicion en Session
                 Session["TabActivo"] = ubicacion;
                 Session["MensajeExito"] = "Mesa agregada exitosamente en " + ubicacion + ".";
+                Session["ModoEdicionActivo"] = ubicacion; // Mantener modo edicion
 
                 // Redirigir a URL limpia para evitar reenvío de formulario
                 Response.Redirect(Request.Url.AbsolutePath, false);
@@ -689,9 +737,10 @@ namespace TukiGestor
 
                     mesaService.EliminarMesa(mesaId);
 
-                    // Guardar tab activo y mensaje en Session
+                    // Guardar tab activo, mensaje y modo edicion en Session
                     Session["TabActivo"] = ubicacion;
                     Session["MensajeExito"] = "Mesa " + numeroMesa + " eliminada exitosamente.";
+                    Session["ModoEdicionActivo"] = ubicacion; // Mantener modo edicion
 
                     // Redirigir a URL limpia para evitar reenvío de formulario
                     Response.Redirect(Request.Url.AbsolutePath, false);
@@ -1310,6 +1359,43 @@ namespace TukiGestor
             {
                 MostrarMensaje("Error al agregar mas productos: " + ex.Message, "danger");
             }
+        }
+
+        private void GuardarPosicionesMesas()
+        {
+            try
+            {
+                string jsonPosiciones = HdnPosicionesMesas.Value;
+
+                // Parsear el JSON usando Newtonsoft.Json
+                var posicionesPorUbicacion = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, List<PosicionMesa>>>(jsonPosiciones);
+
+                if (posicionesPorUbicacion != null)
+                {
+                    foreach (var ubicacion in posicionesPorUbicacion)
+                    {
+                        foreach (var posicion in ubicacion.Value)
+                        {
+                            mesaService.ActualizarPosicion(int.Parse(posicion.mesaId), posicion.x, posicion.y);
+                        }
+                    }
+                }
+
+                // Limpiar el campo después de guardar
+                HdnPosicionesMesas.Value = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error al guardar posiciones: " + ex.Message);
+            }
+        }
+
+        // Clase auxiliar para deserializar las posiciones
+        private class PosicionMesa
+        {
+            public string mesaId { get; set; }
+            public int x { get; set; }
+            public int y { get; set; }
         }
 
         protected void CancelarOrden_Click(object sender, EventArgs e)

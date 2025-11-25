@@ -12,5 +12,8 @@ namespace dominio
         public string NumeroMesa { get; set; }
         public string Ubicacion { get; set; } // 'salon' o 'patio'
         public string Estado { get; set; } // 'libre' o 'ocupada'
+        public int PosicionX { get; set; } 
+        public int PosicionY { get; set; } 
+        public bool Activo { get; set; } 
     }
 }

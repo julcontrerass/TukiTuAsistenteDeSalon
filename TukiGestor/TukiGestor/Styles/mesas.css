@@ -99,6 +99,52 @@
     gap: 10px;
 }
 
+.edit-mode-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-mode-buttons .btn {
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.edit-mode-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para modo edición activo */
+.mesas-canvas.edit-mode {
+    border: 3px dashed #ffc107;
+    background: linear-gradient(to right, #E7D9C2 1px, transparent 1px),
+                linear-gradient(to bottom, #E7D9C2 1px, transparent 1px),
+                #fffbf0;
+    background-size: 50px 50px, 50px 50px, 100%;
+}
+
+.mesas-canvas.edit-mode .mesa-card {
+    cursor: move !important;
+    border: 2px solid #ffc107;
+}
+
+.mesas-canvas.edit-mode .mesa-card:hover {
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+    transform: scale(1.02);
+}
+
+.mesas-canvas.edit-mode .mesa-card.dragging {
+    transition: none;
+    transform: scale(1);
+}
+
+.mesas-canvas:not(.edit-mode) .mesa-card {
+    cursor: pointer;
+}
+
+/* Grid para mostrador */
 .mesas-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -107,6 +153,39 @@
     max-height: calc(80vh - 250px);
     overflow-y: auto;
     padding-right: 10px;
+}
+
+/* Contenedor para posicionamiento libre (Salón y Patio) */
+.mesas-canvas {
+    position: relative;
+    min-height: 650px;
+    height: 650px;
+    min-width: 800px;
+    background: #F6EFE0;
+    border: 2px solid #E7D9C2;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    overflow: auto;
+    transition: all 0.3s ease;
+}
+
+.mesas-canvas::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.mesas-canvas::-webkit-scrollbar-track {
+    background: #F6EFE0;
+    border-radius: 10px;
+}
+
+.mesas-canvas::-webkit-scrollbar-thumb {
+    background: #E7D9C2;
+    border-radius: 10px;
+}
+
+.mesas-canvas::-webkit-scrollbar-thumb:hover {
+    background: #d4c5ae;
 }
 
     .mesas-grid::-webkit-scrollbar {
@@ -143,6 +222,50 @@
     text-decoration: none !important;
     color: inherit !important;
     min-height: 140px;
+    box-sizing: border-box;
+}
+
+/* Estilos para mesas en canvas (drag & drop) */
+.mesas-canvas .mesa-card {
+    position: absolute;
+    width: 150px !important;
+    height: 150px !important;
+    min-height: 150px !important;
+    max-height: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+    padding: 15px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    box-sizing: border-box;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    flex-basis: 150px !important;
+    display: flex !important;
+    aspect-ratio: 1 / 1 !important;
+}
+
+.mesas-canvas .mesa-card:active {
+    cursor: grabbing;
+}
+
+.mesas-canvas .mesa-card.dragging {
+    opacity: 0.9;
+    z-index: 1000;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    cursor: grabbing;
+    pointer-events: none;
+}
+
+/* Forzar tamaño en el contenedor interno */
+.mesas-canvas .mesa-card > * {
+    max-width: 100%;
+}
+
+.mesas-canvas .mesa-card .mesa-icon,
+.mesas-canvas .mesa-card .mesa-number {
+    flex-shrink: 0;
 }
 
 a.mesa-card {
@@ -171,6 +294,10 @@ a.mesa-card {
     position: relative;
 }
 
+.mesas-canvas .mesa-card .mesa-icon {
+    font-size: 90px;
+}
+
 .mesa-card.libre .mesa-icon {
     color: #28a745;
 }
@@ -188,28 +315,64 @@ a.mesa-card {
     z-index: 1;
 }
 
+.mesas-canvas .mesa-card .mesa-number {
+    font-size: 30px;
+}
+
+/* Contenedor de mesa para posicionamiento */
+.mesa-container {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    cursor: default;
+}
+
+/* Cursor en modo edicion */
+.mesas-canvas.edit-mode .mesa-container {
+    cursor: move;
+}
+
+/* Estilo durante el drag */
+.mesas-canvas .mesa-container.dragging {
+    opacity: 0.9;
+    z-index: 1000;
+    pointer-events: none;
+}
+
 .delete-btn {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 3px;
+    right: 3px;
     background: #dc3545;
     color: white;
     border: none;
     border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    font-size: 16px;
+    width: 26px;
+    height: 26px;
+    font-size: 15px;
     cursor: pointer;
     display: none !important;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    z-index: 10;
+    z-index: 100;
     text-decoration: none !important;
+    pointer-events: auto;
 }
 
 .mesas-grid > div:hover .delete-btn {
     display: flex !important;
+}
+
+/* Mostrar boton eliminar solo en modo edicion */
+.mesas-canvas.edit-mode .mesa-container .delete-btn,
+.mesas-canvas.edit-mode .mesa-container a.delete-btn {
+    display: flex !important;
+}
+
+.mesas-canvas.edit-mode .mesa-container:hover .delete-btn {
+    transform: scale(1.2);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
 }
 
 .delete-btn:hover {
@@ -219,9 +382,10 @@ a.mesa-card {
     text-decoration: none !important;
 }
 
-a.delete-btn {
+/* Ocultar boton eliminar cuando NO esta en modo edicion */
+.mesas-canvas:not(.edit-mode) .mesa-container .delete-btn,
+.mesas-canvas:not(.edit-mode) .mesa-container a.delete-btn {
     display: none !important;
-    text-decoration: none !important;
 }
 
 .mesas-grid > div:hover a.delete-btn {
@@ -244,6 +408,53 @@ a.delete-btn {
     min-height: 140px;
     text-decoration: none !important;
     color: inherit !important;
+}
+
+/* Botón agregar mesa para canvas - OCULTO POR DEFECTO */
+.add-mesa-canvas,
+a.add-mesa-canvas {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    font-size: 36px;
+    cursor: pointer;
+    display: none !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+    z-index: 100;
+    text-decoration: none !important;
+}
+
+/* Mostrar boton agregar SOLO en modo edicion */
+.mesas-canvas.edit-mode .add-mesa-canvas,
+.mesas-canvas.edit-mode a.add-mesa-canvas {
+    display: flex !important;
+}
+
+/* Asegurar que esta oculto cuando NO esta en modo edicion */
+.mesas-canvas:not(.edit-mode) .add-mesa-canvas,
+.mesas-canvas:not(.edit-mode) a.add-mesa-canvas {
+    display: none !important;
+}
+
+.add-mesa-canvas:hover {
+    background: #218838;
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    color: white;
+    text-decoration: none !important;
+}
+
+.add-mesa-canvas:active {
+    transform: scale(1.05);
 }
 
 a.add-mesa-card {

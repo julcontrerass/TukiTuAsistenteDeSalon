@@ -49,15 +49,28 @@
                 <div class="tab-pane fade <%= (HdnTabActivo.Value == "salon" || string.IsNullOrEmpty(HdnTabActivo.Value)) ? "show active" : "" %>" id="salon" role="tabpanel">
                     <div class="section-header">
                         <div class="section-title">Mesas del Salon</div>
+                        <div class="edit-mode-buttons">
+                            <button type="button" class="btn btn-warning btn-edit-mode" data-ubicacion="salon" onclick="toggleEditMode('salon')">
+                                <i class="bi bi-pencil-square"></i> Editar Mesas
+                            </button>
+                            <button type="button" class="btn btn-success btn-save-mode" data-ubicacion="salon" onclick="savePositions('salon')" style="display: none;">
+                                <i class="bi bi-check-circle"></i> Guardar Cambios
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-cancel-mode" data-ubicacion="salon" onclick="cancelEditMode('salon')" style="display: none;">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                        </div>
                     </div>
-                    <div class="mesas-grid">
+                    <div class="mesas-canvas" data-ubicacion="salon">
                         <asp:Repeater ID="RepMesasSalon" runat="server">
                             <ItemTemplate>
-                                <div style="position: relative;">
+                                <div class="mesa-container" style='<%# "position: absolute; left: " + (Eval("PosicionX") ?? "0") + "px; top: " + (Eval("PosicionY") ?? "0") + "px; width: 150px; height: 150px;" %>' data-mesa-id='<%# Eval("MesaId") %>'>
                                     <asp:LinkButton ID="LnkMesa" runat="server"
                                         CssClass='<%# "mesa-card " + ((string)Eval("Estado")).ToLower() %>'
                                         CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") + "|salon|" + Eval("Estado") %>'
-                                        OnClick="SeleccionarMesa_Click">
+                                        OnClick="SeleccionarMesa_Click"
+                                        OnClientClick="return handleMesaClick(this, 'salon');"
+                                        style="position: relative; width: 150px !important; height: 150px !important; left: 0; top: 0;">
                                         <div class="mesa-number"><%# Eval("NumeroMesa") %></div>
                                         <i class="bi bi-octagon-fill mesa-icon"></i>
                                     </asp:LinkButton>
@@ -65,15 +78,14 @@
                                         CssClass="delete-btn"
                                         CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") + "|salon" %>'
                                         OnClick="AbrirModalEliminarMesa_Click"
-                                        OnClientClick="event.stopPropagation();">
+                                        Visible='<%# ((string)Eval("Estado")).ToLower() == "libre" %>'>
                                         <i class="bi bi-x"></i>
                                     </asp:LinkButton>
                                 </div>
                             </ItemTemplate>
                         </asp:Repeater>
-                        <asp:LinkButton ID="LnkAgregarSalon" runat="server" CssClass="add-mesa-card" CommandArgument="salon" OnClick="AgregarMesa_Click">
+                        <asp:LinkButton ID="LnkAgregarSalon" runat="server" CssClass="add-mesa-canvas" CommandArgument="salon" OnClick="AgregarMesa_Click">
                             <i class="bi bi-plus-lg"></i>
-                            <div style="color: #666; font-size: 14px;">Agregar Mesa</div>
                         </asp:LinkButton>
                     </div>
                 </div>
@@ -82,15 +94,28 @@
                 <div class="tab-pane fade <%= HdnTabActivo.Value == "patio" ? "show active" : "" %>" id="patio" role="tabpanel">
                     <div class="section-header">
                         <div class="section-title">Mesas del Patio</div>
+                        <div class="edit-mode-buttons">
+                            <button type="button" class="btn btn-warning btn-edit-mode" data-ubicacion="patio" onclick="toggleEditMode('patio')">
+                                <i class="bi bi-pencil-square"></i> Editar Mesas
+                            </button>
+                            <button type="button" class="btn btn-success btn-save-mode" data-ubicacion="patio" onclick="savePositions('patio')" style="display: none;">
+                                <i class="bi bi-check-circle"></i> Guardar Cambios
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-cancel-mode" data-ubicacion="patio" onclick="cancelEditMode('patio')" style="display: none;">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                        </div>
                     </div>
-                    <div class="mesas-grid">
+                    <div class="mesas-canvas" data-ubicacion="patio">
                         <asp:Repeater ID="RepMesasPatio" runat="server">
                             <ItemTemplate>
-                                <div style="position: relative;">
+                                <div class="mesa-container" style='<%# "position: absolute; left: " + (Eval("PosicionX") ?? "0") + "px; top: " + (Eval("PosicionY") ?? "0") + "px; width: 150px; height: 150px;" %>' data-mesa-id='<%# Eval("MesaId") %>'>
                                     <asp:LinkButton ID="LnkMesa" runat="server"
                                         CssClass='<%# "mesa-card " + ((string)Eval("Estado")).ToLower() %>'
                                         CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") + "|patio|" + Eval("Estado") %>'
-                                        OnClick="SeleccionarMesa_Click">
+                                        OnClick="SeleccionarMesa_Click"
+                                        OnClientClick="return handleMesaClick(this, 'patio');"
+                                        style="position: relative; width: 150px !important; height: 150px !important; left: 0; top: 0;">
                                         <div class="mesa-number"><%# Eval("NumeroMesa") %></div>
                                         <i class="bi bi-octagon-fill mesa-icon"></i>
                                     </asp:LinkButton>
@@ -98,15 +123,14 @@
                                         CssClass="delete-btn"
                                         CommandArgument='<%# Eval("MesaId") + "|" + Eval("NumeroMesa") + "|patio" %>'
                                         OnClick="AbrirModalEliminarMesa_Click"
-                                        OnClientClick="event.stopPropagation();">
+                                        Visible='<%# ((string)Eval("Estado")).ToLower() == "libre" %>'>
                                         <i class="bi bi-x"></i>
                                     </asp:LinkButton>
                                 </div>
                             </ItemTemplate>
                         </asp:Repeater>
-                        <asp:LinkButton ID="LnkAgregarPatio" runat="server" CssClass="add-mesa-card" CommandArgument="patio" OnClick="AgregarMesa_Click">
+                        <asp:LinkButton ID="LnkAgregarPatio" runat="server" CssClass="add-mesa-canvas" CommandArgument="patio" OnClick="AgregarMesa_Click">
                             <i class="bi bi-plus-lg"></i>
-                            <div style="color: #666; font-size: 14px;">Agregar Mesa</div>
                         </asp:LinkButton>
                     </div>
                 </div>
@@ -349,7 +373,7 @@
         </div>
     </div>
 
-    <!-- Modal Confirmación Eliminar Mesa -->
+    <!-- Modal Confirmacion Eliminar Mesa -->
     <div class="modal fade" id="modalEliminarMesa" tabindex="-1" aria-labelledby="modalEliminarMesaLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -361,13 +385,14 @@
                 </div>
                 <div class="modal-body text-center py-4">
                     <i class="bi bi-trash3-fill text-danger" style="font-size: 48px;"></i>
-                    <p class="mt-3 mb-0" style="font-size: 16px;">¿Estas seguro de que deseas eliminar la mesa <strong><span id="modalEliminarNumero"></span></strong>?</p>
-                    <p class="text-muted mt-2">Esta accion no se puede deshacer.</p>
+                    <p class="mt-3 mb-0" style="font-size: 16px;">Estas seguro de que deseas eliminar la mesa <strong><span id="modalEliminarNumero"></span></strong>?</p>
+                    <p class="text-muted mt-2">La mesa se ocultara pero se mantendra en el historial.</p>
                     <asp:HiddenField ID="HdnMesaIdEliminar" runat="server" />
                     <asp:HiddenField ID="HdnMesaNumeroEliminar" runat="server" />
                     <asp:HiddenField ID="HdnMesaUbicacionEliminar" runat="server" />
                     <asp:HiddenField ID="HdnProductosOrden" runat="server" />
                     <asp:HiddenField ID="HdnPedidoIdActual" runat="server" />
+                    <asp:HiddenField ID="HdnPosicionesMesas" runat="server" />
                     <asp:Button ID="BtnConfirmarOrdenHidden" runat="server" Style="display:none;" OnClick="ConfirmarOrden_Click" />
                     <asp:Button ID="BtnRealizarPagoHidden" runat="server" Style="display:none;" OnClick="RealizarPago_Click" />
                     <asp:Button ID="BtnCancelarOrdenHidden" runat="server" Style="display:none;" OnClick="CancelarOrden_Click" />
@@ -383,6 +408,244 @@
     </div>
 
     <script>
+        // ===== DRAG & DROP PARA MESAS =====
+        let draggedElement = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let canvasRect = null;
+        let editModeActive = { salon: false, patio: false };
+        let originalPositions = { salon: {}, patio: {} };
+        let currentX = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        function initDragDrop() {
+            const canvases = document.querySelectorAll('.mesas-canvas');
+
+            canvases.forEach(canvas => {
+                const mesas = canvas.querySelectorAll('.mesa-container');
+
+                mesas.forEach(mesa => {
+                    // Remover event listeners existentes para evitar duplicados
+                    mesa.removeEventListener('mousedown', startDrag);
+                    mesa.removeEventListener('touchstart', startDrag);
+
+                    // Mouse events
+                    mesa.addEventListener('mousedown', startDrag, { passive: false });
+
+                    // Touch events
+                    mesa.addEventListener('touchstart', startDrag, { passive: false });
+                });
+            });
+
+            // Global events (solo una vez)
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', endDrag);
+
+            document.addEventListener('mousemove', drag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function startDrag(e) {
+            // No arrastrar si se hace clic en el botón de eliminar
+            if (e.target.closest('.delete-btn') || e.target.classList.contains('delete-btn')) {
+                return;
+            }
+
+            const mesa = e.currentTarget;
+            const canvas = mesa.closest('.mesas-canvas');
+
+            if (!canvas) return;
+
+            const ubicacion = canvas.getAttribute('data-ubicacion');
+
+            // IMPORTANTE: Solo permitir drag en modo edición
+            if (!editModeActive[ubicacion]) {
+                return;
+            }
+
+            e.preventDefault();
+
+            draggedElement = mesa;
+            canvasRect = canvas.getBoundingClientRect();
+            isDragging = true;
+
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            const mesaRect = mesa.getBoundingClientRect();
+
+            offsetX = clientX - mesaRect.left;
+            offsetY = clientY - mesaRect.top;
+
+            mesa.classList.add('dragging');
+            mesa.style.willChange = 'transform';
+        }
+
+        function drag(e) {
+            if (!draggedElement || !canvasRect || !isDragging) return;
+
+            e.preventDefault();
+
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+            const canvas = draggedElement.closest('.mesas-canvas');
+            if (!canvas) return;
+
+            // Calcular nueva posición relativa al canvas incluyendo scroll
+            currentX = clientX - canvasRect.left - offsetX + canvas.scrollLeft;
+            currentY = clientY - canvasRect.top - offsetY + canvas.scrollTop;
+
+            // Limitar a los bordes del canvas
+            const mesaWidth = draggedElement.offsetWidth;
+            const mesaHeight = draggedElement.offsetHeight;
+
+            currentX = Math.max(0, Math.min(currentX, canvas.scrollWidth - mesaWidth));
+            currentY = Math.max(0, Math.min(currentY, canvas.scrollHeight - mesaHeight));
+
+            // Aplicar posición inmediatamente sin requestAnimationFrame para mayor fluidez
+            draggedElement.style.left = currentX + 'px';
+            draggedElement.style.top = currentY + 'px';
+        }
+
+        function endDrag(e) {
+            if (!draggedElement) return;
+
+            isDragging = false;
+            draggedElement.classList.remove('dragging');
+            draggedElement.style.willChange = 'auto';
+
+            draggedElement = null;
+            canvasRect = null;
+        }
+
+        // ===== MODO EDICION =====
+        function toggleEditMode(ubicacion) {
+            const canvas = document.querySelector(`.mesas-canvas[data-ubicacion="${ubicacion}"]`);
+            const btnEdit = document.querySelector(`.btn-edit-mode[data-ubicacion="${ubicacion}"]`);
+            const btnSave = document.querySelector(`.btn-save-mode[data-ubicacion="${ubicacion}"]`);
+            const btnCancel = document.querySelector(`.btn-cancel-mode[data-ubicacion="${ubicacion}"]`);
+
+            if (!canvas) return;
+
+            // Activar modo edicion
+            editModeActive[ubicacion] = true;
+            canvas.classList.add('edit-mode');
+
+            // Guardar posiciones originales por si se cancela
+            saveOriginalPositions(ubicacion);
+
+            // Cambiar botones
+            btnEdit.style.display = 'none';
+            btnSave.style.display = 'inline-block';
+            btnCancel.style.display = 'inline-block';
+        }
+
+        function savePositions(ubicacion) {
+            const canvas = document.querySelector(`.mesas-canvas[data-ubicacion="${ubicacion}"]`);
+            if (!canvas) return;
+
+            // Recolectar posiciones actuales
+            const positions = {};
+            positions[ubicacion] = [];
+
+            const mesas = canvas.querySelectorAll('.mesa-container');
+            mesas.forEach(mesa => {
+                const mesaId = mesa.getAttribute('data-mesa-id');
+                const x = parseInt(mesa.style.left) || 0;
+                const y = parseInt(mesa.style.top) || 0;
+
+                if (mesaId) {
+                    positions[ubicacion].push({
+                        mesaId: mesaId,
+                        x: x,
+                        y: y
+                    });
+                }
+            });
+
+            // Guardar en campo oculto
+            const hdnField = document.getElementById('<%= HdnPosicionesMesas.ClientID %>');
+            if (hdnField) {
+                hdnField.value = JSON.stringify(positions);
+            }
+
+            // Guardar ubicacion actual para mantener el tab activo
+            const hdnTabActivo = document.getElementById('<%= HdnTabActivo.ClientID %>');
+            if (hdnTabActivo) {
+                hdnTabActivo.value = ubicacion;
+            }
+
+            // Hacer postback para guardar en BD
+            __doPostBack('', 'SavePositions');
+        }
+
+        function cancelEditMode(ubicacion) {
+            const canvas = document.querySelector(`.mesas-canvas[data-ubicacion="${ubicacion}"]`);
+            const btnEdit = document.querySelector(`.btn-edit-mode[data-ubicacion="${ubicacion}"]`);
+            const btnSave = document.querySelector(`.btn-save-mode[data-ubicacion="${ubicacion}"]`);
+            const btnCancel = document.querySelector(`.btn-cancel-mode[data-ubicacion="${ubicacion}"]`);
+
+            if (!canvas) return;
+
+            // Restaurar posiciones originales
+            restoreOriginalPositions(ubicacion);
+
+            // Desactivar modo edicion
+            editModeActive[ubicacion] = false;
+            canvas.classList.remove('edit-mode');
+
+            // Cambiar botones
+            btnEdit.style.display = 'inline-block';
+            btnSave.style.display = 'none';
+            btnCancel.style.display = 'none';
+        }
+
+        function saveOriginalPositions(ubicacion) {
+            const canvas = document.querySelector(`.mesas-canvas[data-ubicacion="${ubicacion}"]`);
+            if (!canvas) return;
+
+            originalPositions[ubicacion] = {};
+            const mesas = canvas.querySelectorAll('.mesa-container');
+            mesas.forEach(mesa => {
+                const mesaId = mesa.getAttribute('data-mesa-id');
+                if (mesaId) {
+                    originalPositions[ubicacion][mesaId] = {
+                        x: parseInt(mesa.style.left) || 0,
+                        y: parseInt(mesa.style.top) || 0
+                    };
+                }
+            });
+        }
+
+        function restoreOriginalPositions(ubicacion) {
+            const canvas = document.querySelector(`.mesas-canvas[data-ubicacion="${ubicacion}"]`);
+            if (!canvas || !originalPositions[ubicacion]) return;
+
+            const mesas = canvas.querySelectorAll('.mesa-container');
+            mesas.forEach(mesa => {
+                const mesaId = mesa.getAttribute('data-mesa-id');
+                if (mesaId && originalPositions[ubicacion][mesaId]) {
+                    const pos = originalPositions[ubicacion][mesaId];
+                    mesa.style.left = pos.x + 'px';
+                    mesa.style.top = pos.y + 'px';
+                }
+            });
+        }
+
+        function handleMesaClick(element, ubicacion) {
+            // Si esta en modo edicion, NO abrir la orden
+            if (editModeActive[ubicacion]) {
+                return false; // Prevenir postback
+            }
+            // Si NO esta en modo edicion, permitir abrir la orden
+            return true; // Permitir postback
+        }
+
         // Función helper para formatear números
         const formatearPrecio = (num) => '$' + Math.round(num).toLocaleString('es-AR');
 
@@ -507,6 +770,24 @@
 
             // Event listeners de modales
             document.getElementById('modalOrden')?.addEventListener('hidden.bs.modal', limpiarBusquedaAlCerrarModal);
+
+            // Inicializar drag & drop para mesas
+            initDragDrop();
+
+            // Reinicializar drag & drop al cambiar de pestaña
+            const tabButtons = document.querySelectorAll('#mesasTabs button[data-bs-toggle="tab"]');
+            tabButtons.forEach(btn => {
+                btn.addEventListener('shown.bs.tab', () => {
+                    setTimeout(initDragDrop, 100);
+                });
+            });
         });
+
+        // Reinicializar después de postbacks de ASP.NET
+        if (typeof Sys !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+            Sys.WebForms.PageRequestManager.getInstance().add_endRequest(() => {
+                setTimeout(initDragDrop, 100);
+            });
+        }
     </script>
 </asp:Content>
