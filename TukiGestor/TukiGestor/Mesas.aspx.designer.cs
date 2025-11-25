@@ -222,6 +222,15 @@ namespace TukiGestor
         protected global::System.Web.UI.WebControls.HiddenField HdnPedidoIdActual;
 
         /// <summary>
+        /// HdnPosicionesMesas control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField HdnPosicionesMesas;
+
+        /// <summary>
         /// BtnConfirmarOrdenHidden control.
         /// </summary>
         /// <remarks>
