@@ -1,8 +1,7 @@
-﻿
+﻿/* RESET DEL CONTENEDOR PRINCIPAL */
 .container.body-content {
     padding: 0 !important;
     margin: 0 !important;
-    margin-bottom: 0 !important;
     max-width: 100% !important;
     width: 100% !important;
     height: calc(100vh - 80px);
@@ -10,6 +9,7 @@
     overflow: visible !important;
 }
 
+/* CONTENEDOR CENTRAL DEL HOME */
 .home-container {
     position: fixed;
     left: calc(50vw + 140px);
@@ -19,7 +19,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
     padding: 20px;
 }
@@ -28,6 +27,7 @@
     left: calc(50vw + 40px);
 }
 
+/* WELCOME SECTION */
 .welcome-section {
     background-color: #fff;
     border-radius: 15px;
@@ -51,6 +51,7 @@
         line-height: 1.6;
     }
 
+/* BOTÓN */
 .btn-primary-custom {
     background-color: #E7D8C1;
     color: #333;
@@ -67,135 +68,77 @@
     .btn-primary-custom:hover {
         background-color: #d4c5ae;
         color: #000;
-        text-decoration: none;
     }
 
-.reloj-container {
+/* PANEL SUPERIOR FIJO (RELOJ + ALERTAS) */
+.panel-superior-derecha {
     position: fixed;
     top: 20px;
     right: 20px;
+    width: 350px;
     z-index: 1000;
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 15px 25px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* RELOJ */
+.reloj-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
+    width: 100%;
+    text-align: center;
 }
 
 .reloj-hora {
     font-size: 2em;
     font-weight: 600;
     color: #333;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .reloj-fecha {
     font-size: 0.9em;
     color: #666;
     margin-top: 5px;
-    text-align: center;
 }
 
-
-
-.alertas-stock-container {
-    position: fixed;
-    top: 120px;
-    right: 20px;
-    width: 260px;
-    z-index: 1000;
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-}
-
-.alerta-stock {
-    background: #ffe5e5;
-    border-left: 5px solid #ff4d4d;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    font-size: 0.95em;
-    color: #333;
-}
-
-    .alerta-stock strong {
-        font-weight: 600;
-    }
-
-.stock-numero {
-    color: #d20000;
-    font-weight: bold;
-}
-
-/* CARD PRINCIPAL DE ALERTAS */
-.alertas-card {
-    width: 350px;
-    margin-top: 20px;
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
-}
-
-    /* Título del card */
-    .alertas-card .card-title {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 15px;
-        color: #333;
-    }
-
-/* Cada alerta */
-.alerta-item {
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: #ffe5e5;
-    border-left: 5px solid #ff4d4d;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.alerta-nombre {
-    font-weight: 600;
-    font-size: 15px;
-    color: #444;
-}
-
-.alerta-stock {
-    font-size: 14px;
-    color: #333;
-}
-
-.alerta-numero {
-    color: #d20000;
-    font-weight: bold;
-}
-
-
-/* Contenedor del reloj */
-.reloj-container {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
-    width: 350px;
-    text-align: center;
-    margin-bottom: 20px; /*  separa el card del reloj */
-}
-
-/* CARD PRINCIPAL DE ALERTAS */
+/* CARD DE ALERTAS */
 .card-home.alertas-card {
-    width: 350px; /* mismo ancho que el reloj */
+    width: 100%;
     background: white;
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
+    /* NUEVO → límite de altura + scroll */
+    max-height: 350px; /* ajustable */
+    overflow-y: auto;
+    /* Scroll suave y moderno */
+    scrollbar-width: thin;
+    scrollbar-color: #c4c4c4 #f1f1f1;
 }
 
-    /* Título del card */
+    /* Chrome, Edge y Safari */
+    .card-home.alertas-card::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .card-home.alertas-card::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .card-home.alertas-card::-webkit-scrollbar-thumb {
+        background: #c4c4c4;
+        border-radius: 10px;
+    }
+
+        .card-home.alertas-card::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+
     .card-home.alertas-card .card-title {
         font-size: 20px;
         font-weight: 600;
@@ -203,7 +146,7 @@
         color: #333;
     }
 
-/* Cada alerta */
+/* ALERTAS INDIVIDUALES */
 .alerta-item {
     padding: 10px 12px;
     border-radius: 10px;
@@ -230,6 +173,3 @@
     color: #d20000;
     font-weight: bold;
 }
-
-
-
