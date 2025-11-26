@@ -132,9 +132,7 @@
                                 runat="server"
                                 CssClass="btn btn-secondary dropdown-toggle boton-ranking"
                                 ClientIDMode="Static">
-                                <asp:ListItem Text="Mesas" Value="Todos" Disabled="True" ></asp:ListItem>
-
-                                <asp:ListItem Text="Todas" Value="Todos" />
+                                <asp:ListItem Text="Todas" Value="Todos" Selected="True" />
                                 <asp:ListItem Text="Salón" Value="Salon" />
                                 <asp:ListItem Text="Patio" Value="Patio" />
                             </asp:DropDownList>
@@ -193,9 +191,7 @@
                                 runat="server"
                                 CssClass="btn btn-secondary dropdown-toggle boton-ranking"
                                 ClientIDMode="Static">
-                                <asp:ListItem Text="Mesas" Value="Todos" Disabled="True" Selected="True"></asp:ListItem>
-
-                                <asp:ListItem Text="Todas" Value="Todos" />
+                                <asp:ListItem Text="Todas" Value="Todos" Selected="True" />
                                 <asp:ListItem Text="Salón" Value="Salon" />
                                 <asp:ListItem Text="Patio" Value="Patio" />
                             </asp:DropDownList>
@@ -252,9 +248,7 @@
          runat="server"
          CssClass="btn btn-secondary dropdown-toggle boton-ranking"
          ClientIDMode="Static">
-         <asp:ListItem Text="Mesas" Value="Todos" Disabled="True" Selected="True"></asp:ListItem>
-
-         <asp:ListItem Text="Todas" Value="Todos" />
+         <asp:ListItem Text="Todas" Value="Todos" Selected="True" />
          <asp:ListItem Text="Salón" Value="Salon" />
          <asp:ListItem Text="Patio" Value="Patio" />
      </asp:DropDownList>
@@ -298,8 +292,7 @@
                             runat="server"
                             CssClass="btn btn-secondary dropdown-toggle boton-ranking"
                             ClientIDMode="Static">
-                            <asp:ListItem Text="Categoria" Value="Todos" Disabled="True" />
-                             <asp:ListItem Text="Todas" Value="Todos"/>
+                             <asp:ListItem Text="Todas" Value="Todos" Selected="True" />
                             <asp:ListItem Text="Platos Principales" Value="Comida" />
                             <asp:ListItem Text="Bebidas" Value="Bebidas" />
                             <asp:ListItem Text="Postres" Value="Postres" />
@@ -319,22 +312,42 @@
 
                         <asp:Panel ID="pnlVentas" runat="server" CssClass="tab-pane fade">
 
-                            
+
                 <div class="options-container-pestañas">
+
+                    <!-- Ubicación-->
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle boton-ranking" type="button" data-bs-toggle="dropdown" aria-expanded="false">Tipo de pago</button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item items-ventas" type="button">Efectivo</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-ventas" type="button">Tarjeta de Crédito</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item items-ventas" type="button">Transferencia</button>
-                            </li>
-                        </ul>
+                        <asp:DropDownList ID="ddlUbicacionVentas"
+                            runat="server"
+                            CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                            ClientIDMode="Static">
+                            <asp:ListItem Text="Ubicación" Value="" Disabled="True" Selected="True"></asp:ListItem>
+                            <asp:ListItem Text="Todas" Value="Todos" />
+                            <asp:ListItem Text="Salón" Value="Salon" />
+                            <asp:ListItem Text="Patio" Value="Patio" />
+                        </asp:DropDownList>
                     </div>
+
+                    <!-- Tipo de Pago -->
+                    <div class="dropdown">
+                        <asp:DropDownList ID="ddlTipoPagoVentas"
+                            runat="server"
+                            CssClass="btn btn-secondary dropdown-toggle boton-ranking"
+                            ClientIDMode="Static">
+                            <asp:ListItem Text="Tipo de pago" Value="" Disabled="True" Selected="True" />
+                            <asp:ListItem Text="Todos" Value="Todos" />
+                            <asp:ListItem Text="Efectivo" Value="Efectivo" />
+                            <asp:ListItem Text="Tarjeta de Crédito" Value="Tarjeta de Credito" />
+                            <asp:ListItem Text="Transferencia" Value="Transferencia" />
+                        </asp:DropDownList>
+                    </div>
+
+                    <!-- Botón Buscar -->
+                    <asp:Button ID="btnBuscarVentas"
+                        runat="server"
+                        Text="🔍 Buscar"
+                        CssClass="btn btn-secondary boton-buscar"
+                        OnClick="btnBuscarVentas_Click" />
                 </div>
 
                         </asp:Panel>
@@ -435,6 +448,57 @@
                             DataField="CantidadVendida"
                             HeaderText="Cantidad vendida"
                             SortExpression="CantidadVendida" />
+
+                    </Columns>
+                </asp:GridView>
+            </asp:Panel>
+
+            <asp:Panel ID="pnlResultadosVentas" runat="server" ClientIDMode="Static" Visible="false" UpdateMode="Conditional">
+                <asp:GridView ID="gvVentas" runat="server"
+                    AutoGenerateColumns="False"
+                    CssClass="table table-striped table-hover text-center shadow-lg"
+                    HeaderStyle-CssClass="table-dark"
+                    EmptyDataText="No hay resultados para mostrar."
+                    GridLines="None">
+                    <Columns>
+                        <asp:BoundField
+                            DataField="VentaId"
+                            HeaderText="ID Venta"
+                            SortExpression="VentaId" />
+
+                        <asp:BoundField
+                            DataField="Fecha"
+                            HeaderText="Fecha"
+                            DataFormatString="{0:dd/MM/yyyy HH:mm}"
+                            HtmlEncode="false"
+                            SortExpression="Fecha" />
+
+                        <asp:BoundField
+                            DataField="NumeroMesa"
+                            HeaderText="Mesa"
+                            SortExpression="NumeroMesa" />
+
+                        <asp:BoundField
+                            DataField="Mesero"
+                            HeaderText="Mesero"
+                            SortExpression="Mesero" />
+
+                        <asp:BoundField
+                            DataField="TipoPago"
+                            HeaderText="Tipo de Pago"
+                            SortExpression="TipoPago" />
+
+                        <asp:BoundField
+                            DataField="MontoTotal"
+                            HeaderText="Monto Total"
+                            DataFormatString="{0:C}"
+                            HtmlEncode="false"
+                            SortExpression="MontoTotal" />
+
+                        <asp:BoundField
+                            DataField="Turno"
+                            HeaderText="Turno"
+                            SortExpression="Turno" />
 
                     </Columns>
                 </asp:GridView>

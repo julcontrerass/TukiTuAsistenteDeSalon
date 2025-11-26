@@ -46,6 +46,7 @@
     <Compile Include="ProductoReporte.cs" />
     <Compile Include="MesaReporte.cs" />
     <Compile Include="MeseroReporte.cs" />
+    <Compile Include="VentaReporte.cs" />
     <Compile Include="Usuario.cs" />
     <Compile Include="DetallePedido.cs" />
     <Compile Include="Gerente.cs" />
