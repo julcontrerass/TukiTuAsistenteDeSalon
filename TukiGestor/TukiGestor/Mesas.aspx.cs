@@ -17,6 +17,7 @@ namespace TukiGestor
         private PedidoService pedidoService = new PedidoService();
         private AsignacionMesaService asignacionService = new AsignacionMesaService();
         private MeseroService meseroService = new MeseroService();
+        private VentaService ventaService = new VentaService();
 
         // Listas públicas para binding
         public List<Categoria> Categorias { get; set; }
@@ -689,7 +690,7 @@ namespace TukiGestor
                         }
                     }
                 }
-                LitNombreMesero.Text = "<span style='font-weight: 600;'>" + nombreMesero + "</span>";
+                LitNombreMesero.Text = nombreMesero;
 
                 // Generar HTML con los productos
                 System.Text.StringBuilder htmlProductos = new System.Text.StringBuilder();
@@ -1317,6 +1318,103 @@ namespace TukiGestor
             catch (Exception ex)
             {
                 MostrarMensaje("Error al procesar el pago: " + ex.Message, "danger");
+            }
+        }
+
+        protected void ConfirmarPago_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Obtener el pedidoId del HiddenField
+                if (string.IsNullOrEmpty(HdnPedidoIdActual.Value))
+                {
+                    MostrarMensaje("No se encontro el pedido", "warning");
+                    return;
+                }
+
+                int pedidoId = int.Parse(HdnPedidoIdActual.Value);
+
+                // Obtener el pedido para obtener el total
+                Pedido pedido = pedidoService.ObtenerPedidoPorId(pedidoId);
+                if (pedido == null)
+                {
+                    MostrarMensaje("No se encontro el pedido", "warning");
+                    return;
+                }
+
+                // Obtener metodo de pago y monto recibido de los hidden fields
+                string metodoPago = HdnMetodoPago.Value;
+                decimal montoRecibido = 0;
+
+                if (!string.IsNullOrEmpty(HdnMontoRecibido.Value))
+                {
+                    montoRecibido = decimal.Parse(HdnMontoRecibido.Value, System.Globalization.CultureInfo.InvariantCulture);
+                }
+
+                // Validar que el metodo de pago no este vacio
+                if (string.IsNullOrEmpty(metodoPago))
+                {
+                    MostrarMensaje("Debe seleccionar un metodo de pago", "warning");
+                    return;
+                }
+
+                // Crear el registro de venta
+                Venta venta = new Venta
+                {
+                    PedidoId = pedidoId,
+                    FechaVenta = DateTime.Now,
+                    MontoTotal = pedido.Total,
+                    MetodoPago = metodoPago,
+                    MontoRecibido = montoRecibido > 0 ? (decimal?)montoRecibido : null,
+                    GerenteId = null // Por ahora no hay gerente asignado
+                };
+
+                // Registrar la venta en la base de datos
+                int ventaId = ventaService.RegistrarVenta(venta);
+
+                // Finalizar el pedido
+                pedidoService.FinalizarPedido(pedidoId);
+
+                // Obtener ubicacion del HiddenField (fuente de verdad)
+                string ubicacion = !string.IsNullOrEmpty(HdnTabActivo.Value) ? HdnTabActivo.Value : "salon";
+
+                // Liberar la mesa (si no es mostrador)
+                bool esMostrador = ViewState["EsMostrador"] != null && (bool)ViewState["EsMostrador"];
+
+                if (!esMostrador && ViewState["MesaIdSeleccionada"] != null)
+                {
+                    int mesaId = (int)ViewState["MesaIdSeleccionada"];
+
+                    // Cambiar estado de la mesa a libre
+                    mesaService.ActualizarEstadoMesa(mesaId, "libre");
+
+                    // Desactivar la asignacion
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorMesa(mesaId);
+                    if (asignacion != null)
+                    {
+                        asignacionService.DesactivarAsignacion(asignacion.AsignacionId);
+                    }
+                }
+
+                // Limpiar ViewState y HiddenFields
+                ViewState["MesaIdSeleccionada"] = null;
+                ViewState["NumeroMesaSeleccionada"] = null;
+                ViewState["UbicacionSeleccionada"] = null;
+                ViewState["EsMostrador"] = null;
+                HdnPedidoIdActual.Value = string.Empty;
+                HdnMetodoPago.Value = string.Empty;
+                HdnMontoRecibido.Value = string.Empty;
+
+                // Guardar tab activo en Session (no mostramos mensaje, usamos el modal de JavaScript)
+                Session["TabActivo"] = ubicacion;
+
+                // Redirigir para evitar reenvio de formulario
+                Response.Redirect(Request.Url.AbsolutePath, false);
+                Context.ApplicationInstance.CompleteRequest();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al confirmar el pago: " + ex.Message, "danger");
             }
         }
 
