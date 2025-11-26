@@ -1073,3 +1073,59 @@ a.add-mesa-card {
     font-style: italic;
 }
 
+/* Estilos para botones de metodo de pago */
+input[type="radio"][name="metodoPago"]:checked + div {
+    opacity: 1;
+}
+
+label:has(input[type="radio"][name="metodoPago"]:checked) {
+    border-color: #C19A6B !important;
+    background: #E7D9C2 !important;
+    box-shadow: 0 0 0 3px rgba(193, 154, 107, 0.15) !important;
+}
+
+label:has(input#radioEfectivo:checked) {
+    border-color: #C19A6B !important;
+}
+
+label:has(input#radioTarjeta:checked) {
+    border-color: #C19A6B !important;
+}
+
+label:has(input#radioTransferencia:checked) {
+    border-color: #C19A6B !important;
+}
+
+label:has(input[type="radio"][name="metodoPago"]) {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+label:has(input[type="radio"][name="metodoPago"]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(193, 154, 107, 0.2);
+    border-color: #C19A6B !important;
+}
+
+/* Estilos para items de productos en modal de pago */
+#modal-pago-productos .resumen-item {
+    background: #E7D9C2 !important;
+    border: 1px solid #C19A6B !important;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+#modal-pago-productos .resumen-item-nombre {
+    color: #333 !important;
+    font-weight: 600;
+}
+
+#modal-pago-productos .resumen-item-cantidad {
+    color: #666 !important;
+}
+
+#modal-pago-productos .resumen-item-precio {
+    color: #8B7355 !important;
+    font-weight: 700;
+}

@@ -338,9 +338,11 @@
                             <span style="color: #666;">Mesa:</span>
                             <span id="modal-ubicacion-mesa" style="font-weight: 600;"></span>
                         </div>
-                        <div style="display: flex; justify-content: space-between;">
+                        <div id="divMeseroResumen" style="display: flex; justify-content: space-between;">
                             <span style="color: #666;">Mesero:</span>
-                            <asp:Literal ID="LitNombreMesero" runat="server"></asp:Literal>
+                            <span id="spanNombreMeseroResumen" style="font-weight: 600;">
+                                <asp:Literal ID="LitNombreMesero" runat="server"></asp:Literal>
+                            </span>
                         </div>
                     </div>
 
@@ -368,11 +370,11 @@
                         </asp:LinkButton>
                         <div class="d-flex gap-3">
                             <button type="button" class="btn btn-danger flex-fill py-3" style="font-weight: 600; font-size: 16px;"
-                                onclick="if (confirm('¿Estás seguro de que deseas cancelar esta orden? Se perderán todos los productos.')) { <%= Page.ClientScript.GetPostBackEventReference(BtnCancelarOrdenHidden, "") %>; }">
+                                data-bs-toggle="modal" data-bs-target="#modalConfirmarCancelarOrden">
                                 <i class="bi bi-trash"></i> Cancelar Orden
                             </button>
                             <button type="button" class="btn btn-success flex-fill py-3" style="font-weight: 600; font-size: 16px;"
-                                onclick="<%= Page.ClientScript.GetPostBackEventReference(BtnRealizarPagoHidden, "") %>">
+                                data-bs-toggle="modal" data-bs-target="#modalRealizarPago">
                                 <i class="bi bi-cash-coin"></i> Realizar Pago
                             </button>
                         </div>
@@ -416,6 +418,213 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Confirmacion Cancelar Orden -->
+    <div class="modal fade" id="modalConfirmarCancelarOrden" tabindex="-1" aria-labelledby="modalConfirmarCancelarOrdenLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="modalConfirmarCancelarOrdenLabel">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Cancelacion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="bi bi-trash3-fill text-danger" style="font-size: 64px;"></i>
+                    <h5 class="mt-3 mb-2">Estas seguro de que deseas cancelar esta orden?</h5>
+                    <p class="text-muted">Se perderan todos los productos de esta orden y no podras recuperarlos.</p>
+                    <div class="alert alert-warning mt-3" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> Esta accion no se puede deshacer
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> No, Volver
+                    </button>
+                    <button type="button" class="btn btn-danger px-4"
+                        onclick="<%= Page.ClientScript.GetPostBackEventReference(BtnCancelarOrdenHidden, "") %>">
+                        <i class="bi bi-trash-fill"></i> Si, Cancelar Orden
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Realizar Pago -->
+    <div class="modal fade" id="modalRealizarPago" tabindex="-1" aria-labelledby="modalRealizarPagoLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" style="border-radius: 15px; overflow: hidden; border: 2px solid #E7D9C2;">
+                <div class="modal-header" style="background: #E7D9C2; border: none; padding: 25px;">
+                    <div>
+                        <h4 class="modal-title mb-1" id="modalRealizarPagoLabel" style="color: #333;">
+                            <i class="bi bi-credit-card-fill"></i> Procesar Pago
+                        </h4>
+                        <p class="mb-0" style="font-size: 14px; color: #666;">Orden #<span id="modal-pago-numero-orden"></span></p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 30px; background: #F6EFE0;">
+                    <div class="row g-4">
+                        <!-- COLUMNA IZQUIERDA - DETALLES DE LA ORDEN -->
+                        <div class="col-md-6">
+                            <!-- Informacion del Cliente -->
+                            <div class="card shadow-sm mb-3" style="border: 1px solid #C19A6B; border-radius: 12px; background: white;">
+                                <div class="card-body" style="padding: 20px;">
+                                    <h6 class="card-title mb-3" style="color: #333; font-weight: bold; font-size: 16px;">
+                                        <i class="bi bi-info-circle-fill" style="color: #C19A6B;"></i> Detalles de la Orden
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <div style="background: #E7D9C2; padding: 12px; border-radius: 8px;">
+                                                <small class="text-muted d-block mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Fecha y Hora</small>
+                                                <div id="modal-pago-fecha" style="font-weight: 600; color: #333; font-size: 14px;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div style="background: #E7D9C2; padding: 12px; border-radius: 8px;">
+                                                <small class="text-muted d-block mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Mesa</small>
+                                                <div id="modal-pago-mesa" style="font-weight: 600; color: #333; font-size: 14px;"></div>
+                                            </div>
+                                        </div>
+                                        <div id="divMeseroPago" class="col-12">
+                                            <div style="background: #E7D9C2; padding: 12px; border-radius: 8px; border-left: 4px solid #C19A6B;">
+                                                <small class="text-muted d-block mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Atendido por</small>
+                                                <div id="modal-pago-mesero" style="font-weight: 600; color: #333; font-size: 14px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Lista de Productos -->
+                            <div class="card shadow-sm" style="border: 1px solid #E7D9C2; border-radius: 12px; background: white;">
+                                <div class="card-body" style="padding: 20px;">
+                                    <h6 class="card-title mb-3" style="color: #333; font-weight: bold; font-size: 16px;">
+                                        <i class="bi bi-cart-check-fill" style="color: #C19A6B;"></i> Productos Ordenados
+                                    </h6>
+                                    <div id="modal-pago-productos" style="max-height: 280px; overflow-y: auto; margin: -5px;">
+                                        <!-- Se llenara con JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA DERECHA - PAGO -->
+                        <div class="col-md-6">
+                            <!-- Total a Pagar -->
+                            <div class="card shadow-sm mb-3" style="border: 2px solid #E7D9C2; border-radius: 12px; background: #E7D9C2;">
+                                <div class="card-body text-center" style="padding: 25px;">
+                                    <p class="mb-2" style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Total a Pagar</p>
+                                    <h2 id="modal-pago-total" class="mb-0" style="font-size: 48px; font-weight: bold; color: #8B7355;">$0</h2>
+                                </div>
+                            </div>
+
+                            <!-- Metodos de Pago -->
+                            <div class="card shadow-sm mb-3" style="border: 1px solid #E7D9C2; border-radius: 12px; background: white;">
+                                <div class="card-body" style="padding: 20px;">
+                                    <h6 class="card-title mb-3" style="color: #333; font-weight: bold; font-size: 16px;">
+                                        <i class="bi bi-wallet2" style="color: #C19A6B;"></i> Metodo de Pago
+                                    </h6>
+                                    <div class="d-grid gap-2">
+                                        <label class="btn text-start" style="border: 2px solid #E7D9C2; border-radius: 10px; padding: 15px; position: relative; transition: all 0.3s; background: white;">
+                                            <input class="form-check-input" type="radio" name="metodoPago" id="radioEfectivo" value="Efectivo" checked onchange="toggleMontoRecibido()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px;">
+                                            <div>
+                                                <i class="bi bi-cash-stack" style="font-size: 24px; color: #C19A6B;"></i>
+                                                <span class="ms-2" style="font-weight: 600; font-size: 16px; color: #333;">Efectivo</span>
+                                            </div>
+                                        </label>
+                                        <label class="btn text-start" style="border: 2px solid #E7D9C2; border-radius: 10px; padding: 15px; position: relative; transition: all 0.3s; background: white;">
+                                            <input class="form-check-input" type="radio" name="metodoPago" id="radioTarjeta" value="Tarjeta" onchange="toggleMontoRecibido()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px;">
+                                            <div>
+                                                <i class="bi bi-credit-card-2-front" style="font-size: 24px; color: #C19A6B;"></i>
+                                                <span class="ms-2" style="font-weight: 600; font-size: 16px; color: #333;">Tarjeta</span>
+                                            </div>
+                                        </label>
+                                        <label class="btn text-start" style="border: 2px solid #E7D9C2; border-radius: 10px; padding: 15px; position: relative; transition: all 0.3s; background: white;">
+                                            <input class="form-check-input" type="radio" name="metodoPago" id="radioTransferencia" value="Transferencia" onchange="toggleMontoRecibido()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px;">
+                                            <div>
+                                                <i class="bi bi-arrow-left-right" style="font-size: 24px; color: #C19A6B;"></i>
+                                                <span class="ms-2" style="font-weight: 600; font-size: 16px; color: #333;">Transferencia</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Monto Recibido (solo efectivo) -->
+                            <div id="divMontoRecibido" class="card shadow-sm" style="border: 1px solid #E7D9C2; border-radius: 12px; background: white;">
+                                <div class="card-body" style="padding: 20px;">
+                                    <label for="txtMontoRecibido" class="form-label" style="font-weight: 600; color: #333; font-size: 14px;">
+                                        <i class="bi bi-currency-dollar" style="color: #C19A6B;"></i> Monto Recibido del Cliente
+                                    </label>
+                                    <input type="number" class="form-control form-control-lg" id="txtMontoRecibido"
+                                        placeholder="$0.00" step="0.01" min="0"
+                                        oninput="calcularVuelto()"
+                                        style="font-size: 24px; font-weight: bold; border: 2px solid #E7D9C2; border-radius: 10px; text-align: center;">
+
+                                    <!-- Vuelto -->
+                                    <div id="divVuelto" class="mt-3" style="display: none;">
+                                        <div style="background: #E7D9C2; padding: 15px; border-radius: 10px; text-align: center; border: 2px solid #E7D9C2;">
+                                            <small class="d-block mb-1" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Vuelto a Entregar</small>
+                                            <h4 id="spanVuelto" class="mb-0" style="font-size: 32px; font-weight: bold; color: #333;">$0</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden fields para enviar al servidor -->
+                    <asp:HiddenField ID="HdnMetodoPago" runat="server" />
+                    <asp:HiddenField ID="HdnMontoRecibido" runat="server" />
+                </div>
+                <div class="modal-footer" style="border-top: 2px solid #E7D9C2; padding: 20px 30px; background: #F6EFE0;">
+                    <button type="button" class="btn btn-lg px-5" data-bs-dismiss="modal" style="border-radius: 10px; background: #6c757d; color: white; border: none;">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-lg px-5" onclick="confirmarPago()" style="border-radius: 10px; background: #E7D9C2; color: #333; border: none; font-weight: 600; box-shadow: 0 4px 8px rgba(193, 154, 107, 0.3);">
+                        <i class="bi bi-check-circle-fill"></i> Confirmar Pago
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmacion Pago Exitoso -->
+    <div class="modal fade" id="modalPagoExitoso" tabindex="-1" aria-labelledby="modalPagoExitosoLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px; overflow: hidden; border: 2px solid #E7D9C2;">
+                <div class="modal-body text-center" style="padding: 50px 40px; background: #F6EFE0;">
+                    <div class="mb-4">
+                        <div style="width: 100px; height: 100px; background: #E7D9C2; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(193, 154, 107, 0.3);">
+                            <i class="bi bi-check-lg" style="font-size: 60px; font-weight: bold; color: #333;"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-3" style="color: #8B7355; font-weight: bold;">Pago Confirmado!</h3>
+                    <p class="text-muted mb-4" style="font-size: 16px;">El pago se ha procesado exitosamente.</p>
+                    <div class="alert" style="background: white; border: 2px solid #E7D9C2; border-radius: 10px; padding: 20px;">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="color: #666;">Orden:</span>
+                            <strong id="modal-exito-orden" style="color: #333;">#0</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="color: #666;">Metodo de Pago:</span>
+                            <strong id="modal-exito-metodo" style="color: #333;">-</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span style="color: #666;">Total Pagado:</span>
+                            <strong id="modal-exito-total" style="color: #8B7355; font-size: 18px;">$0</strong>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-lg px-5 mt-3" onclick="cerrarModalExito()" style="border-radius: 10px; background: #E7D9C2; color: #333; border: none; font-weight: 600; box-shadow: 0 4px 8px rgba(193, 154, 107, 0.3);">
+                        <i class="bi bi-check-circle"></i> Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <asp:Button ID="BtnConfirmarPagoHidden" runat="server" Style="display:none;" OnClick="ConfirmarPago_Click" />
 
     <script>
         // ===== DRAG & DROP PARA MESAS =====
@@ -731,19 +940,7 @@
             <%= Page.ClientScript.GetPostBackEventReference(BtnConfirmarOrdenHidden, "") %>;
         }
 
-        // ===== MANEJO DE MODALS =====
-        // NOTA: Esta función ya no se usa, el botón "Agregar Más Productos" ahora hace postback al servidor
-        // para cargar los productos existentes correctamente
-        /*
-        function agregarMasProductos() {
-            bootstrap.Modal.getInstance(document.getElementById('modalResumenPago'))?.hide();
-            setTimeout(() => {
-                document.getElementById('modal-orden-mesa-numero').textContent =
-                    document.getElementById('modal-resumen-mesa-numero').textContent;
-                new bootstrap.Modal(document.getElementById('modalOrden')).show();
-            }, 300);
-        }
-        */
+       
 
         // ===== BÚSQUEDA =====
         function handleEnterBusqueda(event) {
@@ -803,5 +1000,146 @@
                 setTimeout(initDragDrop, 100);
             });
         }
+
+        // ===== FUNCIONES PARA MODAL DE PAGO =====
+        function toggleMontoRecibido() {
+            const divMontoRecibido = document.getElementById('divMontoRecibido');
+            const divVuelto = document.getElementById('divVuelto');
+            const radioEfectivo = document.getElementById('radioEfectivo');
+
+            if (radioEfectivo.checked) {
+                divMontoRecibido.style.display = 'block';
+                calcularVuelto();
+            } else {
+                divMontoRecibido.style.display = 'none';
+                divVuelto.style.display = 'none';
+            }
+        }
+
+        function calcularVuelto() {
+            const totalPagar = parseFloat(document.getElementById('modal-pago-total').textContent.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
+            const montoRecibido = parseFloat(document.getElementById('txtMontoRecibido').value) || 0;
+            const divVuelto = document.getElementById('divVuelto');
+            const spanVuelto = document.getElementById('spanVuelto');
+
+            if (montoRecibido > 0) {
+                const vuelto = montoRecibido - totalPagar;
+                spanVuelto.textContent = formatearPrecio(vuelto);
+                divVuelto.style.display = vuelto >= 0 ? 'block' : 'none';
+            } else {
+                divVuelto.style.display = 'none';
+            }
+        }
+
+        function confirmarPago() {
+            const metodoPago = document.querySelector('input[name="metodoPago"]:checked').value;
+            const totalPagar = parseFloat(document.getElementById('modal-pago-total').textContent.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
+            const numeroOrden = document.getElementById('modal-pago-numero-orden').textContent;
+
+            // Validacion para efectivo
+            if (metodoPago === 'Efectivo') {
+                const montoRecibido = parseFloat(document.getElementById('txtMontoRecibido').value) || 0;
+
+                if (montoRecibido <= 0) {
+                    alert('Por favor ingrese el monto recibido');
+                    return;
+                }
+
+                if (montoRecibido < totalPagar) {
+                    alert('El monto recibido es menor al total a pagar');
+                    return;
+                }
+
+                // Guardar monto recibido en hidden field
+                document.getElementById('<%= HdnMontoRecibido.ClientID %>').value = montoRecibido;
+            } else {
+                // Para tarjeta y transferencia, el monto recibido es igual al total
+                document.getElementById('<%= HdnMontoRecibido.ClientID %>').value = totalPagar;
+            }
+
+            // Guardar metodo de pago en hidden field
+            document.getElementById('<%= HdnMetodoPago.ClientID %>').value = metodoPago;
+
+            // Guardar datos para modal de exito
+            sessionStorage.setItem('pagoExitoso', JSON.stringify({
+                orden: numeroOrden,
+                metodo: metodoPago,
+                total: document.getElementById('modal-pago-total').textContent
+            }));
+
+            // Cerrar modal de pago
+            bootstrap.Modal.getInstance(document.getElementById('modalRealizarPago'))?.hide();
+
+            // Ejecutar postback
+            <%= Page.ClientScript.GetPostBackEventReference(BtnConfirmarPagoHidden, "") %>;
+        }
+
+        function cerrarModalExito() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalPagoExitoso'));
+            if (modal) {
+                modal.hide();
+            }
+            sessionStorage.removeItem('pagoExitoso');
+        }
+
+        // Evento para cuando se abre el modal de pago desde el resumen
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalRealizarPago = document.getElementById('modalRealizarPago');
+            if (modalRealizarPago) {
+                modalRealizarPago.addEventListener('show.bs.modal', () => {
+                    // Copiar datos del modal de resumen al modal de pago
+                    document.getElementById('modal-pago-numero-orden').textContent =
+                        document.getElementById('modal-numero-orden').textContent;
+                    document.getElementById('modal-pago-fecha').textContent =
+                        document.getElementById('modal-fecha-orden').textContent;
+                    document.getElementById('modal-pago-mesa').textContent =
+                        document.getElementById('modal-ubicacion-mesa').textContent;
+
+                    // Obtener el nombre del mesero del span en el modal de resumen
+                    const spanMesero = document.getElementById('spanNombreMeseroResumen');
+                    const nombreMesero = spanMesero ? spanMesero.textContent.trim() : 'N/A';
+
+                    // Verificar si es mostrador (si el nombre es "Mostrador")
+                    const esMostrador = nombreMesero === 'Mostrador';
+                    const divMeseroPago = document.getElementById('divMeseroPago');
+
+                    if (esMostrador) {
+                        // Ocultar el campo de mesero si es mostrador
+                        divMeseroPago.style.display = 'none';
+                    } else {
+                        // Mostrar y llenar el campo de mesero
+                        divMeseroPago.style.display = 'block';
+                        document.getElementById('modal-pago-mesero').textContent = nombreMesero;
+                    }
+
+                    document.getElementById('modal-pago-total').textContent =
+                        document.getElementById('totalPagar').textContent;
+
+                    // Copiar productos
+                    const productosHTML = document.getElementById('resumenCompleto').innerHTML;
+                    document.getElementById('modal-pago-productos').innerHTML = productosHTML;
+
+                    // Resetear formulario
+                    document.getElementById('radioEfectivo').checked = true;
+                    document.getElementById('txtMontoRecibido').value = '';
+                    toggleMontoRecibido();
+                });
+            }
+
+            // Verificar si hay pago exitoso en sessionStorage
+            const pagoExitoso = sessionStorage.getItem('pagoExitoso');
+            if (pagoExitoso) {
+                const datos = JSON.parse(pagoExitoso);
+                document.getElementById('modal-exito-orden').textContent = '#' + datos.orden;
+                document.getElementById('modal-exito-metodo').textContent = datos.metodo;
+                document.getElementById('modal-exito-total').textContent = datos.total;
+
+                // Mostrar modal de exito
+                setTimeout(() => {
+                    const modal = new bootstrap.Modal(document.getElementById('modalPagoExitoso'));
+                    modal.show();
+                }, 500);
+            }
+        });
     </script>
 </asp:Content>
