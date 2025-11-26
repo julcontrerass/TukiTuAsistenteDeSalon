@@ -16,6 +16,7 @@ namespace TukiGestor
         private CategoriaService categoriaService = new CategoriaService();
         private PedidoService pedidoService = new PedidoService();
         private AsignacionMesaService asignacionService = new AsignacionMesaService();
+        private MeseroService meseroService = new MeseroService();
 
         // Listas públicas para binding
         public List<Categoria> Categorias { get; set; }
@@ -86,6 +87,14 @@ namespace TukiGestor
 
             CargarMesasEnRepeaters();
             CargarCategoriasYProductos();
+
+            // Solo cargar meseros en la primera carga, no en postbacks
+            // para no perder la selección del usuario
+            if (!IsPostBack)
+            {
+                CargarMeseros();
+            }
+
             CargarOrdenesActivas();
 
             // Manejar mensajes del patrón Post-Redirect-Get
@@ -132,6 +141,8 @@ namespace TukiGestor
             if (!IsPostBack && Session["MesaAbrir"] != null)
             {
                 string numeroMesa = Session["MesaAbrir"].ToString();
+                int meseroId = 0;
+                string nombreMesero = "";
 
                 // IMPORTANTE: Restaurar TODOS los datos de la mesa desde Session al ViewState
                 if (Session["MesaIdAbrir"] != null)
@@ -148,7 +159,18 @@ namespace TukiGestor
 
                     if (Session["MeseroIdAbrir"] != null)
                     {
-                        ViewState["MeseroIdSeleccionado"] = (int)Session["MeseroIdAbrir"];
+                        meseroId = (int)Session["MeseroIdAbrir"];
+                        ViewState["MeseroIdSeleccionado"] = meseroId;
+                    }
+                }
+
+                // Obtener nombre del mesero
+                if (meseroId > 0)
+                {
+                    Mesero mesero = meseroService.ObtenerPorId(meseroId);
+                    if (mesero != null)
+                    {
+                        nombreMesero = mesero.Nombre + " " + mesero.Apellido;
                     }
                 }
 
@@ -159,7 +181,7 @@ namespace TukiGestor
                 Session.Remove("UbicacionAbrir");
                 Session.Remove("MeseroIdAbrir");
 
-                AbrirModalOrden(numeroMesa);
+                AbrirModalOrden(numeroMesa, nombreMesero);
             }
         }
 
@@ -325,6 +347,32 @@ namespace TukiGestor
             }
         }
 
+        private void CargarMeseros()
+        {
+            try
+            {
+                // Cargar meseros activos desde la base de datos
+                List<Mesero> meseros = meseroService.ListarActivos();
+
+                // Limpiar el dropdown
+                DdlCamarero.Items.Clear();
+
+                // Agregar opción por defecto
+                DdlCamarero.Items.Add(new ListItem("Seleccione un camarero", ""));
+
+                // Agregar los meseros activos
+                foreach (var mesero in meseros)
+                {
+                    string nombreCompleto = mesero.Nombre + " " + mesero.Apellido;
+                    DdlCamarero.Items.Add(new ListItem(nombreCompleto, mesero.MeseroId.ToString()));
+                }
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cargar meseros: " + ex.Message, "danger");
+            }
+        }
+
         // Método auxiliar para obtener productos de una categoría específica
         public List<Producto> ObtenerProductosPorCategoria(int categoriaId)
         {
@@ -436,8 +484,18 @@ namespace TukiGestor
                         else
                         {
                             System.Diagnostics.Debug.WriteLine($"✗ NO se encontró pedido activo para AsignacionId: {asignacion.AsignacionId}");
+
+                            // Cargar nombre del mesero para mostrarlo en el modal
+                            ViewState["AsignacionIdActual"] = asignacion.AsignacionId;
+                            string nombreMesero = "";
+                            Mesero mesero = meseroService.ObtenerPorId(asignacion.MeseroId);
+                            if (mesero != null)
+                            {
+                                nombreMesero = mesero.Nombre + " " + mesero.Apellido;
+                            }
+
                             // No tiene pedido, abrir modal de orden para agregar productos
-                            AbrirModalOrden(numeroMesa);
+                            AbrirModalOrden(numeroMesa, nombreMesero);
                         }
                     }
                     else
@@ -531,9 +589,29 @@ namespace TukiGestor
             ClientScript.RegisterStartupScript(this.GetType(), "ReabrirModalMesa", script, true);
         }
 
-        private void AbrirModalOrden(string numeroMesa)
+        private void AbrirModalOrden(string numeroMesa, string nombreMesero = "")
         {
             // Abrir modal de orden para una NUEVA orden (no agregar más productos)
+            string scriptMesero = "";
+            if (!string.IsNullOrEmpty(nombreMesero))
+            {
+                scriptMesero = $@"
+                    var panelMesero = document.getElementById('{PanelMeseroOrden.ClientID}');
+                    var litMesero = document.getElementById('{LitNombreMeseroOrden.ClientID}');
+                    if (panelMesero && litMesero) {{
+                        litMesero.innerHTML = '<strong>{nombreMesero}</strong>';
+                        panelMesero.style.display = 'block';
+                    }}";
+            }
+            else
+            {
+                scriptMesero = $@"
+                    var panelMesero = document.getElementById('{PanelMeseroOrden.ClientID}');
+                    if (panelMesero) {{
+                        panelMesero.style.display = 'none';
+                    }}";
+            }
+
             string script = $@"
                 setTimeout(function() {{
                     // Limpiar variables globales de productos existentes
@@ -557,6 +635,9 @@ namespace TukiGestor
                     document.querySelectorAll('.producto-item input[type=""number""]').forEach(function(input) {{
                         input.value = 0;
                     }});
+
+                    // Configurar mesero
+                    {scriptMesero}
 
                     // Abrir modal de orden
                     document.getElementById('modal-orden-mesa-numero').textContent = '{numeroMesa}';
@@ -586,8 +667,29 @@ namespace TukiGestor
                 // Obtener los detalles del pedido
                 List<DetallePedido> detalles = pedidoService.ObtenerDetallesPedido(pedidoId);
 
-                // Guardar pedidoId en HiddenField
+                // Guardar pedidoId en HiddenField Y ViewState para asegurar persistencia
                 HdnPedidoIdActual.Value = pedidoId.ToString();
+                ViewState["PedidoIdActual"] = pedidoId;
+
+                // Obtener y mostrar el nombre del mesero
+                string nombreMesero = "N/A";
+                if (pedido.EsMostrador)
+                {
+                    nombreMesero = "Mostrador";
+                }
+                else if (pedido.AsignacionId > 0)
+                {
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionId);
+                    if (asignacion != null)
+                    {
+                        Mesero mesero = meseroService.ObtenerPorId(asignacion.MeseroId);
+                        if (mesero != null)
+                        {
+                            nombreMesero = mesero.Nombre + " " + mesero.Apellido;
+                        }
+                    }
+                }
+                LitNombreMesero.Text = "<span style='font-weight: 600;'>" + nombreMesero + "</span>";
 
                 // Generar HTML con los productos
                 System.Text.StringBuilder htmlProductos = new System.Text.StringBuilder();
@@ -850,7 +952,7 @@ namespace TukiGestor
                 ViewState["NumeroMesaSeleccionada"] = "Mostrador";
                 ViewState["UbicacionSeleccionada"] = "mostrador";
 
-                // Abrir modal de orden
+                // Abrir modal de orden (sin mesero, ya que es mostrador)
                 AbrirModalOrden("Mostrador");
             }
             catch (Exception ex)
@@ -1140,6 +1242,7 @@ namespace TukiGestor
 
                 // Guardar y limpiar
                 HdnPedidoIdActual.Value = pedidoId.ToString();
+                ViewState["PedidoIdActual"] = pedidoId;
                 HdnProductosOrden.Value = string.Empty;
                 HdnTabActivo.Value = ubicacion;
 
@@ -1221,14 +1324,31 @@ namespace TukiGestor
         {
             try
             {
-                // Obtener el pedidoId del HiddenField
-                if (string.IsNullOrEmpty(HdnPedidoIdActual.Value))
+                System.Diagnostics.Debug.WriteLine("=== EJECUTANDO AgregarMasProductos_Click ===");
+
+                // Intentar obtener el pedidoId del HiddenField primero, luego del ViewState
+                int pedidoId = 0;
+
+                if (!string.IsNullOrEmpty(HdnPedidoIdActual.Value))
                 {
+                    pedidoId = int.Parse(HdnPedidoIdActual.Value);
+                    System.Diagnostics.Debug.WriteLine($"PedidoId desde HiddenField: {pedidoId}");
+                }
+                else if (ViewState["PedidoIdActual"] != null)
+                {
+                    pedidoId = (int)ViewState["PedidoIdActual"];
+                    System.Diagnostics.Debug.WriteLine($"PedidoId desde ViewState: {pedidoId}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("ERROR: No se encontró PedidoId en HiddenField ni ViewState");
                     MostrarMensaje("No se encontro el pedido", "warning");
                     return;
                 }
 
-                int pedidoId = int.Parse(HdnPedidoIdActual.Value);
+                // Guardar pedidoId en ViewState y HiddenField para el siguiente postback
+                ViewState["PedidoIdActual"] = pedidoId;
+                HdnPedidoIdActual.Value = pedidoId.ToString();
 
                 // Obtener los detalles del pedido actual
                 List<DetallePedido> detalles = pedidoService.ObtenerDetallesPedido(pedidoId);
@@ -1273,10 +1393,36 @@ namespace TukiGestor
                 // Guardar tab activo
                 HdnTabActivo.Value = ubicacion;
 
+                // Obtener nombre del mesero
+                string nombreMesero = "";
+                if (!pedido.EsMostrador && pedido.AsignacionId > 0)
+                {
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionId);
+                    if (asignacion != null)
+                    {
+                        Mesero mesero = meseroService.ObtenerPorId(asignacion.MeseroId);
+                        if (mesero != null)
+                        {
+                            nombreMesero = mesero.Nombre + " " + mesero.Apellido;
+                        }
+                    }
+                }
+
                 // Generar JavaScript para abrir modal
                 // IMPORTANTE: Mostrar productos existentes en el RESUMEN DE LA ORDEN
                 System.Text.StringBuilder scriptProductos = new System.Text.StringBuilder();
-                scriptProductos.Append("setTimeout(function() {");
+
+                scriptProductos.Append(@"
+                    // Esperar a que Bootstrap esté disponible
+                    (function ejecutarCuandoBootstrapEsteDisponible() {
+                        if (typeof bootstrap === 'undefined') {
+                            setTimeout(ejecutarCuandoBootstrapEsteDisponible, 100);
+                            return;
+                        }
+
+                        // Función para abrir el modal de orden con productos existentes
+                        function abrirModalConProductosExistentes() {
+                ");
 
                 // Limpiar todos los inputs (ponerlos en 0) para agregar solo productos NUEVOS
                 scriptProductos.Append(@"
@@ -1311,7 +1457,9 @@ namespace TukiGestor
 
                     // Construir JSON de productos existentes para JavaScript
                     if (!primero) jsonProductosExistentes.Append(",");
-                    jsonProductosExistentes.AppendFormat(@"{{""nombre"":""{0}"",""cantidad"":{1},""precio"":{2},""subtotal"":{3}}}",
+                    jsonProductosExistentes.AppendFormat(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        @"{{""nombre"":""{0}"",""cantidad"":{1},""precio"":{2},""subtotal"":{3}}}",
                         detalle.NombreProducto.Replace("\"", "\\\""),
                         detalle.Cantidad,
                         detalle.PrecioUnitario,
@@ -1322,9 +1470,32 @@ namespace TukiGestor
 
                 jsonProductosExistentes.Append("]");
 
+                // Script para mostrar/ocultar mesero
+                string scriptMesero = "";
+                if (!string.IsNullOrEmpty(nombreMesero))
+                {
+                    scriptMesero = $@"
+                    var panelMesero = document.getElementById('{PanelMeseroOrden.ClientID}');
+                    var litMesero = document.getElementById('{LitNombreMeseroOrden.ClientID}');
+                    if (panelMesero && litMesero) {{
+                        litMesero.innerHTML = '<strong>{nombreMesero}</strong>';
+                        panelMesero.style.display = 'block';
+                    }}";
+                }
+                else
+                {
+                    scriptMesero = $@"
+                    var panelMesero = document.getElementById('{PanelMeseroOrden.ClientID}');
+                    if (panelMesero) {{
+                        panelMesero.style.display = 'none';
+                    }}";
+                }
+
                 // Establecer el HTML del resumen directamente (SIN llamar a actualizarResumenOrden)
                 // porque esa funcion solo lee los inputs que estan en 0
-                scriptProductos.AppendFormat(@"
+                scriptProductos.AppendFormat(
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    @"
                     // Guardar productos existentes en variable global para que actualizarResumenOrden pueda usarlos
                     window.productosExistentesOrden = {0};
                     window.totalExistenteOrden = {1};
@@ -1340,18 +1511,37 @@ namespace TukiGestor
                     // Establecer el total
                     var totalOrden = document.getElementById('totalOrden');
                     if (totalOrden) {{
-                        totalOrden.textContent = '${3:N0}';
+                        totalOrden.textContent = formatearPrecio({3});
                     }}
+
+                    // Configurar mesero
+                    {5}
 
                     // Establecer el numero de mesa en el modal
                     document.getElementById('modal-orden-mesa-numero').textContent = '{4}';
 
-                    // Abrir el modal
-                    var modal = new bootstrap.Modal(document.getElementById('modalOrden'));
+                    // Abrir el modal de orden
+                    var modalOrden = document.getElementById('modalOrden');
+                    var modal = new bootstrap.Modal(modalOrden);
                     modal.show();
-                ", jsonProductosExistentes.ToString(), totalExistente, htmlResumen.ToString().Replace("`", "\\`"), totalExistente, numeroMesa);
+                ", jsonProductosExistentes.ToString(), totalExistente, htmlResumen.ToString().Replace("`", "\\`"), totalExistente, numeroMesa, scriptMesero);
 
-                scriptProductos.Append("}, 100);");
+                scriptProductos.Append(@"
+                        }
+
+                        // Cerrar el modal de resumen usando Bootstrap
+                        var modalResumen = document.getElementById('modalResumenPago');
+                        var modalResumenInstance = bootstrap.Modal.getInstance(modalResumen);
+
+                        if (modalResumenInstance) {
+                            modalResumenInstance.hide();
+                        }
+
+                        // Esperar a que se cierre el modal antes de abrir el siguiente
+                        setTimeout(abrirModalConProductosExistentes, 500);
+
+                    })(); // Ejecutar la función inmediatamente
+                ");
 
                 ClientScript.RegisterStartupScript(this.GetType(), "AbrirModalConProductos", scriptProductos.ToString(), true);
             }

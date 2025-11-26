@@ -196,13 +196,7 @@
                         <label for="<%= DdlCamarero.ClientID %>" class="form-label">
                             <i class="bi bi-person-badge"></i> Camarero Asignado
                         </label>
-                        <asp:DropDownList ID="DdlCamarero" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="">Seleccione un camarero</asp:ListItem>
-                            <asp:ListItem Value="1">Juan Perez</asp:ListItem>
-                            <asp:ListItem Value="2">Maria Gonzalez</asp:ListItem>
-                            <asp:ListItem Value="3">Carlos Rodriguez</asp:ListItem>
-                            <asp:ListItem Value="4">Ana Martinez</asp:ListItem>
-                            <asp:ListItem Value="5">Luis Fernandez</asp:ListItem>
+                        <asp:DropDownList ID="DdlCamarero" runat="server" CssClass="form-select" EnableViewState="true">
                         </asp:DropDownList>
                     </div>
                     <asp:Button ID="BtnConfirmarAbrirMesa" runat="server" CssClass="btn-abrir-mesa" Text="Abrir Mesa" OnClick="ConfirmarAbrirMesa_Click" />
@@ -216,9 +210,17 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalOrdenLabel">
-                        <i class="bi bi-clipboard-check"></i> Tomar Orden - Mesa <span id="modal-orden-mesa-numero"></span>
-                    </h5>
+                    <div>
+                        <h5 class="modal-title" id="modalOrdenLabel">
+                            <i class="bi bi-clipboard-check"></i> Tomar Orden - Mesa <span id="modal-orden-mesa-numero"></span>
+                        </h5>
+                        <asp:Panel ID="PanelMeseroOrden" runat="server" Visible="false" style="margin-top: 5px;">
+                            <small style="color: #666;">
+                                Mesero:
+                                <asp:Literal ID="LitNombreMeseroOrden" runat="server"></asp:Literal>
+                            </small>
+                        </asp:Panel>
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -332,9 +334,13 @@
                             <span style="color: #666;">Fecha:</span>
                             <span id="modal-fecha-orden" style="font-weight: 600;"></span>
                         </div>
-                        <div style="display: flex; justify-content: space-between;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                             <span style="color: #666;">Mesa:</span>
                             <span id="modal-ubicacion-mesa" style="font-weight: 600;"></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">Mesero:</span>
+                            <asp:Literal ID="LitNombreMesero" runat="server"></asp:Literal>
                         </div>
                     </div>
 
@@ -354,9 +360,12 @@
                     </div>
 
                     <div class="d-flex flex-column gap-3 mt-4">
-                        <button type="button" class="btn btn-warning w-100 py-3" style="font-weight: 600; font-size: 16px;" onclick="agregarMasProductos()">
+                        <asp:LinkButton ID="LnkAgregarMasProductos" runat="server"
+                            CssClass="btn btn-warning w-100 py-3"
+                            style="font-weight: 600; font-size: 16px; text-decoration: none;"
+                            OnClick="AgregarMasProductos_Click">
                             <i class="bi bi-plus-circle"></i> Agregar Mas Productos
-                        </button>
+                        </asp:LinkButton>
                         <div class="d-flex gap-3">
                             <button type="button" class="btn btn-danger flex-fill py-3" style="font-weight: 600; font-size: 16px;"
                                 onclick="if (confirm('¿Estás seguro de que deseas cancelar esta orden? Se perderán todos los productos.')) { <%= Page.ClientScript.GetPostBackEventReference(BtnCancelarOrdenHidden, "") %>; }">
@@ -390,12 +399,13 @@
                     <asp:HiddenField ID="HdnMesaIdEliminar" runat="server" />
                     <asp:HiddenField ID="HdnMesaNumeroEliminar" runat="server" />
                     <asp:HiddenField ID="HdnMesaUbicacionEliminar" runat="server" />
-                    <asp:HiddenField ID="HdnProductosOrden" runat="server" />
-                    <asp:HiddenField ID="HdnPedidoIdActual" runat="server" />
-                    <asp:HiddenField ID="HdnPosicionesMesas" runat="server" />
+                    <asp:HiddenField ID="HdnProductosOrden" runat="server" EnableViewState="true" />
+                    <asp:HiddenField ID="HdnPedidoIdActual" runat="server" EnableViewState="true" />
+                    <asp:HiddenField ID="HdnPosicionesMesas" runat="server" EnableViewState="true" />
                     <asp:Button ID="BtnConfirmarOrdenHidden" runat="server" Style="display:none;" OnClick="ConfirmarOrden_Click" />
                     <asp:Button ID="BtnRealizarPagoHidden" runat="server" Style="display:none;" OnClick="RealizarPago_Click" />
                     <asp:Button ID="BtnCancelarOrdenHidden" runat="server" Style="display:none;" OnClick="CancelarOrden_Click" />
+                    <asp:Button ID="BtnAgregarMasProductosHidden" runat="server" Style="display:none;" OnClick="AgregarMasProductos_Click" />
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
@@ -722,6 +732,9 @@
         }
 
         // ===== MANEJO DE MODALS =====
+        // NOTA: Esta función ya no se usa, el botón "Agregar Más Productos" ahora hace postback al servidor
+        // para cargar los productos existentes correctamente
+        /*
         function agregarMasProductos() {
             bootstrap.Modal.getInstance(document.getElementById('modalResumenPago'))?.hide();
             setTimeout(() => {
@@ -730,6 +743,7 @@
                 new bootstrap.Modal(document.getElementById('modalOrden')).show();
             }, 300);
         }
+        */
 
         // ===== BÚSQUEDA =====
         function handleEnterBusqueda(event) {
