@@ -135,7 +135,7 @@
     border: 1px solid #ffeaa7;
 }
 
-
+/*
 
 .confirmar-overlay {
     position: fixed;
@@ -144,6 +144,15 @@
     width: 100%;
     height: 100%;
     background-color: rgba(33, 33, 33, 0.8);
+    z-index: 2000;
+}*/
+.confirmar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(246, 239, 224, 0.3);
     z-index: 2000;
 }
 

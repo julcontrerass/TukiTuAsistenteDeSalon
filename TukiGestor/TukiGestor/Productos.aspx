@@ -58,19 +58,19 @@
                         <!-- listado -->
                         <asp:Panel ID="pnlListado" runat="server" CssClass="tab-pane fade active show">
                             <div class="d-flex justify-content-center align-items-center mb-4 gap-3">
-    <!-- Buscador -->
-    <div class="input-group" style="width: 400px;">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <asp:TextBox ID="txtBuscarProducto" runat="server" CssClass="form-control"  placeholder="Buscar producto..." AutoPostBack="true" OnTextChanged="txtBuscarProducto_TextChanged"></asp:TextBox>
-    </div>
-    <!-- Filtro por categoría -->
-    <div style="width: 250px;">
-        <asp:DropDownList ID="ddlFiltroCategoria" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlFiltroCategoria_SelectedIndexChanged">
-        </asp:DropDownList>
-    </div>
-    <!-- Filtro de ordenamiento -->
-    <div style="width: 250px;">
-        <asp:DropDownList ID="ddlOrdenamiento" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlOrdenamiento_SelectedIndexChanged">
+                                <!-- Buscador -->
+                                <div class="input-group" style="width: 400px;">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <asp:TextBox ID="txtBuscarProducto" runat="server" CssClass="form-control" placeholder="Buscar producto..." AutoPostBack="true" OnTextChanged="txtBuscarProducto_TextChanged"></asp:TextBox>
+                                </div>
+                                <!-- Filtro por categoría -->
+                                <div style="width: 250px;">
+                                    <asp:DropDownList ID="ddlFiltroCategoria" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlFiltroCategoria_SelectedIndexChanged">
+                                    </asp:DropDownList>
+                                </div>
+                                <!-- Filtro de ordenamiento -->
+                                <div style="width: 250px;">
+                                    <asp:DropDownList ID="ddlOrdenamiento" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlOrdenamiento_SelectedIndexChanged">
                                         <asp:ListItem Value="reciente" Text="Más recientes primero" Selected="True"></asp:ListItem>
                                         <asp:ListItem Value="nombre_asc" Text="Nombre (A-Z)"></asp:ListItem>
                                         <asp:ListItem Value="nombre_desc" Text="Nombre (Z-A)"></asp:ListItem>
@@ -81,7 +81,7 @@
                                     </asp:DropDownList>
                                 </div>
                                 <!-- Botón limpiar filtros -->
-                                <asp:LinkButton ID="btnLimpiarFiltros" runat="server" CssClass="btn btn-outline-secondary"  OnClick="btnLimpiarFiltros_Click" ToolTip="Limpiar filtros">
+                                <asp:LinkButton ID="btnLimpiarFiltros" runat="server" CssClass="btn btn-outline-secondary" OnClick="btnLimpiarFiltros_Click" ToolTip="Limpiar filtros">
                                     <i class="bi bi-x-circle"></i>
                                 </asp:LinkButton>
                             </div>
