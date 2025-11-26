@@ -389,6 +389,116 @@ BEGIN
 END;
 GO
 
+-- Reporte de Balance General
+CREATE PROCEDURE sp_ReporteBalance(
+    @Turno VARCHAR(20) = 'Todos',
+    @FechaDesde DATE,
+    @FechaHasta DATE,
+    @Ubicacion VARCHAR(20) = 'Todos'
+)
+AS
+BEGIN
+    IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena')
+        OR @FechaDesde IS NULL
+        OR @FechaHasta IS NULL
+        OR @Ubicacion NOT IN('Todos', 'Salon', 'Patio'))
+    BEGIN
+        RAISERROR('Faltan parámetros obligatorios', 16, 1);
+        RETURN;
+    END
+
+    -- Total de ventas y cantidad
+    DECLARE @TotalVentas DECIMAL(18,2);
+    DECLARE @CantidadVentas INT;
+    DECLARE @CantidadClientes INT;
+    DECLARE @ProductosVendidos INT;
+
+    SELECT
+        @TotalVentas = ISNULL(SUM(V.MontoTotal), 0),
+        @CantidadVentas = COUNT(DISTINCT V.VentaId),
+        @CantidadClientes = COUNT(DISTINCT PE.AsignacionId)
+    FROM VENTA V
+    INNER JOIN PEDIDO PE ON V.PedidoId = PE.PedidoId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion OR PE.EsMostrador = 1);
+
+    -- Total de productos vendidos
+    SELECT @ProductosVendidos = ISNULL(SUM(DP.Cantidad), 0)
+    FROM DETALLEPEDIDO DP
+    INNER JOIN PEDIDO PE ON DP.PedidoId = PE.PedidoId
+    INNER JOIN VENTA V ON V.PedidoId = PE.PedidoId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion OR PE.EsMostrador = 1);
+
+    -- Resultado
+    SELECT
+        @TotalVentas AS TotalVentas,
+        @CantidadVentas AS CantidadVentas,
+        @CantidadClientes AS CantidadClientes,
+        CASE WHEN @CantidadVentas > 0 THEN @TotalVentas / @CantidadVentas ELSE 0 END AS TicketPromedio,
+        @ProductosVendidos AS ProductosVendidos;
+END;
+GO
+
+-- Reporte de Ventas por Forma de Pago
+CREATE PROCEDURE sp_ReporteVentasPorFormaPago(
+    @Turno VARCHAR(20) = 'Todos',
+    @FechaDesde DATE,
+    @FechaHasta DATE,
+    @Ubicacion VARCHAR(20) = 'Todos'
+)
+AS
+BEGIN
+    IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena')
+        OR @FechaDesde IS NULL
+        OR @FechaHasta IS NULL
+        OR @Ubicacion NOT IN('Todos', 'Salon', 'Patio'))
+    BEGIN
+        RAISERROR('Faltan parámetros obligatorios', 16, 1);
+        RETURN;
+    END
+
+    DECLARE @TotalGeneral DECIMAL(18,2);
+
+    SELECT @TotalGeneral = ISNULL(SUM(V.MontoTotal), 0)
+    FROM VENTA V
+    INNER JOIN PEDIDO PE ON V.PedidoId = PE.PedidoId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion OR PE.EsMostrador = 1);
+
+    SELECT
+        V.MetodoPago AS FormaPago,
+        SUM(V.MontoTotal) AS Monto,
+        COUNT(*) AS Cantidad,
+        CASE WHEN @TotalGeneral > 0
+            THEN (SUM(V.MontoTotal) * 100.0 / @TotalGeneral)
+            ELSE 0
+        END AS Porcentaje
+    FROM VENTA V
+    INNER JOIN PEDIDO PE ON V.PedidoId = PE.PedidoId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion OR PE.EsMostrador = 1)
+    GROUP BY V.MetodoPago
+    ORDER BY Monto DESC;
+END;
+GO
+
 ------------------------------------------------
 -- CONSULTAS DE VERIFICACION
 ------------------------------------------------

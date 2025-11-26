@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using dominio;
 using Service;
+using Newtonsoft.Json;
 
 namespace TukiGestor
 {
@@ -215,7 +216,7 @@ namespace TukiGestor
             MostrarTab("balance");
             ocultarTablas();
             OcultarMensaje();
-
+            CargarBalanceInicial();
         }
 
 
@@ -513,6 +514,156 @@ namespace TukiGestor
             }
         }
 
+        protected void btnBuscarBalance_Click(object sender, EventArgs e)
+        {
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                string turno = ddlTurno.SelectedValue ?? "Todos";
+                string rangoFecha = ddlRango.SelectedValue;
+
+                (DateTime fechaInicio, DateTime fechaFin) = obtenerRango(rangoFecha);
+
+                string ubicacion = "Todos"; // Balance muestra resumen general
+
+                // Obtener datos del balance
+                BalanceReporte balance = reporteService.ObtenerBalance(turno, ubicacion, fechaInicio, fechaFin);
+
+                // Obtener datos de ventas por forma de pago
+                List<VentaPorFormaPago> ventasPorFormaPago = reporteService.ObtenerVentasPorFormaPago(turno, ubicacion, fechaInicio, fechaFin);
+
+                // Poblar las métricas principales
+                lblTotalVentas.Text = balance.TotalVentas.ToString("C", new System.Globalization.CultureInfo("es-AR"));
+                lblCantidadVentas.Text = balance.CantidadVentas.ToString();
+                lblCantidadClientes.Text = balance.CantidadClientes.ToString();
+                lblTicketPromedio.Text = balance.TicketPromedio.ToString("C", new System.Globalization.CultureInfo("es-AR"));
+                lblProductosVendidos.Text = balance.ProductosVendidos.ToString();
+
+                // Poblar el GridView con ventas por forma de pago
+                gvFormaPago.DataSource = ventasPorFormaPago;
+                gvFormaPago.DataBind();
+
+                // Preparar datos para el gráfico
+                if (ventasPorFormaPago != null && ventasPorFormaPago.Count > 0)
+                {
+                    var labels = new List<string>();
+                    var datos = new List<decimal>();
+                    var colores = new List<string>();
+
+                    // Definir colores para cada forma de pago
+                    var coloresPorFormaPago = new Dictionary<string, string>
+                    {
+                        { "Efectivo", "#28a745" },
+                        { "Crédito", "#007bff" },
+                        { "Débito", "#17a2b8" },
+                        { "Transferencia", "#ffc107" },
+                        { "MercadoPago", "#00b8d4" },
+                        { "Otros", "#6c757d" }
+                    };
+
+                    foreach (var venta in ventasPorFormaPago)
+                    {
+                        labels.Add(venta.FormaPago);
+                        datos.Add(venta.Monto);
+
+                        // Asignar color según la forma de pago
+                        if (coloresPorFormaPago.ContainsKey(venta.FormaPago))
+                        {
+                            colores.Add(coloresPorFormaPago[venta.FormaPago]);
+                        }
+                        else
+                        {
+                            colores.Add("#6c757d"); // Color por defecto
+                        }
+                    }
+
+                    // Convertir a JSON para JavaScript
+                    hfFormaPagoLabels.Value = JsonConvert.SerializeObject(labels);
+                    hfFormaPagoData.Value = JsonConvert.SerializeObject(datos);
+                    hfFormaPagoColors.Value = JsonConvert.SerializeObject(colores);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
+
+        private void CargarBalanceInicial()
+        {
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                // Cargar balance de hoy por defecto
+                string turno = "Todos";
+                DateTime fechaInicio = DateTime.Now;
+                DateTime fechaFin = DateTime.Now;
+                string ubicacion = "Todos";
+
+                // Obtener datos del balance
+                BalanceReporte balance = reporteService.ObtenerBalance(turno, ubicacion, fechaInicio, fechaFin);
+
+                // Obtener datos de ventas por forma de pago
+                List<VentaPorFormaPago> ventasPorFormaPago = reporteService.ObtenerVentasPorFormaPago(turno, ubicacion, fechaInicio, fechaFin);
+
+                // Poblar las métricas principales
+                lblTotalVentas.Text = balance.TotalVentas.ToString("C", new System.Globalization.CultureInfo("es-AR"));
+                lblCantidadVentas.Text = balance.CantidadVentas.ToString();
+                lblCantidadClientes.Text = balance.CantidadClientes.ToString();
+                lblTicketPromedio.Text = balance.TicketPromedio.ToString("C", new System.Globalization.CultureInfo("es-AR"));
+                lblProductosVendidos.Text = balance.ProductosVendidos.ToString();
+
+                // Poblar el GridView con ventas por forma de pago
+                gvFormaPago.DataSource = ventasPorFormaPago;
+                gvFormaPago.DataBind();
+
+                // Preparar datos para el gráfico
+                if (ventasPorFormaPago != null && ventasPorFormaPago.Count > 0)
+                {
+                    var labels = new List<string>();
+                    var datos = new List<decimal>();
+                    var colores = new List<string>();
+
+                    // Definir colores para cada forma de pago
+                    var coloresPorFormaPago = new Dictionary<string, string>
+                    {
+                        { "Efectivo", "#28a745" },
+                        { "Crédito", "#007bff" },
+                        { "Débito", "#17a2b8" },
+                        { "Transferencia", "#ffc107" },
+                        { "MercadoPago", "#00b8d4" },
+                        { "Otros", "#6c757d" }
+                    };
+
+                    foreach (var venta in ventasPorFormaPago)
+                    {
+                        labels.Add(venta.FormaPago);
+                        datos.Add(venta.Monto);
+
+                        // Asignar color según la forma de pago
+                        if (coloresPorFormaPago.ContainsKey(venta.FormaPago))
+                        {
+                            colores.Add(coloresPorFormaPago[venta.FormaPago]);
+                        }
+                        else
+                        {
+                            colores.Add("#6c757d"); // Color por defecto
+                        }
+                    }
+
+                    // Convertir a JSON para JavaScript
+                    hfFormaPagoLabels.Value = JsonConvert.SerializeObject(labels);
+                    hfFormaPagoData.Value = JsonConvert.SerializeObject(datos);
+                    hfFormaPagoColors.Value = JsonConvert.SerializeObject(colores);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
 
     }
 }

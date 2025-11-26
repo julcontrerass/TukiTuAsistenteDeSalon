@@ -352,7 +352,134 @@
 
                         </asp:Panel>
 
-                        <asp:Panel ID="pnlBalance" runat="server" CssClass="tab-pane fade"></asp:Panel>
+                        <asp:Panel ID="pnlBalance" runat="server" CssClass="tab-pane fade">
+                            <div class="balance-container-scroll">
+
+                                <!-- Botón de búsqueda -->
+                                <div class="mb-4 text-end">
+                                    <asp:Button ID="btnBuscarBalance" runat="server"
+                                        CssClass="btn btn-primary btn-lg px-4"
+                                        Text="Generar Balance"
+                                        OnClick="btnBuscarBalance_Click"
+                                        ClientIDMode="Static" />
+                                </div>
+
+                                <!-- Tarjetas de métricas principales -->
+                                <div class="row g-4 mb-4">
+                                    <div class="col-md-3">
+                                        <div class="metric-card">
+                                            <h6 class="metric-label">
+                                                <i class="bi bi-cash-stack me-2"></i>Total Ventas
+                                            </h6>
+                                            <h3 class="metric-value">
+                                                <asp:Label ID="lblTotalVentas" runat="server" Text="$0.00"></asp:Label>
+                                            </h3>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="metric-card">
+                                            <h6 class="metric-label">
+                                                <i class="bi bi-receipt me-2"></i>Cantidad de Ventas
+                                            </h6>
+                                            <h3 class="metric-value">
+                                                <asp:Label ID="lblCantidadVentas" runat="server" Text="0"></asp:Label>
+                                            </h3>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="metric-card">
+                                            <h6 class="metric-label">
+                                                <i class="bi bi-people-fill me-2"></i>Clientes Atendidos
+                                            </h6>
+                                            <h3 class="metric-value">
+                                                <asp:Label ID="lblCantidadClientes" runat="server" Text="0"></asp:Label>
+                                            </h3>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="metric-card">
+                                            <h6 class="metric-label">
+                                                <i class="bi bi-calculator me-2"></i>Ticket Promedio
+                                            </h6>
+                                            <h3 class="metric-value">
+                                                <asp:Label ID="lblTicketPromedio" runat="server" Text="$0.00"></asp:Label>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tarjetas secundarias -->
+                                <div class="row g-4 mb-4">
+                                    <div class="col-md-6">
+                                        <div class="metric-card-secondary">
+                                            <h6 class="mb-2">
+                                                <i class="bi bi-box-seam me-2"></i>Productos Vendidos
+                                            </h6>
+                                            <h4 class="mb-0">
+                                                <asp:Label ID="lblProductosVendidos" runat="server" Text="0"></asp:Label>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Gráficos -->
+                                <div class="row g-4">
+                                    <!-- Gráfico de Torta - Ventas por Forma de Pago -->
+                                    <div class="col-md-6">
+                                        <div class="chart-card">
+                                            <h5 class="chart-title">
+                                                <i class="bi bi-pie-chart-fill"></i>
+                                                Ventas por Forma de Pago
+                                            </h5>
+                                            <div class="chart-container">
+                                                <canvas id="chartFormaPago"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tabla de Formas de Pago -->
+                                    <div class="col-md-6">
+                                        <div class="chart-card">
+                                            <h5 class="chart-title">
+                                                <i class="bi bi-table"></i>
+                                                Detalle por Forma de Pago
+                                            </h5>
+                                            <div class="table-responsive">
+                                                <asp:GridView ID="gvFormaPago" runat="server"
+                                                    AutoGenerateColumns="False"
+                                                    CssClass="table table-hover"
+                                                    HeaderStyle-CssClass="table-dark"
+                                                    EmptyDataText="No hay datos para mostrar."
+                                                    GridLines="None">
+                                                    <Columns>
+                                                        <asp:BoundField DataField="FormaPago" HeaderText="Forma de Pago" />
+                                                        <asp:BoundField DataField="Cantidad" HeaderText="Cantidad" />
+                                                        <asp:TemplateField HeaderText="Monto">
+                                                            <ItemTemplate>
+                                                                <%# String.Format("${0:N2}", Eval("Monto")) %>
+                                                            </ItemTemplate>
+                                                        </asp:TemplateField>
+                                                        <asp:TemplateField HeaderText="Porcentaje">
+                                                            <ItemTemplate>
+                                                                <span class="fw-bold"><%# String.Format("{0:N1}%", Eval("Porcentaje")) %></span>
+                                                            </ItemTemplate>
+                                                        </asp:TemplateField>
+                                                    </Columns>
+                                                </asp:GridView>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden fields para datos del gráfico -->
+                                <asp:HiddenField ID="hfFormaPagoLabels" runat="server" ClientIDMode="Static" />
+                                <asp:HiddenField ID="hfFormaPagoData" runat="server" ClientIDMode="Static" />
+                                <asp:HiddenField ID="hfFormaPagoColors" runat="server" ClientIDMode="Static" />
+                            </div>
+                        </asp:Panel>
 
 
             <asp:Panel ID="pnlResultadoMesas" runat="server" ClientIDMode="Static" Visible="false" UpdateMode="Conditional">
@@ -559,8 +686,89 @@
 
 
 
+        // Chart.js - Gráfico de Torta para Forma de Pago
+        let chartFormaPago = null;
+
+        function renderizarGraficoFormaPago() {
+            const labels = document.getElementById('hfFormaPagoLabels');
+            const data = document.getElementById('hfFormaPagoData');
+            const colors = document.getElementById('hfFormaPagoColors');
+
+            if (!labels || !data || !labels.value || !data.value) {
+                return;
+            }
+
+            const labelsArray = JSON.parse(labels.value);
+            const dataArray = JSON.parse(data.value);
+            const colorsArray = JSON.parse(colors.value);
+
+            const ctx = document.getElementById('chartFormaPago');
+            if (!ctx) return;
+
+            // Destruir gráfico anterior si existe
+            if (chartFormaPago) {
+                chartFormaPago.destroy();
+            }
+
+            chartFormaPago = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labelsArray,
+                    datasets: [{
+                        data: dataArray,
+                        backgroundColor: colorsArray,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 8,
+                                font: {
+                                    size: 10,
+                                    family: 'Segoe UI'
+                                },
+                                boxWidth: 12
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += '$' + context.parsed.toFixed(2);
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Ejecutar cuando se carga la página o después de un postback
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderizarGraficoFormaPago);
+        } else {
+            renderizarGraficoFormaPago();
+        }
+
+        // Re-renderizar después de un postback de ASP.NET
+        Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function() {
+            setTimeout(renderizarGraficoFormaPago, 100);
+        });
+
     </script>
 
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 </asp:Content>
 

@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsignacionMesa.cs" />
+    <Compile Include="BalanceReporte.cs" />
     <Compile Include="Categoria.cs" />
     <Compile Include="ProductoReporte.cs" />
     <Compile Include="MesaReporte.cs" />
