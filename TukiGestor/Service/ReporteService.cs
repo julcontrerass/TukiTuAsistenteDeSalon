@@ -151,6 +151,47 @@ namespace Service
                 datos.cerrarConexion();
             }
         }
+
+        public List<VentaReporte> BuscarVentas(string turno, string ubicacion, DateTime fechaInicio, DateTime fechaFin, string tipoPago)
+        {
+            try
+            {
+                List<VentaReporte> ventaReporte = new List<VentaReporte>();
+
+                datos.SetearStoredProcedure("sp_ReporteVentas");
+                datos.setearParametro("@Turno", turno);
+                datos.setearParametro("@FechaDesde", fechaInicio);
+                datos.setearParametro("@FechaHasta", fechaFin);
+                datos.setearParametro("@Ubicacion", ubicacion);
+                datos.setearParametro("@TipoPago", tipoPago);
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    VentaReporte venta = new VentaReporte();
+
+                    venta.VentaId = (int)datos.Lector["VentaId"];
+                    venta.Fecha = (DateTime)datos.Lector["Fecha"];
+                    venta.NumeroMesa = (string)datos.Lector["NumeroMesa"];
+                    venta.Mesero = (string)datos.Lector["Mesero"];
+                    venta.TipoPago = (string)datos.Lector["TipoPago"];
+                    venta.MontoTotal = (decimal)datos.Lector["MontoTotal"];
+                    venta.Turno = (string)datos.Lector["Turno"];
+
+                    ventaReporte.Add(venta);
+                }
+
+                return ventaReporte;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Fallo la busqueda por ventas: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
     }
 }
  

@@ -312,6 +312,33 @@ namespace TukiGestor
         protected global::System.Web.UI.WebControls.Panel pnlVentas;
 
         /// <summary>
+        /// ddlUbicacionVentas control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlUbicacionVentas;
+
+        /// <summary>
+        /// ddlTipoPagoVentas control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlTipoPagoVentas;
+
+        /// <summary>
+        /// btnBuscarVentas control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnBuscarVentas;
+
+        /// <summary>
         /// pnlBalance control.
         /// </summary>
         /// <remarks>
@@ -373,5 +400,23 @@ namespace TukiGestor
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView gvProductos;
+
+        /// <summary>
+        /// pnlResultadosVentas control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlResultadosVentas;
+
+        /// <summary>
+        /// gvVentas control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvVentas;
     }
 }
