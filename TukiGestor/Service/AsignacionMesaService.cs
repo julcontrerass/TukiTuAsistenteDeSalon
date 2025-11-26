@@ -25,8 +25,8 @@ namespace Service
                                       OUTPUT INSERTED.AsignacionId
                                       VALUES (@FechaAsignacion, @MeseroId, @MesaId, @Activa)");
                 datos.setearParametro("@FechaAsignacion", asignacion.FechaAsignacion);
-                datos.setearParametro("@MeseroId", asignacion.MeseroId);
-                datos.setearParametro("@MesaId", asignacion.MesaId);
+                datos.setearParametro("@MeseroId", asignacion.Mesero.MeseroId);
+                datos.setearParametro("@MesaId", asignacion.Mesa.MesaId);
                 datos.setearParametro("@Activa", asignacion.Activa);
 
                 object resultado = datos.ejecutarScalar();
@@ -70,8 +70,8 @@ namespace Service
                     {
                         AsignacionId = (int)datos.Lector["AsignacionId"],
                         FechaAsignacion = (DateTime)datos.Lector["FechaAsignacion"],
-                        MeseroId = (int)datos.Lector["MeseroId"],
-                        MesaId = (int)datos.Lector["MesaId"],
+                        Mesero = new Mesero { MeseroId = (int)datos.Lector["MeseroId"] },
+                        Mesa = new Mesa { MesaId = (int)datos.Lector["MesaId"] },
                         Activa = (bool)datos.Lector["Activa"]
                     };
                 }
@@ -104,8 +104,8 @@ namespace Service
                     {
                         AsignacionId = (int)datos.Lector["AsignacionId"],
                         FechaAsignacion = (DateTime)datos.Lector["FechaAsignacion"],
-                        MeseroId = (int)datos.Lector["MeseroId"],
-                        MesaId = (int)datos.Lector["MesaId"],
+                        Mesero = new Mesero { MeseroId = (int)datos.Lector["MeseroId"] },
+                        Mesa = new Mesa { MesaId = (int)datos.Lector["MesaId"] },
                         Activa = (bool)datos.Lector["Activa"]
                     };
                 }

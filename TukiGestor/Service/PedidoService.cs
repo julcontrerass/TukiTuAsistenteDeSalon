@@ -27,7 +27,7 @@ namespace Service
                 datos.setearParametro("@FechaApertura", pedido.FechaPedido);
                 datos.setearParametro("@Estado", pedido.EstadoPedido);
                 datos.setearParametro("@Total", pedido.Total);
-                datos.setearParametro("@AsignacionId", pedido.AsignacionId == 0 ? (object)DBNull.Value : pedido.AsignacionId);
+                datos.setearParametro("@AsignacionId", pedido.AsignacionMesa?.AsignacionId ?? (object)DBNull.Value);
                 datos.setearParametro("@CantidadPersonas", 1);
                 datos.setearParametro("@EsMostrador", pedido.EsMostrador);
 
@@ -46,8 +46,8 @@ namespace Service
             {
                 datos.SetearConsulta(@"INSERT INTO DETALLEPEDIDO (PedidoId, ProductoId, Cantidad, PrecioUnitario, Estado, Subtotal)
                                       VALUES (@PedidoId, @ProductoId, @Cantidad, @PrecioUnitario, @Estado, @Subtotal)");
-                datos.setearParametro("@PedidoId", detalle.PedidoId);
-                datos.setearParametro("@ProductoId", detalle.ProductoId);
+                datos.setearParametro("@PedidoId", detalle.Pedido.PedidoId);
+                datos.setearParametro("@ProductoId", detalle.Producto.ProductoId);
                 datos.setearParametro("@Cantidad", detalle.Cantidad);
                 datos.setearParametro("@PrecioUnitario", detalle.PrecioUnitario);
                 datos.setearParametro("@Estado", true);
@@ -130,7 +130,7 @@ namespace Service
                         FechaCierre = datos.Lector["FechaCierre"] != DBNull.Value ? (DateTime)datos.Lector["FechaCierre"] : DateTime.MinValue,
                         EstadoPedido = (bool)datos.Lector["Estado"],
                         Total = (decimal)datos.Lector["Total"],
-                        AsignacionId = datos.Lector["AsignacionId"] != DBNull.Value ? (int)datos.Lector["AsignacionId"] : 0,
+                        AsignacionMesa = datos.Lector["AsignacionId"] != DBNull.Value ? new AsignacionMesa { AsignacionId = (int)datos.Lector["AsignacionId"] } : null,
                         EsMostrador = (bool)datos.Lector["EsMostrador"]
                     };
                     pedidos.Add(pedido);
@@ -164,8 +164,8 @@ namespace Service
                     DetallePedido detalle = new DetallePedido
                     {
                         DetalleId = (int)datos.Lector["DetalleId"],
-                        PedidoId = (int)datos.Lector["PedidoId"],
-                        ProductoId = (int)datos.Lector["ProductoId"],
+                        Pedido = new Pedido { PedidoId = (int)datos.Lector["PedidoId"] },
+                        Producto = new Producto { ProductoId = (int)datos.Lector["ProductoId"] },
                         Cantidad = (int)datos.Lector["Cantidad"],
                         PrecioUnitario = (decimal)datos.Lector["PrecioUnitario"],
                         Subtotal = (decimal)datos.Lector["Subtotal"],
@@ -205,7 +205,7 @@ namespace Service
                         FechaCierre = datos.Lector["FechaCierre"] != DBNull.Value ? (DateTime)datos.Lector["FechaCierre"] : DateTime.MinValue,
                         EstadoPedido = (bool)datos.Lector["Estado"],
                         Total = (decimal)datos.Lector["Total"],
-                        AsignacionId = datos.Lector["AsignacionId"] != DBNull.Value ? (int)datos.Lector["AsignacionId"] : 0,
+                        AsignacionMesa = datos.Lector["AsignacionId"] != DBNull.Value ? new AsignacionMesa { AsignacionId = (int)datos.Lector["AsignacionId"] } : null,
                         EsMostrador = (bool)datos.Lector["EsMostrador"]
                     };
                 }
