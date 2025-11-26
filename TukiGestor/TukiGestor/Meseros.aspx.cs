@@ -302,13 +302,7 @@ namespace TukiGestor
                 try
                 {
                     EmailService emailService = new EmailService();
-                    emailService.EnviarEmailNuevoMesero(
-                        nuevo.Email,
-                        nuevo.Nombre,
-                        nuevo.Apellido,
-                        nuevo.NombreUsuario,
-                        nuevo.Contraseña
-                    );
+                    emailService.EnviarEmailNuevoMesero(nuevo.Email, nuevo.Nombre, nuevo.Apellido, nuevo.NombreUsuario, nuevo.Contraseña);
                 }
                 catch (Exception ex)
                 {

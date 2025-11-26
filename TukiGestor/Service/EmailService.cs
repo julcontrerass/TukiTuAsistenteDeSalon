@@ -46,7 +46,7 @@ namespace Service
 
         public void EnviarEmailNuevoMesero(string emailDestino, string nombre, string apellido, string usuario, string password)
         {
-            string asunto = "¡Bienvenido a TukiBar!";
+            string asunto = "¡Bienvenido a TUKI, tu asistente de salón!";
             string cuerpo = $@"
                 <h2>¡Hola {nombre} {apellido}!</h2>
                 <p>Tu cuenta fue creada exitosamente.</p>
@@ -56,7 +56,7 @@ namespace Service
                     <li><strong>Contraseña:</strong> {password}</li>
                     <li><strong>Email registrado:</strong> {emailDestino}</li>
                 </ul>
-                <p>¡Bienvenido al equipo de TukiBar!</p>";
+                <p>¡Bienvenido al equipo de TUKI!</p>";
 
             armarCorreo(emailDestino, asunto, cuerpo);
             enviarCorreo();
