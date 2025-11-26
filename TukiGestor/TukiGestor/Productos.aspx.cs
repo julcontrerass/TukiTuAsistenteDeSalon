@@ -168,7 +168,7 @@ namespace TukiGestor
                     Stock = cantidad,
                     Precio = precio,
                     Disponible = true,
-                    CategoriaId = categoriaId
+                    Categoria = new Categoria { CategoriaId = categoriaId }
                 };
 
                 service.Agregar(nuevo);
@@ -232,7 +232,7 @@ namespace TukiGestor
                     Nombre = nombre,
                     Stock = cantidad,
                     Precio = precio,
-                    CategoriaId = categoriaId,
+                    Categoria = new Categoria { CategoriaId = categoriaId },
                     Disponible = true
                 };
 
@@ -317,7 +317,7 @@ namespace TukiGestor
                         txtNombreEditar.Text = producto.Nombre;
                         txtCantidadEditar.Text = producto.Stock.ToString();
                         txtPrecioEditar.Text = producto.Precio.ToString();
-                        ddlCategoriasEditar.SelectedValue = producto.CategoriaId.ToString();
+                        ddlCategoriasEditar.SelectedValue = producto.Categoria.CategoriaId.ToString();
 
                         MostrarTab("editar");
                         OcultarMensaje();

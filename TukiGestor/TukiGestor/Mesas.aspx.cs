@@ -378,7 +378,7 @@ namespace TukiGestor
         public List<Producto> ObtenerProductosPorCategoria(int categoriaId)
         {
             if (Productos == null) return new List<Producto>();
-            return Productos.Where(p => p.CategoriaId == categoriaId).ToList();
+            return Productos.Where(p => p.Categoria.CategoriaId == categoriaId).ToList();
         }
 
         // Método para generar HTML de productos por categoría
@@ -471,10 +471,10 @@ namespace TukiGestor
                         // DEBUG: Mostrar todos los pedidos activos
                         foreach (var p in pedidos)
                         {
-                            System.Diagnostics.Debug.WriteLine($"  - Pedido #{p.PedidoId}, AsignacionId: {p.AsignacionId}, EsMostrador: {p.EsMostrador}");
+                            System.Diagnostics.Debug.WriteLine($"  - Pedido #{p.PedidoId}, AsignacionId: {p.AsignacionMesa?.AsignacionId}, EsMostrador: {p.EsMostrador}");
                         }
 
-                        Pedido pedidoActivo = pedidos.FirstOrDefault(p => p.AsignacionId == asignacion.AsignacionId);
+                        Pedido pedidoActivo = pedidos.FirstOrDefault(p => p.AsignacionMesa?.AsignacionId == asignacion.AsignacionId);
 
                         if (pedidoActivo != null)
                         {
@@ -489,7 +489,7 @@ namespace TukiGestor
                             // Cargar nombre del mesero para mostrarlo en el modal
                             ViewState["AsignacionIdActual"] = asignacion.AsignacionId;
                             string nombreMesero = "";
-                            Mesero mesero = meseroService.ObtenerPorId(asignacion.MeseroId);
+                            Mesero mesero = meseroService.ObtenerPorId(asignacion.Mesero.MeseroId);
                             if (mesero != null)
                             {
                                 nombreMesero = mesero.Nombre + " " + mesero.Apellido;
@@ -551,8 +551,8 @@ namespace TukiGestor
                 // Crear la asignación de mesa
                 AsignacionMesa nuevaAsignacion = new AsignacionMesa
                 {
-                    MesaId = mesaId,
-                    MeseroId = meseroId,
+                    Mesa = new Mesa { MesaId = mesaId },
+                    Mesero = new Mesero { MeseroId = meseroId },
                     FechaAsignacion = DateTime.Now,
                     Activa = true
                 };
@@ -678,12 +678,12 @@ namespace TukiGestor
                 {
                     nombreMesero = "Mostrador";
                 }
-                else if (pedido.AsignacionId > 0)
+                else if (pedido.AsignacionMesa?.AsignacionId > 0)
                 {
-                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionId);
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionMesa.AsignacionId);
                     if (asignacion != null)
                     {
-                        Mesero mesero = meseroService.ObtenerPorId(asignacion.MeseroId);
+                        Mesero mesero = meseroService.ObtenerPorId(asignacion.Mesero.MeseroId);
                         if (mesero != null)
                         {
                             nombreMesero = mesero.Nombre + " " + mesero.Apellido;
@@ -1067,7 +1067,7 @@ namespace TukiGestor
                             <button type='button' onclick='cambiarCantidad(this, 1, event)'>+</button>
                         </div>
                     </div>
-                ", prod.Nombre, prod.Precio, prod.CategoriaId, prod.ProductoId);
+                ", prod.Nombre, prod.Precio, prod.Categoria.CategoriaId, prod.ProductoId);
             }
 
             html.Append("</div>");
@@ -1148,8 +1148,8 @@ namespace TukiGestor
                     {
                         DetallePedido detalle = new DetallePedido
                         {
-                            PedidoId = pedidoId,
-                            ProductoId = producto.ProductoId,
+                            Pedido = new Pedido { PedidoId = pedidoId },
+                            Producto = new Producto { ProductoId = producto.ProductoId },
                             Cantidad = producto.Cantidad,
                             PrecioUnitario = producto.PrecioUnitario,
                             Subtotal = producto.Cantidad * producto.PrecioUnitario
@@ -1158,7 +1158,7 @@ namespace TukiGestor
                         pedidoService.AgregarDetallePedido(detalle);
 
                         // DESCONTAR STOCK
-                        productoService.DescontarStock(detalle.ProductoId, detalle.Cantidad);
+                        productoService.DescontarStock(detalle.Producto.ProductoId, detalle.Cantidad);
                     }
 
                     // Actualizar total del pedido
@@ -1192,8 +1192,8 @@ namespace TukiGestor
 
                                 AsignacionMesa nuevaAsignacion = new AsignacionMesa
                                 {
-                                    MesaId = mesaId,
-                                    MeseroId = meseroId,
+                                    Mesa = new Mesa { MesaId = mesaId },
+                                    Mesero = new Mesero { MeseroId = meseroId },
                                     FechaAsignacion = DateTime.Now,
                                     Activa = true
                                 };
@@ -1209,7 +1209,7 @@ namespace TukiGestor
                         FechaPedido = DateTime.Now,
                         EstadoPedido = true,
                         Total = total,
-                        AsignacionId = asignacionId > 0 ? asignacionId : 0,
+                        AsignacionMesa = asignacionId > 0 ? new AsignacionMesa { AsignacionId = asignacionId } : null,
                         EsMostrador = esMostrador
                     };
 
@@ -1220,8 +1220,8 @@ namespace TukiGestor
                     {
                         DetallePedido detalle = new DetallePedido
                         {
-                            PedidoId = pedidoId,
-                            ProductoId = producto.ProductoId,
+                            Pedido = new Pedido { PedidoId = pedidoId },
+                            Producto = new Producto { ProductoId = producto.ProductoId },
                             Cantidad = producto.Cantidad,
                             PrecioUnitario = producto.PrecioUnitario,
                             Subtotal = producto.Cantidad * producto.PrecioUnitario
@@ -1230,7 +1230,7 @@ namespace TukiGestor
                         pedidoService.AgregarDetallePedido(detalle);
 
                         // DESCONTAR STOCK
-                        productoService.DescontarStock(detalle.ProductoId, detalle.Cantidad);
+                        productoService.DescontarStock(detalle.Producto.ProductoId, detalle.Cantidad);
                     }
 
                     // Si no es mostrador, marcar mesa ocupada
@@ -1361,12 +1361,12 @@ namespace TukiGestor
                 // Crear el registro de venta
                 Venta venta = new Venta
                 {
-                    PedidoId = pedidoId,
+                    Pedido = new Pedido { PedidoId = pedidoId },
                     FechaVenta = DateTime.Now,
                     MontoTotal = pedido.Total,
                     MetodoPago = metodoPago,
                     MontoRecibido = montoRecibido > 0 ? (decimal?)montoRecibido : null,
-                    GerenteId = null // Por ahora no hay gerente asignado
+                    Gerente = null // Por ahora no hay gerente asignado
                 };
 
                 // Registrar la venta en la base de datos
@@ -1467,13 +1467,13 @@ namespace TukiGestor
                     numeroMesa = "Mostrador";
                     ubicacion = "mostrador";
                 }
-                else if (pedido.AsignacionId > 0)
+                else if (pedido.AsignacionMesa?.AsignacionId > 0)
                 {
                     // Es una mesa
-                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionId);
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionMesa.AsignacionId);
                     if (asignacion != null)
                     {
-                        Mesa mesa = mesaService.ObtenerMesaPorId(asignacion.MesaId);
+                        Mesa mesa = mesaService.ObtenerMesaPorId(asignacion.Mesa.MesaId);
                         if (mesa != null)
                         {
                             numeroMesa = mesa.NumeroMesa;
@@ -1493,12 +1493,12 @@ namespace TukiGestor
 
                 // Obtener nombre del mesero
                 string nombreMesero = "";
-                if (!pedido.EsMostrador && pedido.AsignacionId > 0)
+                if (!pedido.EsMostrador && pedido.AsignacionMesa?.AsignacionId > 0)
                 {
-                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionId);
+                    AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionMesa.AsignacionId);
                     if (asignacion != null)
                     {
-                        Mesero mesero = meseroService.ObtenerPorId(asignacion.MeseroId);
+                        Mesero mesero = meseroService.ObtenerPorId(asignacion.Mesero.MeseroId);
                         if (mesero != null)
                         {
                             nombreMesero = mesero.Nombre + " " + mesero.Apellido;

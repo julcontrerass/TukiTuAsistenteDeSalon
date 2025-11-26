@@ -25,7 +25,7 @@ namespace Service
                     prod.Nombre = (string)datos.Lector["Nombre"];
                     prod.Precio = (decimal)datos.Lector["Precio"];
                     prod.Disponible = (bool)datos.Lector["Disponible"];
-                    prod.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    prod.Categoria = new Categoria { CategoriaId = (int)datos.Lector["CategoriaId"] };
                     prod.Stock = (int)datos.Lector["Stock"];
                     lista.Add(prod);
                 }
@@ -50,7 +50,7 @@ namespace Service
                 datos.setearParametro("@Nombre", nuevo.Nombre);
                 datos.setearParametro("@Precio", nuevo.Precio);
                 datos.setearParametro("@Disponible", nuevo.Disponible);
-                datos.setearParametro("@CategoriaId", nuevo.CategoriaId);
+                datos.setearParametro("@CategoriaId", nuevo.Categoria.CategoriaId);
                 datos.setearParametro("@Stock", nuevo.Stock);
                 datos.ejecutarAccion();
             }
@@ -94,7 +94,7 @@ namespace Service
                 datos.SetearConsulta("UPDATE PRODUCTO SET Nombre = @Nombre, Precio = @Precio, " +"CategoriaId = @CategoriaId, Stock = @Stock " +"WHERE ProductoId = @ProductoId");
                 datos.setearParametro("@Nombre", producto.Nombre);
                 datos.setearParametro("@Precio", producto.Precio);
-                datos.setearParametro("@CategoriaId", producto.CategoriaId);
+                datos.setearParametro("@CategoriaId", producto.Categoria.CategoriaId);
                 datos.setearParametro("@Stock", producto.Stock);
                 datos.setearParametro("@ProductoId", producto.ProductoId);
                 datos.ejecutarAccion();
@@ -143,7 +143,7 @@ namespace Service
                     prod.Nombre = (string)datos.Lector["Nombre"];
                     prod.Precio = (decimal)datos.Lector["Precio"];
                     prod.Disponible = (bool)datos.Lector["Disponible"];
-                    prod.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    prod.Categoria = new Categoria { CategoriaId = (int)datos.Lector["CategoriaId"] };
                     prod.Stock = (int)datos.Lector["Stock"];
                     lista.Add(prod);
                 }
@@ -201,7 +201,7 @@ namespace Service
                     prod.Nombre = (string)datos.Lector["Nombre"];
                     prod.Precio = (decimal)datos.Lector["Precio"];
                     prod.Disponible = (bool)datos.Lector["Disponible"];
-                    prod.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    prod.Categoria = new Categoria { CategoriaId = (int)datos.Lector["CategoriaId"] };
                     prod.Stock = (int)datos.Lector["Stock"];
 
                     lista.Add(prod);
@@ -339,7 +339,7 @@ namespace Service
                     prod.Nombre = (string)datos.Lector["Nombre"];
                     prod.Precio = (decimal)datos.Lector["Precio"];
                     prod.Disponible = (bool)datos.Lector["Disponible"];
-                    prod.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    prod.Categoria = new Categoria { CategoriaId = (int)datos.Lector["CategoriaId"] };
                     prod.Stock = (int)datos.Lector["Stock"];
                     lista.Add(prod);
                 }
@@ -371,7 +371,7 @@ namespace Service
                     p.Nombre = (string)datos.Lector["Nombre"];
                     p.Precio = (decimal)datos.Lector["Precio"];
                     p.Disponible = (bool)datos.Lector["Disponible"];
-                    p.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    p.Categoria = new Categoria { CategoriaId = (int)datos.Lector["CategoriaId"] };
                     p.Stock = (int)datos.Lector["Stock"];
                     lista.Add(p);
                 }
@@ -461,7 +461,7 @@ namespace Service
                     prod.Nombre = (string)datos.Lector["Nombre"];
                     prod.Precio = (decimal)datos.Lector["Precio"];
                     prod.Disponible = (bool)datos.Lector["Disponible"];
-                    prod.CategoriaId = (int)datos.Lector["CategoriaId"];
+                    prod.Categoria = new Categoria { CategoriaId = (int)datos.Lector["CategoriaId"] };
                     prod.Stock = (int)datos.Lector["Stock"];
                     lista.Add(prod);
                 }

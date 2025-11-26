@@ -548,7 +548,6 @@
                 //document.getElementById("panelBalance").style.display = "none";       
 
                 const panel = document.getElementById("pnlMensaje");
-                console.log("la concha tu madre", panel);
                 if (panel) {
                     panel.style.display = "none";
                     panel.classList.remove("alert-show");
