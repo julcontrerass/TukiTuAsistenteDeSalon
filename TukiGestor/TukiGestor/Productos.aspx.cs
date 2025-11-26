@@ -11,35 +11,20 @@ namespace TukiGestor
 {
     public partial class Stock : System.Web.UI.Page
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            if (!IsPostBack)
-            {
-                CargarProductos();
-                CargarCategorias();
-                CargarCategoriasEditar();
-                CargarListadoCategorias();
-            }
-        }
+        
 
-       /* private void CargarProductos()
-        {
-            ProductoService productoService = new ProductoService();
-            List<Producto> listaProductos = productoService.Listar();
-            RepeaterProductos.DataSource = listaProductos;
-            RepeaterProductos.DataBind();
-        }
-       */
-        private void CargarProductos()
-        {
-            ProductoService productoService = new ProductoService();
-            string textoBusqueda = txtBuscarProducto.Text.Trim();
-            string ordenamiento = ddlOrdenamiento.SelectedValue;
+        /* private void CargarProductos()
+         {
+             ProductoService productoService = new ProductoService();
+             List<Producto> listaProductos = productoService.Listar();
+             RepeaterProductos.DataSource = listaProductos;
+             RepeaterProductos.DataBind();
+         }
+        */
+        
 
-            List<Producto> listaProductos = productoService.BuscarYFiltrar(textoBusqueda, ordenamiento);
-            RepeaterProductos.DataSource = listaProductos;
-            RepeaterProductos.DataBind();
-        }
+       
+        
 
 
         private void CargarCategorias()
@@ -376,6 +361,7 @@ namespace TukiGestor
                 CargarCategorias();
                 CargarCategoriasEditar();
                 CargarListadoCategorias();
+                CargarFiltroCategoria();
                 MostrarMensaje("Categoría agregada correctamente", "success");
             }
             catch (Exception ex)
@@ -465,6 +451,7 @@ namespace TukiGestor
                 CargarCategorias();
                 CargarCategoriasEditar();
                 CargarListadoCategorias();
+                CargarFiltroCategoria();
                 MostrarTab("categorias");
                 MostrarMensaje("Categoría actualizada correctamente", "success");
             }
@@ -624,7 +611,7 @@ namespace TukiGestor
                     CargarCategorias();
                     CargarCategoriasEditar();
                     CargarListadoCategorias();
-
+                    CargarFiltroCategoria();
                     MostrarMensaje("Categoría reactivada correctamente.", "success");
                 }
                 catch (Exception ex)
@@ -668,6 +655,7 @@ namespace TukiGestor
                     CargarCategorias();
                     CargarCategoriasEditar();
                     CargarListadoCategorias();
+                    CargarFiltroCategoria();
                     // Si estamos en la solapa de eliminadas, la recargamos también
                     if (pnlCategoriasEliminadas.CssClass.Contains("active"))
                     {
@@ -695,13 +683,63 @@ namespace TukiGestor
             CargarProductos();
         }
 
+        
+
+
+
+
+
+
+
+        private void CargarFiltroCategoria()
+        {
+            CategoriaService categoriaService = new CategoriaService();
+            List<Categoria> categorias = categoriaService.Listar();
+            ddlFiltroCategoria.DataSource = categorias;
+            ddlFiltroCategoria.DataTextField = "Nombre";
+            ddlFiltroCategoria.DataValueField = "CategoriaId";
+            ddlFiltroCategoria.DataBind();
+            ddlFiltroCategoria.Items.Insert(0, new ListItem("Todas las categorías", "0"));
+        }
+
+        
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                CargarFiltroCategoria(); 
+                CargarCategorias();
+                CargarCategoriasEditar();
+                CargarListadoCategorias();
+                CargarProductos(); 
+            }
+        }
+
+        private void CargarProductos()
+        {
+            ProductoService productoService = new ProductoService();
+            string textoBusqueda = txtBuscarProducto.Text.Trim();
+            string ordenamiento = ddlOrdenamiento.SelectedValue;
+            int categoriaId = int.Parse(ddlFiltroCategoria.SelectedValue); 
+
+            List<Producto> listaProductos = productoService.BuscarYFiltrar(textoBusqueda, ordenamiento, categoriaId); 
+            RepeaterProductos.DataSource = listaProductos;
+            RepeaterProductos.DataBind();
+        }
+
+        protected void ddlFiltroCategoria_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CargarProductos();
+        }
+
         protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
         {
             txtBuscarProducto.Text = string.Empty;
             ddlOrdenamiento.SelectedIndex = 0;
+            ddlFiltroCategoria.SelectedIndex = 0; 
             CargarProductos();
         }
-
 
     }
 }
