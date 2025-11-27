@@ -85,41 +85,49 @@
                                     <i class="bi bi-x-circle"></i>
                                 </asp:LinkButton>
                             </div>
-                            <asp:Repeater ID="RepeaterProductos" runat="server" OnItemCommand="RepeaterProductos_ItemCommand">
-                                <HeaderTemplate>
-                                    <div class="tabla-scroll">
-                                        <table class="table table-striped table-hover text-center shadow-lg">
-                                            <thead class="table-dark">
-                                                <tr>
-                                                    <th>Nombre</th>
-                                                    <th>Cantidad</th>
-                                                    <th>Precio</th>
-                                                    <th>Acciones</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                </HeaderTemplate>
-                                <ItemTemplate>
-                                    <tr>
-                                        <td><%# Eval("Nombre") %></td>
-                                        <td><%# Eval("Stock") %></td>
-                                        <td>$<%# Eval("Precio") %></td>
-                                        <td>
-                                            <asp:LinkButton runat="server" CssClass="btn btn-link text-warning me-2" CommandName="Editar" CommandArgument='<%# Eval("ProductoId") %>'>
-                                                <i class="bi bi-pencil-fill"></i>
-                                            </asp:LinkButton>
-                                            <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="ConfirmarEliminarProducto" CommandArgument='<%# Eval("ProductoId") %>'>
-                                                <i class="bi bi-trash-fill"></i>
-                                            </asp:LinkButton>
-                                        </td>
-                                    </tr>
-                                </ItemTemplate>
-                                <FooterTemplate>
-                                            </tbody>
-                                        </table>
-                                     </div>
-                                </FooterTemplate>
-                            </asp:Repeater>
+                            
+                            <div class="tabla-scroll">
+    <asp:GridView ID="RepeaterProductos" 
+                  runat="server" 
+                  AutoGenerateColumns="false" 
+                  CssClass="table table-striped table-hover text-center shadow-lg"
+                  HeaderStyle-CssClass="table-dark"
+                 OnRowCommand="RepeaterProductos_RowCommand">
+        <Columns>
+
+            <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
+
+            <asp:BoundField DataField="Stock" HeaderText="Cantidad" />
+
+            <asp:TemplateField HeaderText="Precio">
+                <ItemTemplate>
+                    $<%# Eval("Precio") %>
+                </ItemTemplate>
+            </asp:TemplateField>
+
+            <asp:TemplateField HeaderText="Acciones">
+                <ItemTemplate>
+                    <asp:LinkButton runat="server"
+                                    CssClass="btn btn-link text-warning me-2"
+                                    CommandName="Editar"
+                                    CommandArgument='<%# Eval("ProductoId") %>'>
+                        <i class="bi bi-pencil-fill"></i>
+                    </asp:LinkButton>
+
+                    <asp:LinkButton runat="server"
+                                    CssClass="btn btn-link text-danger"
+                                    CommandName="ConfirmarEliminarProducto"
+                                    CommandArgument='<%# Eval("ProductoId") %>'>
+                        <i class="bi bi-trash-fill"></i>
+                    </asp:LinkButton>
+                </ItemTemplate>
+            </asp:TemplateField>
+
+        </Columns>
+    </asp:GridView>
+</div>
+
+
                         </asp:Panel>
                         <!-- nuevo producto -->
                         <asp:Panel ID="pnlNuevo" runat="server" CssClass="tab-pane fade">
@@ -176,35 +184,41 @@
                             <div class="p-4">
                                 <h4 class="mb-3 text-center">Categorías de productos</h4>
                                 <div style="max-height: 400px; overflow-y: auto; border-radius: 8px;">
-                                    <asp:Repeater ID="RepeaterCategorias" runat="server" OnItemCommand="RepeaterCategorias_ItemCommand">
-                                        <HeaderTemplate>
-                                            <table class="table table-striped table-hover text-center shadow-lg mb-0">
-                                                <thead class="table-dark sticky-top">
-                                                    <tr>
-                                                        <th>Nombre</th>
-                                                        <th>Acciones</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                        </HeaderTemplate>
-                                        <ItemTemplate>
-                                            <tr>
-                                                <td><%# Eval("Nombre") %></td>
-                                                <td>
-                                                    <asp:LinkButton runat="server" CssClass="btn btn-link text-warning me-2" CommandName="EditarCategoria" CommandArgument='<%# Eval("CategoriaId") %>'>
-                                                        <i class="bi bi-pencil-fill"></i>
-                                                    </asp:LinkButton>
-                                                    <asp:LinkButton runat="server" CssClass="btn btn-link text-danger" CommandName="ConfirmarEliminarCategoria" CommandArgument='<%# Eval("CategoriaId") %>'>
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </asp:LinkButton>
-                                                </td>
-                                            </tr>
-                                        </ItemTemplate>
-                                        <FooterTemplate>
-                                                </tbody>
-                                            </table>
-                                        </FooterTemplate>
-                                    </asp:Repeater>
+
+
+                                    <asp:GridView ID="RepeaterCategorias"
+              runat="server"
+              AutoGenerateColumns="false"
+              CssClass="table table-striped table-hover text-center shadow-lg mb-0"
+              HeaderStyle-CssClass="table-dark sticky-top"
+             OnRowCommand="RepeaterCategorias_RowCommand">
+    <Columns>
+
+        <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
+
+        <asp:TemplateField HeaderText="Acciones">
+            <ItemTemplate>
+                <asp:LinkButton runat="server"
+                                CssClass="btn btn-link text-warning me-2"
+                                CommandName="EditarCategoria"
+                                CommandArgument='<%# Eval("CategoriaId") %>'>
+                    <i class="bi bi-pencil-fill"></i>
+                </asp:LinkButton>
+
+                <asp:LinkButton runat="server"
+                                CssClass="btn btn-link text-danger"
+                                CommandName="ConfirmarEliminarCategoria"
+                                CommandArgument='<%# Eval("CategoriaId") %>'>
+                    <i class="bi bi-trash-fill"></i>
+                </asp:LinkButton>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+    </Columns>
+</asp:GridView>
+
+
+                                    
                                 </div>
                             </div>
                         </asp:Panel>

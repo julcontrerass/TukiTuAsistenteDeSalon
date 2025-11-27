@@ -18,7 +18,8 @@ GO
 CREATE TABLE USUARIO(
     UsuarioId INT IDENTITY(1,1) PRIMARY KEY,
     NombreUsuario VARCHAR(50) NOT NULL,
-    Contrasenia VARCHAR(50) NOT NULL,
+    Contrasenia VARCHAR(100) NOT NULL,
+    Rol VARCHAR(20) NOT NULL,
     Email VARCHAR(50)
 );
 
@@ -140,12 +141,12 @@ INSERT INTO PRODUCTO (Nombre, Precio, Stock, Disponible, CategoriaId) VALUES
 ('Cheesecake', 950.00, 25, 1, 3);
 GO
 
-INSERT INTO USUARIO (NombreUsuario, Contrasenia, Email) VALUES
-('robertocarlos', '123456', 'robertocarlos@tuki.com'),
-('cacho', '123456', 'cacho@tuki.com'),
-('ruperto', '123456', 'ruperto@tuki.com'),
-('alla', '123456', 'alla@tuki.com'),
-('aca', '123456', 'aca@tuki.com');
+INSERT INTO USUARIO (NombreUsuario, Contrasenia, Email, Rol) VALUES
+('robertocarlos', '123456', 'robertocarlos@tuki.com', 'gerente'),
+('cacho', '123456', 'cacho@tuki.com', 'gerente'),
+('ruperto', '123456', 'ruperto@tuki.com', 'gerente'),
+('alla', '123456', 'alla@tuki.com', 'gerente'),
+('aca', '123456', 'aca@tuki.com', 'gerente');
 GO
 
 INSERT INTO MESERO (Nombre, Apellido, Activo, UsuarioId) VALUES
@@ -506,19 +507,3 @@ BEGIN
     ORDER BY Monto DESC;
 END;
 GO
-
-------------------------------------------------
--- CONSULTAS DE VERIFICACION
-------------------------------------------------
-/*
-SELECT * FROM ASIGNACIONMESA
-SELECT * FROM CATEGORIA
-SELECT * FROM DETALLEPEDIDO
-SELECT * FROM GERENTE
-SELECT * FROM MESA
-SELECT * FROM MESERO
-SELECT * FROM PEDIDO
-SELECT * FROM PRODUCTO
-SELECT * FROM USUARIO
-SELECT * FROM VENTA
-*/

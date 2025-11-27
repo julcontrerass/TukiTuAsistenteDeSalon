@@ -16,6 +16,21 @@ namespace TukiGestor
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["usuarioLoggeado"] == null)
+            {
+                Response.Redirect("~/Login.aspx");
+                return;
+            }
+
+
+            Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];
+            bool esMesero = usuarioLoggeado.Rol == "mesero";
+
+            if (esMesero)
+            {
+            btnTabVentas.Visible = false;
+            btnTabBalance.Visible = false;
+            }
 
         }
                              

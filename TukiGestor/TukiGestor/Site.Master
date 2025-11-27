@@ -4,7 +4,7 @@
 
 <html lang="es">
 <head runat="server">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%: Page.Title %> TIKI</title>
@@ -12,9 +12,9 @@
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/bundles/modernizr") %>
     </asp:PlaceHolder>
-    <webopt:bundlereference runat="server" path="~/Content/css" />
+    <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
     <style>
         html, body {
@@ -43,9 +43,9 @@
             transition: width 0.3s ease;
         }
 
-        .sidebar.collapsed {
-            width: 80px;
-        }
+            .sidebar.collapsed {
+                width: 80px;
+            }
 
         .sidebar-header {
             padding: 20px 20px;
@@ -82,9 +82,9 @@
             transition: all 0.3s ease;
         }
 
-        .toggle-btn:hover {
-            color: #000;
-        }
+            .toggle-btn:hover {
+                color: #000;
+            }
 
         .sidebar.collapsed .toggle-btn {
             position: absolute;
@@ -104,52 +104,52 @@
             flex-grow: 1;
         }
 
-        .sidebar-nav li {
-            margin-bottom: 0;
-            position: relative;
-        }
+            .sidebar-nav li {
+                margin-bottom: 0;
+                position: relative;
+            }
 
-        .sidebar-nav li:has(a.active) {
-            background-color: #F6EFE0;
-        }
+                .sidebar-nav li:has(a.active) {
+                    background-color: #F6EFE0;
+                }
 
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            color: #333;
-            text-decoration: none;
-            font-size: 0.9em;
-            font-weight: 500;
-            white-space: nowrap;
-            position: relative;
-        }
+            .sidebar-nav a {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+                color: #333;
+                text-decoration: none;
+                font-size: 0.9em;
+                font-weight: 500;
+                white-space: nowrap;
+                position: relative;
+            }
 
-        .sidebar-nav a i {
-            font-size: 1.1em;
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
-            min-width: 20px;
-        }
+                .sidebar-nav a i {
+                    font-size: 1.1em;
+                    margin-right: 12px;
+                    width: 20px;
+                    text-align: center;
+                    min-width: 20px;
+                }
 
-        .sidebar-nav a span {
-            transition: opacity 0.2s ease;
-        }
+                .sidebar-nav a span {
+                    transition: opacity 0.2s ease;
+                }
 
         .sidebar.collapsed .sidebar-nav a {
             justify-content: center;
             padding: 12px 16px;
         }
 
-        .sidebar.collapsed .sidebar-nav a i {
-            margin-right: 0;
-        }
+            .sidebar.collapsed .sidebar-nav a i {
+                margin-right: 0;
+            }
 
-        .sidebar.collapsed .sidebar-nav a span {
-            opacity: 0;
-            display: none;
-        }
+            .sidebar.collapsed .sidebar-nav a span {
+                opacity: 0;
+                display: none;
+            }
 
         .sidebar-nav li:hover {
             background-color: rgba(0, 0, 0, 0.05);
@@ -208,9 +208,9 @@
             transition: background-color 0.2s ease;
         }
 
-        .user-menu-toggle:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
+            .user-menu-toggle:hover {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
 
         .user-avatar-icon {
             font-size: 40px;
@@ -222,13 +222,14 @@
             text-align: left;
             color: #333;
             font-weight: 500;
-            font-size: 0.9em;
+            font-size: 1rem;
         }
 
         .chevron-icon {
             color: #333;
             font-size: 0.8em;
             transition: transform 0.3s ease;
+            margin-left: auto;
         }
 
         .user-menu-toggle.active .chevron-icon {
@@ -259,9 +260,9 @@
             z-index: 1000;
         }
 
-        .user-dropdown.show {
-            display: block;
-        }
+            .user-dropdown.show {
+                display: block;
+            }
 
         .user-dropdown-item {
             display: flex;
@@ -274,15 +275,15 @@
             transition: background-color 0.2s ease;
         }
 
-        .user-dropdown-item:hover {
-            background-color: #E7D9C2;
-            color: #000;
-        }
+            .user-dropdown-item:hover {
+                background-color: #E7D9C2;
+                color: #000;
+            }
 
-        .user-dropdown-item i {
-            font-size: 1em;
-            width: 18px;
-        }
+            .user-dropdown-item i {
+                font-size: 1em;
+                width: 18px;
+            }
 
         .user-dropdown-divider {
             margin: 8px 0;
@@ -310,12 +311,12 @@
             z-index: 500;
         }
 
-        footer p {
-            margin: 0;
-            color: #333;
-            margin-left: 300px;
-            transition: margin-left 0.3s ease;
-        }
+            footer p {
+                margin: 0;
+                color: #333;
+                margin-left: 300px;
+                transition: margin-left 0.3s ease;
+            }
 
         body.sidebar-collapsed footer p {
             margin-left: 100px;
@@ -332,8 +333,17 @@
                 margin-left: 0;
             }
         }
+
+        .container-datosusuario {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rol-tipo{
+            font-weight: 300;
+        }
     </style>
-        <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
 
 </head>
 <body>
@@ -369,26 +379,36 @@
                 </button>
             </div>
             <ul class="sidebar-nav">
-                <li><a runat="server" id="linkInicio" href="~/Home.aspx"><i class="bi bi-house-door"></i><span> Inicio</span></a></li>
-                <li><a runat="server" id="linkMesas" href="~/Mesas.aspx"><i class="bi bi-grid-3x3"></i><span> Mesas</span></a></li>
-                <li><a runat="server" id="linkStock" href="~/Productos.aspx"><i class="bi bi-box-seam"></i><span> Productos</span></a></li>
-                <li><a runat="server" id="linkMeseros" href="~/Meseros.aspx"><i class="bi bi-person"></i><span> Meseros</span></a></li>
-                <li><a runat="server" id="linkReporte" href="~/Reporte.aspx"><i class="bi bi-graph-up"></i><span> Reporte</span></a></li>
+                <li><a runat="server" id="linkInicio" href="~/Home.aspx"><i class="bi bi-house-door"></i><span>Inicio</span></a></li>
+                <li><a runat="server" id="linkMesas" href="~/Mesas.aspx"><i class="bi bi-grid-3x3"></i><span>Mesas</span></a></li>
+                <li><a runat="server" id="linkStock" href="~/Productos.aspx"><i class="bi bi-box-seam"></i><span>Productos</span></a></li>
+                <li><a runat="server" id="linkMeseros" href="~/Meseros.aspx"><i class="bi bi-person"></i><span>Meseros</span></a></li>
+                <li><a runat="server" id="linkReporte" href="~/Reporte.aspx"><i class="bi bi-graph-up"></i><span>Reporte</span></a></li>
             </ul>
 
             <div class="sidebar-user-menu">
                 <button class="user-menu-toggle" id="userMenuToggle" type="button">
                     <i class="bi bi-person-circle user-avatar-icon"></i>
-                    <span class="user-name">Usuario</span>
+                    <div class="container-datosusuario">
+                        <asp:Label ID="lblNombreUsuario" runat="server" Text="" CssClass="user-name"></asp:Label>
+                        <asp:Label ID="lblRolUsuario" runat="server" Text="" CssClass="rol-tipo"></asp:Label>
+                    </div>
                     <i class="bi bi-chevron-down chevron-icon"></i>
+
                 </button>
                 <div class="user-dropdown" id="userDropdown">
-<a runat="server" id="linkConfiguracion" href="~/Configuracion.aspx" class="user-dropdown-item">
-    <i class="bi bi-gear"></i>
-    <span> Configuración</span>
-</a>                    <a href="#" class="user-dropdown-item"><i class="bi bi-person"></i><span> Perfil</span></a>
+                    <a runat="server" id="linkConfiguracion" href="~/Configuracion.aspx" class="user-dropdown-item">
+                        <i class="bi bi-gear"></i>
+                        <span>Configuración</span>
+                    </a><a href="#" class="user-dropdown-item"><i class="bi bi-person"></i><span>Perfil</span></a>
                     <hr class="user-dropdown-divider" />
-                    <a href="~/Login.aspx" runat="server" class="user-dropdown-item"><i class="bi bi-box-arrow-right"></i><span> Cerrar sesión</span></a>
+                    <asp:LinkButton 
+    ID="btnCerrarSesion" 
+    runat="server" 
+    CssClass="user-dropdown-item"
+   onclick="btnCerrarSesion_Click">
+    <i class="bi bi-box-arrow-right"></i><span>Cerrar sesión</span>
+</asp:LinkButton>
                 </div>
             </div>
         </div>
@@ -410,14 +430,14 @@
     </asp:PlaceHolder>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Sidebar toggle
             const toggleBtn = document.getElementById('toggleSidebar');
             const sidebar = document.getElementById('sidebar');
             const toggleIcon = toggleBtn.querySelector('i');
 
             if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function() {
+                toggleBtn.addEventListener('click', function () {
                     sidebar.classList.toggle('collapsed');
                     document.body.classList.toggle('sidebar-collapsed');
 
@@ -436,14 +456,14 @@
             const userDropdown = document.getElementById('userDropdown');
 
             if (userMenuToggle && userDropdown) {
-                userMenuToggle.addEventListener('click', function(e) {
+                userMenuToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
                     userDropdown.classList.toggle('show');
                     userMenuToggle.classList.toggle('active');
                 });
 
                 // Cerrar dropdown al hacer clic fuera
-                document.addEventListener('click', function(e) {
+                document.addEventListener('click', function (e) {
                     if (!userMenuToggle.contains(e.target) && !userDropdown.contains(e.target)) {
                         userDropdown.classList.remove('show');
                         userMenuToggle.classList.remove('active');
@@ -453,7 +473,7 @@
                 // Cerrar dropdown al hacer clic en un item
                 const dropdownItems = userDropdown.querySelectorAll('.user-dropdown-item');
                 dropdownItems.forEach(item => {
-                    item.addEventListener('click', function() {
+                    item.addEventListener('click', function () {
                         userDropdown.classList.remove('show');
                         userMenuToggle.classList.remove('active');
                     });
