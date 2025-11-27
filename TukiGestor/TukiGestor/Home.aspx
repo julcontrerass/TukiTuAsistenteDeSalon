@@ -16,7 +16,13 @@
                     <ItemTemplate>
                         <div class="orden-item">
                             <div class="orden-header">
-                                <span class="orden-id">Orden #<%# Eval("PedidoId") %></span>
+                                <div>
+                                    <span class="orden-id">Orden #<%# Eval("PedidoId") %></span>
+                                    <div class="orden-ubicacion">
+                                        <span><%# Eval("Ubicacion") %></span>
+                                        <%# (bool)Eval("MostrarMesero") ? "<span class='orden-mesero'> - " + Eval("Mesero") + "</span>" : "" %>
+                                    </div>
+                                </div>
                                 <span class="orden-fecha">
                                     <%# ((DateTime)Eval("FechaPedido")).ToString("HH:mm") %>
                                 </span>
