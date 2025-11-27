@@ -99,7 +99,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="favicon.ico" />
     <Content Include="Assets\LogoTransparente.png" />
     <Content Include="Home.aspx" />
     <Content Include="Login.aspx" />
