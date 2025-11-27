@@ -351,6 +351,105 @@ namespace TukiGestor
             }
         }
 
+        protected void gvVentas_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "VerDetalle")
+            {
+                try
+                {
+                    int ventaId = Convert.ToInt32(e.CommandArgument);
+
+                    // Obtener información de la venta
+                    VentaService ventaService = new VentaService();
+                    Venta venta = ventaService.ObtenerVentaPorId(ventaId);
+
+                    if (venta == null)
+                    {
+                        MostrarMensaje("No se encontró la venta", "error");
+                        return;
+                    }
+
+                    // Obtener información del pedido
+                    PedidoService pedidoService = new PedidoService();
+                    Pedido pedido = pedidoService.ObtenerPedidoPorId(venta.Pedido.PedidoId);
+
+                    // Obtener detalles del pedido (productos)
+                    List<DetallePedido> detalles = pedidoService.ObtenerDetallesPedido(venta.Pedido.PedidoId);
+
+                    // Determinar ubicación y mesero
+                    string ubicacion = "Mostrador";
+                    string mesero = "N/A";
+                    bool mostrarMesero = false;
+
+                    if (!pedido.EsMostrador && pedido.AsignacionMesa != null)
+                    {
+                        AsignacionMesaService asignacionService = new AsignacionMesaService();
+                        AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(pedido.AsignacionMesa.AsignacionId);
+
+                        if (asignacion != null)
+                        {
+                            MesaService mesaService = new MesaService();
+                            Mesa mesa = mesaService.ObtenerMesaPorId(asignacion.Mesa.MesaId);
+                            ubicacion = mesa.Ubicacion + " - Mesa " + mesa.NumeroMesa;
+
+                            MeseroService meseroService = new MeseroService();
+                            Mesero meseroObj = meseroService.ObtenerPorId(asignacion.Mesero.MeseroId);
+                            mesero = meseroObj.Nombre + " " + meseroObj.Apellido;
+                            mostrarMesero = true;
+                        }
+                    }
+
+                    // Generar HTML para productos
+                    System.Text.StringBuilder htmlProductos = new System.Text.StringBuilder();
+                    foreach (var detalle in detalles)
+                    {
+                        decimal subtotal = detalle.Cantidad * detalle.PrecioUnitario;
+                        htmlProductos.AppendFormat(@"
+                            <div style='padding: 10px; border-bottom: 1px solid #E7D9C2; display: flex; justify-content: space-between; align-items: center;'>
+                                <div>
+                                    <div style='font-weight: 600; color: #333;'>{0}</div>
+                                    <div style='font-size: 12px; color: #666;'>Cantidad: {1} x ${2:N0}</div>
+                                </div>
+                                <div style='font-weight: 700; color: #8B7355;'>${3:N0}</div>
+                            </div>",
+                            detalle.NombreProducto,
+                            detalle.Cantidad,
+                            detalle.PrecioUnitario,
+                            subtotal
+                        );
+                    }
+
+                    // Crear script para mostrar el modal
+                    string script = $@"
+                        setTimeout(function() {{
+                            document.getElementById('modalVentaId').textContent = '{ventaId}';
+                            document.getElementById('modalVentaFecha').textContent = '{venta.FechaVenta.ToString("dd/MM/yyyy HH:mm")}';
+                            document.getElementById('modalVentaUbicacion').textContent = '{ubicacion}';
+                            document.getElementById('modalVentaTipoPago').textContent = '{venta.MetodoPago}';
+                            document.getElementById('modalVentaTotal').textContent = '${venta.MontoTotal:N0}';
+                            document.getElementById('modalVentaProductos').innerHTML = `{htmlProductos.ToString()}`;
+
+                            var divMesero = document.getElementById('divVentaMesero');
+                            if ({mostrarMesero.ToString().ToLower()}) {{
+                                divMesero.style.display = 'block';
+                                document.getElementById('modalVentaMesero').textContent = '{mesero}';
+                            }} else {{
+                                divMesero.style.display = 'none';
+                            }}
+
+                            var modal = new bootstrap.Modal(document.getElementById('modalDetalleVenta'));
+                            modal.show();
+                        }}, 100);
+                    ";
+                    ClientScript.RegisterStartupScript(this.GetType(), "MostrarDetalleVenta", script, true);
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al obtener detalle de venta: " + ex.Message, "error");
+                }
+            }
+        }
+
         // Métodos para Mesas
         private void LimpiarFiltrosMesas()
         {
@@ -612,7 +711,6 @@ namespace TukiGestor
                 lblTotalVentas.Text = balance.TotalVentas.ToString("C", new System.Globalization.CultureInfo("es-AR"));
                 lblCantidadVentas.Text = balance.CantidadVentas.ToString();
                 lblCantidadClientes.Text = balance.CantidadClientes.ToString();
-                lblTicketPromedio.Text = balance.TicketPromedio.ToString("C", new System.Globalization.CultureInfo("es-AR"));
                 lblProductosVendidos.Text = balance.ProductosVendidos.ToString();
 
                 // Poblar el GridView con ventas por forma de pago

@@ -43,5 +43,42 @@ namespace Service
                 datos.cerrarConexion();
             }
         }
+
+        public Venta ObtenerVentaPorId(int ventaId)
+        {
+            try
+            {
+                datos.SetearConsulta(@"
+                    SELECT V.VentaId, V.PedidoId, V.FechaVenta, V.MontoTotal, V.MetodoPago, V.MontoRecibido, V.GerenteId
+                    FROM VENTA V
+                    WHERE V.VentaId = @VentaId");
+                datos.setearParametro("@VentaId", ventaId);
+                datos.ejecutarLectura();
+
+                Venta venta = null;
+                if (datos.Lector.Read())
+                {
+                    venta = new Venta
+                    {
+                        VentaId = (int)datos.Lector["VentaId"],
+                        Pedido = new Pedido { PedidoId = (int)datos.Lector["PedidoId"] },
+                        FechaVenta = (DateTime)datos.Lector["FechaVenta"],
+                        MontoTotal = (decimal)datos.Lector["MontoTotal"],
+                        MetodoPago = (string)datos.Lector["MetodoPago"],
+                        MontoRecibido = datos.Lector["MontoRecibido"] != DBNull.Value ? (decimal?)datos.Lector["MontoRecibido"] : null
+                    };
+                }
+
+                return venta;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la venta: " + ex.Message, ex);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
     }
 }

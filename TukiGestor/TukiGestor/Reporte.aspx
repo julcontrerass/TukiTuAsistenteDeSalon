@@ -333,6 +333,7 @@
                             <asp:ListItem Text="Todas" Value="Todos" />
                             <asp:ListItem Text="Salón" Value="Salon" />
                             <asp:ListItem Text="Patio" Value="Patio" />
+                            <asp:ListItem Text="Mostrador" Value="Mostrador" />
                         </asp:DropDownList>
                     </div>
 
@@ -401,25 +402,11 @@
                                     <div class="col-md-3">
                                         <div class="metric-card">
                                             <h6 class="metric-label">
-                                                <i class="bi bi-calculator me-2"></i>Ticket Promedio
-                                            </h6>
-                                            <h3 class="metric-value">
-                                                <asp:Label ID="lblTicketPromedio" runat="server" Text="$0.00"></asp:Label>
-                                            </h3>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Tarjetas secundarias -->
-                                <div class="row g-4 mb-4">
-                                    <div class="col-md-6">
-                                        <div class="metric-card-secondary">
-                                            <h6 class="mb-2">
                                                 <i class="bi bi-box-seam me-2"></i>Productos Vendidos
                                             </h6>
-                                            <h4 class="mb-0">
+                                            <h3 class="metric-value">
                                                 <asp:Label ID="lblProductosVendidos" runat="server" Text="0"></asp:Label>
-                                            </h4>
+                                            </h3>
                                         </div>
                                     </div>
                                 </div>
@@ -427,7 +414,7 @@
                                 <!-- Gráficos -->
                                 <div class="row g-4">
                                     <!-- Gráfico de Torta - Ventas por Forma de Pago -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-7">
                                         <div class="chart-card">
                                             <h5 class="chart-title">
                                                 <i class="bi bi-pie-chart-fill"></i>
@@ -440,7 +427,7 @@
                                     </div>
 
                                     <!-- Tabla de Formas de Pago -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <div class="chart-card">
                                             <h5 class="chart-title">
                                                 <i class="bi bi-table"></i>
@@ -585,12 +572,21 @@
                     CssClass="table table-striped table-hover text-center shadow-lg"
                     HeaderStyle-CssClass="table-dark"
                     EmptyDataText="No hay resultados para mostrar."
-                    GridLines="None">
+                    GridLines="None"
+                    OnRowCommand="gvVentas_RowCommand">
                     <Columns>
-                        <asp:BoundField
-                            DataField="VentaId"
-                            HeaderText="ID Venta"
-                            SortExpression="VentaId" />
+                        <asp:TemplateField HeaderText="Acciones">
+                            <ItemTemplate>
+                                <asp:LinkButton ID="btnVerDetalle" runat="server"
+                                    CssClass="btn btn-sm"
+                                    Style="background-color: #E7D9C2; color: #333; border: none; font-weight: 600;"
+                                    CommandName="VerDetalle"
+                                    CommandArgument='<%# Eval("VentaId") %>'
+                                    ToolTip="Ver detalle de venta">
+                                    <i class="bi bi-eye-fill"></i> Ver Detalle
+                                </asp:LinkButton>
+                            </ItemTemplate>
+                        </asp:TemplateField>
 
                         <asp:BoundField
                             DataField="Fecha"
@@ -631,6 +627,84 @@
             </asp:Panel>
 
 
+        </div>
+    </div>
+
+    <!-- Modal Detalle de Venta -->
+    <div class="modal fade" id="modalDetalleVenta" tabindex="-1" aria-labelledby="modalDetalleVentaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="border-radius: 15px; overflow: hidden; border: 2px solid #E7D9C2;">
+                <div class="modal-header" style="background: #E7D9C2; border: none; padding: 25px;">
+                    <div>
+                        <h4 class="modal-title mb-1" id="modalDetalleVentaLabel" style="color: #333;">
+                            <i class="bi bi-receipt-cutoff"></i> Detalle de Venta
+                        </h4>
+                        <p class="mb-0" style="font-size: 14px; color: #666;">Venta #<span id="modalVentaId"></span></p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 30px; background: #F6EFE0;">
+                    <!-- Información General -->
+                    <div class="card shadow-sm mb-3" style="border: 1px solid #C19A6B; border-radius: 12px; background: white;">
+                        <div class="card-body" style="padding: 20px;">
+                            <h6 class="card-title mb-3" style="color: #333; font-weight: bold; font-size: 16px;">
+                                <i class="bi bi-info-circle-fill" style="color: #C19A6B;"></i> Información General
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div style="background: #E7D9C2; padding: 12px; border-radius: 8px;">
+                                        <small class="text-muted d-block mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Fecha y Hora</small>
+                                        <div id="modalVentaFecha" style="font-weight: 600; color: #333; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div style="background: #E7D9C2; padding: 12px; border-radius: 8px;">
+                                        <small class="text-muted d-block mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Ubicación</small>
+                                        <div id="modalVentaUbicacion" style="font-weight: 600; color: #333; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" id="divVentaMesero" style="display: none;">
+                                    <div style="background: #E7D9C2; padding: 12px; border-radius: 8px;">
+                                        <small class="text-muted d-block mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Mesero</small>
+                                        <div id="modalVentaMesero" style="font-weight: 600; color: #333; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div style="background: #E7D9C2; padding: 12px; border-radius: 8px;">
+                                        <small class="text-muted d-block mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Tipo de Pago</small>
+                                        <div id="modalVentaTipoPago" style="font-weight: 600; color: #333; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos Vendidos -->
+                    <div class="card shadow-sm mb-3" style="border: 1px solid #E7D9C2; border-radius: 12px; background: white;">
+                        <div class="card-body" style="padding: 20px;">
+                            <h6 class="card-title mb-3" style="color: #333; font-weight: bold; font-size: 16px;">
+                                <i class="bi bi-cart-check-fill" style="color: #C19A6B;"></i> Productos Vendidos
+                            </h6>
+                            <div id="modalVentaProductos" style="max-height: 300px; overflow-y: auto;">
+                                <!-- Se llenara desde el servidor -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="card shadow-sm" style="border: 2px solid #E7D9C2; border-radius: 12px; background: #E7D9C2;">
+                        <div class="card-body text-center" style="padding: 20px;">
+                            <p class="mb-2" style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Total de la Venta</p>
+                            <h2 id="modalVentaTotal" class="mb-0" style="font-size: 36px; font-weight: bold; color: #8B7355;">$0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #F6EFE0; border-top: 1px solid #E7D9C2; padding: 20px;">
+                    <button type="button" class="btn px-4" data-bs-dismiss="modal" style="background: #E7D9C2; color: #333; font-weight: 600; border: none;">
+                        <i class="bi bi-x-circle"></i> Cerrar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

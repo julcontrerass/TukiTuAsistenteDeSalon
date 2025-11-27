@@ -360,7 +360,7 @@ BEGIN
     IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena')
         OR @FechaDesde IS NULL
         OR @FechaHasta IS NULL
-        OR @Ubicacion NOT IN('Todos', 'Salon', 'Patio')
+        OR @Ubicacion NOT IN('Todos', 'Salon', 'Patio', 'Mostrador')
         OR @TipoPago IS NULL)
     BEGIN
         RAISERROR('Faltan parámetros obligatorios', 16, 1);
@@ -370,20 +370,28 @@ BEGIN
     SELECT
         V.VentaId,
         V.FechaVenta AS Fecha,
-        M.NumeroMesa,
-        ME.Nombre + ' ' + ME.Apellido AS Mesero,
+        CASE
+            WHEN PE.EsMostrador = 1 THEN 'Mostrador'
+            ELSE ISNULL(M.NumeroMesa, 'N/A')
+        END AS NumeroMesa,
+        CASE
+            WHEN PE.EsMostrador = 1 THEN 'N/A'
+            ELSE ISNULL(ME.Nombre + ' ' + ME.Apellido, 'N/A')
+        END AS Mesero,
         V.MetodoPago AS TipoPago,
         V.MontoTotal,
         dbo.fn_CalcularTurno(V.FechaVenta) AS Turno
     FROM VENTA V
     INNER JOIN PEDIDO PE ON V.PedidoId = PE.PedidoId
-    INNER JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
-    INNER JOIN MESA M ON AM.MesaId = M.MesaId
-    INNER JOIN MESERO ME ON AM.MeseroId = ME.MeseroId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    LEFT JOIN MESERO ME ON AM.MeseroId = ME.MeseroId
     WHERE V.FechaVenta >= @FechaDesde
         AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
         AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
-        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion)
+        AND (@Ubicacion = 'Todos'
+            OR (@Ubicacion = 'Mostrador' AND PE.EsMostrador = 1)
+            OR (@Ubicacion <> 'Mostrador' AND M.Ubicacion = @Ubicacion))
         AND (@TipoPago = 'Todos' OR V.MetodoPago = @TipoPago)
     ORDER BY V.FechaVenta DESC;
 END;
