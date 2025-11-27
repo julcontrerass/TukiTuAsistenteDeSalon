@@ -817,7 +817,7 @@ namespace TukiGestor
                         txtNombreEditar.Text = producto.Nombre;
                         txtCantidadEditar.Text = producto.Stock.ToString();
                         txtPrecioEditar.Text = producto.Precio.ToString();
-                        ddlCategoriasEditar.SelectedValue = producto.CategoriaId.ToString();
+                        ddlCategoriasEditar.SelectedValue = producto.Categoria.CategoriaId.ToString();
 
                         MostrarTab("editar");
                         OcultarMensaje();
