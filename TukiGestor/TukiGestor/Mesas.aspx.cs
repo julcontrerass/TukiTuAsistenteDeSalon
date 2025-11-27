@@ -57,6 +57,8 @@ namespace TukiGestor
             // Detectar postback de guardar posiciones
             if (IsPostBack)
             {
+               
+
                 string eventTarget = Request.Form["__EVENTTARGET"];
                 string eventArgument = Request.Form["__EVENTARGUMENT"];
 
@@ -93,6 +95,20 @@ namespace TukiGestor
             // para no perder la selección del usuario
             if (!IsPostBack)
             {
+                if (Session["usuarioLoggeado"] == null)
+                {
+                    Response.Redirect("~/Login.aspx");
+                    return;
+                }
+
+                Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];
+                if (usuarioLoggeado.Rol != "gerente")
+                {
+                    divEditarMesas.Visible = false;
+                    divEditarMesasPatio.Visible = false;
+                }
+
+
                 CargarMeseros();
             }
 

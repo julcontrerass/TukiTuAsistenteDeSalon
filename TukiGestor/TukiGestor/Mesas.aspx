@@ -50,9 +50,14 @@
                     <div class="section-header">
                         <div class="section-title">Mesas del Salon</div>
                         <div class="edit-mode-buttons">
+                            <div id="divEditarMesas" runat="server"> 
                             <button type="button" class="btn btn-warning btn-edit-mode" data-ubicacion="salon" onclick="toggleEditMode('salon')">
                                 <i class="bi bi-pencil-square"></i> Editar Mesas
                             </button>
+                            </div>
+
+
+
                             <button type="button" class="btn btn-success btn-save-mode" data-ubicacion="salon" onclick="savePositions('salon')" style="display: none;">
                                 <i class="bi bi-check-circle"></i> Guardar Cambios
                             </button>
@@ -95,9 +100,14 @@
                     <div class="section-header">
                         <div class="section-title">Mesas del Patio</div>
                         <div class="edit-mode-buttons">
-                            <button type="button" class="btn btn-warning btn-edit-mode" data-ubicacion="patio" onclick="toggleEditMode('patio')">
-                                <i class="bi bi-pencil-square"></i> Editar Mesas
-                            </button>
+
+                            <div id="divEditarMesasPatio" runat="server">
+                                <button type="button" class="btn btn-warning btn-edit-mode" data-ubicacion="patio" onclick="toggleEditMode('patio')">
+                                    <i class="bi bi-pencil-square"></i>Editar Mesas
+                                </button>
+                            </div>
+
+
                             <button type="button" class="btn btn-success btn-save-mode" data-ubicacion="patio" onclick="savePositions('patio')" style="display: none;">
                                 <i class="bi bi-check-circle"></i> Guardar Cambios
                             </button>

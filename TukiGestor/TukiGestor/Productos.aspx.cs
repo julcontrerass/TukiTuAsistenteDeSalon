@@ -29,11 +29,21 @@ namespace TukiGestor
 
         private void CargarCategorias()
         {
+
+            Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];            
+
             CategoriaService categoriaService = new CategoriaService();
             List<Categoria> categorias = categoriaService.Listar();
             ddlCategorias.DataSource = categorias;
             ddlCategorias.DataTextField = "Nombre";
             ddlCategorias.DataValueField = "CategoriaId";
+
+            if (usuarioLoggeado.Rol == "mesero")
+            {
+                RepeaterCategorias.Columns[1].Visible = false;
+            }
+
+
             ddlCategorias.DataBind();
             ddlCategorias.Items.Insert(0, new ListItem("-- Seleccione categoría --", "0"));
         }
@@ -276,6 +286,7 @@ namespace TukiGestor
         }
 
 
+ 
         protected void RepeaterProductos_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName == "ConfirmarEliminarProducto")
@@ -370,60 +381,7 @@ namespace TukiGestor
             }
         }
 
-
-
-        protected void RepeaterCategorias_ItemCommand(object source, RepeaterCommandEventArgs e)
-        {
-            if (e.CommandName == "ConfirmarEliminarCategoria")
-            {
-                hfIdEliminar.Value = e.CommandArgument.ToString();
-                hfTipoEliminar.Value = "categoria";
-                lblConfirmarMensaje.Text = "¿Seguro que desea eliminar esta categoría?";
-                pnlConfirmarEliminar.Visible = true;
-            }
-            else if (e.CommandName == "Eliminar")
-            {
-                try
-                {
-                    int id = int.Parse(e.CommandArgument.ToString());
-                    CategoriaService service = new CategoriaService();
-                    service.Eliminar(id);
-                    CargarCategorias();
-                    CargarCategoriasEditar();
-                    CargarListadoCategorias();
-                    MostrarMensaje("Categoría eliminada correctamente", "success");
-                }
-                catch (Exception ex)
-                {
-                    MostrarMensaje("Error al eliminar categoría: " + ex.Message, "error");
-                }
-            }
-            else if (e.CommandName == "EditarCategoria")
-            {
-                try
-                {
-                    int id = int.Parse(e.CommandArgument.ToString());
-                    CategoriaService service = new CategoriaService();
-                    List<Categoria> categorias = service.Listar();
-                    Categoria categoria = categorias.FirstOrDefault(c => c.CategoriaId == id);
-
-                    if (categoria != null)
-                    {
-                        hfCategoriaId.Value = categoria.CategoriaId.ToString();
-                        txtNombreCategoriaEditar.Text = categoria.Nombre;
-
-                        MostrarTab("editarCategoria");
-                        OcultarMensaje();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MostrarMensaje("Error al cargar categoría: " + ex.Message, "error");
-                }
-            }
-        }
-
-      
+  
         protected void btnActualizarCategoria_Click(object sender, EventArgs e)
         {
             try
@@ -708,6 +666,21 @@ namespace TukiGestor
         {
             if (!IsPostBack)
             {
+                if (Session["usuarioLoggeado"] == null)
+                {
+                    Response.Redirect("~/Login.aspx");
+                    return;
+                }
+
+                Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];
+
+                if(usuarioLoggeado.Rol == "mesero")
+                {
+                    btnTabNuevo.Visible = false;
+                    btnTabCategoriaNueva.Visible = false;
+                    btnTabEliminados.Visible = false;
+                    btnTabCategoriasEliminadas.Visible = false;
+                }
                 CargarFiltroCategoria(); 
                 CargarCategorias();
                 CargarCategoriasEditar();
@@ -721,10 +694,21 @@ namespace TukiGestor
             ProductoService productoService = new ProductoService();
             string textoBusqueda = txtBuscarProducto.Text.Trim();
             string ordenamiento = ddlOrdenamiento.SelectedValue;
-            int categoriaId = int.Parse(ddlFiltroCategoria.SelectedValue); 
+            int categoriaId = int.Parse(ddlFiltroCategoria.SelectedValue);
 
-            List<Producto> listaProductos = productoService.BuscarYFiltrar(textoBusqueda, ordenamiento, categoriaId); 
+            Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];
+
+           
+
+
+            List<Producto> listaProductos = productoService.BuscarYFiltrar(textoBusqueda, ordenamiento, categoriaId);
             RepeaterProductos.DataSource = listaProductos;
+
+            if (usuarioLoggeado.Rol == "mesero")
+            {
+                RepeaterProductos.Columns[3].Visible = false;
+            }
+
             RepeaterProductos.DataBind();
         }
 
@@ -741,5 +725,109 @@ namespace TukiGestor
             CargarProductos();
         }
 
+        protected void RepeaterCategorias_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "ConfirmarEliminarCategoria")
+            {
+                hfIdEliminar.Value = e.CommandArgument.ToString();
+                hfTipoEliminar.Value = "categoria";
+                lblConfirmarMensaje.Text = "¿Seguro que desea eliminar esta categoría?";
+                pnlConfirmarEliminar.Visible = true;
+            }
+            else if (e.CommandName == "Eliminar")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    CategoriaService service = new CategoriaService();
+                    service.Eliminar(id);
+                    CargarCategorias();
+                    CargarCategoriasEditar();
+                    CargarListadoCategorias();
+                    MostrarMensaje("Categoría eliminada correctamente", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al eliminar categoría: " + ex.Message, "error");
+                }
+            }
+            else if (e.CommandName == "EditarCategoria")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    CategoriaService service = new CategoriaService();
+                    List<Categoria> categorias = service.Listar();
+                    Categoria categoria = categorias.FirstOrDefault(c => c.CategoriaId == id);
+
+                    if (categoria != null)
+                    {
+                        hfCategoriaId.Value = categoria.CategoriaId.ToString();
+                        txtNombreCategoriaEditar.Text = categoria.Nombre;
+
+                        MostrarTab("editarCategoria");
+                        OcultarMensaje();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al cargar categoría: " + ex.Message, "error");
+                }
+            }
+        }
+
+        protected void RepeaterProductos_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "ConfirmarEliminarProducto")
+            {
+                hfIdEliminar.Value = e.CommandArgument.ToString();
+                hfTipoEliminar.Value = "producto";
+                lblConfirmarMensaje.Text = "¿Seguro que desea eliminar este producto?";
+                pnlConfirmarEliminar.Visible = true;
+            }
+            else if (e.CommandName == "Eliminar")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    ProductoService service = new ProductoService();
+                    service.Eliminar(id);
+                    CargarProductos();
+                    MostrarMensaje("Producto eliminado correctamente", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al eliminar producto: " + ex.Message, "error");
+                }
+            }
+            else if (e.CommandName == "Editar")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    ProductoService service = new ProductoService();
+                    List<Producto> productos = service.Listar();
+                    Producto producto = productos.FirstOrDefault(p => p.ProductoId == id);
+
+                    if (producto != null)
+                    {
+                        CargarCategoriasEditar();
+
+                        hfProductoId.Value = producto.ProductoId.ToString();
+                        txtNombreEditar.Text = producto.Nombre;
+                        txtCantidadEditar.Text = producto.Stock.ToString();
+                        txtPrecioEditar.Text = producto.Precio.ToString();
+                        ddlCategoriasEditar.SelectedValue = producto.CategoriaId.ToString();
+
+                        MostrarTab("editar");
+                        OcultarMensaje();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al cargar producto: " + ex.Message, "error");
+                }
+            }
+        }
     }
 }

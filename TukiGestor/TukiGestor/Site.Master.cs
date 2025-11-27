@@ -1,4 +1,5 @@
-﻿using System;
+﻿using dominio;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -13,6 +14,25 @@ namespace TukiGestor
 
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            if (Session["usuarioLoggeado"] == null)
+            {
+                Response.Redirect("~/Login.aspx");
+                return;
+            }
+
+            Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];
+            bool esMesero = usuarioLoggeado.Rol == "mesero";
+
+            if (esMesero)
+            {
+                linkMeseros.Visible = false;
+            }
+
+            lblNombreUsuario.Text = usuarioLoggeado.NombreUsuario;
+            lblRolUsuario.Text = usuarioLoggeado.Rol;
+
+
             SetActiveMenuItem();
         }
 
@@ -47,6 +67,13 @@ namespace TukiGestor
                 // Por defecto, si no coincide con ninguna, activar Inicio
                 linkInicio.Attributes["class"] = "active";
             }
+        }
+
+        protected void btnCerrarSesion_Click(object sender, EventArgs e)
+        {
+            Session.Clear();
+            Session.Abandon();
+            Response.Redirect("~/Login.aspx");
         }
     }
 }
