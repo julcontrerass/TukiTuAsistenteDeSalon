@@ -70,7 +70,127 @@
         color: #000;
     }
 
-/* PANEL SUPERIOR FIJO (RELOJ + ALERTAS) */
+/* ========================================== */
+/* PANEL SUPERIOR IZQUIERDA (ÓRDENES) */
+/* ========================================== */
+.panel-superior-izquierda {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 380px;
+    z-index: 1000;
+}
+
+/* Card de órdenes */
+.card-home.ordenes-card {
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0px 8px 20px rgba(102, 126, 234, 0.3);
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+}
+
+    /* Scrollbar personalizado (Chrome/Safari) */
+    .card-home.ordenes-card::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .card-home.ordenes-card::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    .card-home.ordenes-card::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+
+        .card-home.ordenes-card::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+    .card-home.ordenes-card .card-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #fff;
+        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+/* Items individuales de orden */
+.orden-item {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .orden-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .orden-item:last-child {
+        margin-bottom: 0;
+    }
+
+/* Header de la orden */
+.orden-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.orden-id {
+    font-size: 16px;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.orden-fecha {
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+    background: #f5f5f5;
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+
+/* Cuerpo de la orden */
+.orden-body {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    padding: 8px 0;
+}
+
+/* Footer de la orden */
+.orden-footer {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    text-align: right;
+    padding-top: 8px;
+    border-top: 2px solid #f0f0f0;
+}
+
+    .orden-footer::before {
+        content: '💰 ';
+    }
+
+/* ========================================== */
+/* PANEL SUPERIOR DERECHA (RELOJ + ALERTAS) */
+/* ========================================== */
 .panel-superior-derecha {
     position: fixed;
     top: 20px;
@@ -87,7 +207,7 @@
     background: white;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
     width: 100%;
     text-align: center;
 }
@@ -110,11 +230,9 @@
     background: white;
     border-radius: 15px;
     padding: 20px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.15);
-    /* NUEVO → límite de altura + scroll */
-    max-height: 350px; /* ajustable */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
+    max-height: 350px;
     overflow-y: auto;
-    /* Scroll suave y moderno */
     scrollbar-width: thin;
     scrollbar-color: #c4c4c4 #f1f1f1;
 }
@@ -137,7 +255,6 @@
         .card-home.alertas-card::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
-
 
     .card-home.alertas-card .card-title {
         font-size: 20px;

@@ -15,6 +15,24 @@ namespace TukiGestor
     {
 
         /// <summary>
+        /// Control pnlOrdenesAbiertas.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlOrdenesAbiertas;
+
+        /// <summary>
+        /// Control RepeaterOrdenes.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater RepeaterOrdenes;
+
+        /// <summary>
         /// Control pnlStockBajo.
         /// </summary>
         /// <remarks>

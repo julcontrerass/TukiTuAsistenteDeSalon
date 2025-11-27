@@ -6,6 +6,36 @@
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
+    <!-- PANEL SUPERIOR IZQUIERDA (ÓRDENES ABIERTAS) -->
+    <asp:Panel ID="pnlOrdenesAbiertas" runat="server" Visible="false">
+        <div class="panel-superior-izquierda">
+            <div class="card-home ordenes-card">
+                <h3 class="card-title">🧾 Órdenes Abiertas</h3>
+
+                <asp:Repeater ID="RepeaterOrdenes" runat="server">
+                    <ItemTemplate>
+                        <div class="orden-item">
+                            <div class="orden-header">
+                                <span class="orden-id">Orden #<%# Eval("PedidoId") %></span>
+                                <span class="orden-fecha">
+                                    <%# ((DateTime)Eval("FechaPedido")).ToString("HH:mm") %>
+                                </span>
+                            </div>
+
+                            <div class="orden-body">
+                                <%# Eval("DescripcionResumen") %>
+                            </div>
+
+                            <div class="orden-footer">
+                                Total: $<%# ((decimal)Eval("Total")).ToString("N0") %>
+                            </div>
+                        </div>
+                    </ItemTemplate>
+                </asp:Repeater>
+            </div>
+        </div>
+    </asp:Panel>
+
     <!-- CONTENEDOR FIJO SUPERIOR DERECHA (RELOJ + ALERTAS) -->
     <div class="panel-superior-derecha">
 
