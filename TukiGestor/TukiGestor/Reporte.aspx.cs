@@ -651,7 +651,6 @@ namespace TukiGestor
                 lblTotalVentas.Text = balance.TotalVentas.ToString("C", new System.Globalization.CultureInfo("es-AR"));
                 lblCantidadVentas.Text = balance.CantidadVentas.ToString();
                 lblCantidadClientes.Text = balance.CantidadClientes.ToString();
-                lblTicketPromedio.Text = balance.TicketPromedio.ToString("C", new System.Globalization.CultureInfo("es-AR"));
                 lblProductosVendidos.Text = balance.ProductosVendidos.ToString();
 
                 // Poblar el GridView con ventas por forma de pago
