@@ -420,6 +420,7 @@ namespace TukiGestor
 
                         lblMensaje.CssClass = "text-warning fw-bold";
                 }
+                CargarGerentes();
 
                 // Limpiamos los campos
                 txtNombreUsuario.Text = "";
