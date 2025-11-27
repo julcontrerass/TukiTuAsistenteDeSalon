@@ -170,6 +170,12 @@
     margin-left: 1rem;
 }
 
+.boton-generar-balance {
+    margin-left: auto !important;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
 .alert-danger {
     background-color: #f8d7da;
     color: #721c24;
@@ -184,3 +190,148 @@
     text-align: center;
     font-weight: 500;
 }
+
+/* Balance Module Styles */
+.balance-container-scroll {
+    padding: 20px 0;
+    padding-bottom: 30px;
+    max-height: 65vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 10px;
+}
+
+.balance-container-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.balance-container-scroll::-webkit-scrollbar-track {
+    background: #E7D9C2;
+    border-radius: 10px;
+}
+
+.balance-container-scroll::-webkit-scrollbar-thumb {
+    background: #646464;
+    border-radius: 10px;
+}
+
+.balance-container-scroll::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+}
+
+.metric-card {
+    background: transparent;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: none;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: none;
+    }
+
+.metric-card-secondary {
+    background: transparent;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+    .metric-card-secondary:hover {
+        transform: translateY(-3px);
+        box-shadow: none;
+    }
+
+.metric-label {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+}
+
+    .metric-label i {
+        font-size: 1.2rem;
+        color: #646464;
+    }
+
+.metric-value {
+    color: #333;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.chart-card {
+    background: transparent;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: none;
+    height: auto;
+    max-height: 350px;
+}
+
+.chart-title {
+    color: #333;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #E7D9C2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .chart-title i {
+        color: #646464;
+    }
+
+.chart-container {
+    position: relative;
+    height: 200px;
+    max-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.chart-container canvas {
+    max-height: 180px !important;
+    max-width: 100% !important;
+}
+
+/* Progress bar customization */
+.progress {
+    background-color: #E7D9C2;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Balance button - solo cambiar color */
+#btnBuscarBalance {
+    background-color: #4a4a4a;
+    border-color: #4a4a4a;
+}
+
+    #btnBuscarBalance:hover {
+        background-color: #3a3a3a;
+        border-color: #3a3a3a;
+    }
+
+    #btnBuscarBalance:focus,
+    #btnBuscarBalance:active {
+        background-color: #3a3a3a;
+        border-color: #3a3a3a;
+    }

@@ -24,12 +24,12 @@ namespace Service
                 datos.SetearConsulta(@"INSERT INTO VENTA (PedidoId, FechaVenta, MontoTotal, MetodoPago, MontoRecibido, GerenteId)
                                       OUTPUT INSERTED.VentaId
                                       VALUES (@PedidoId, @FechaVenta, @MontoTotal, @MetodoPago, @MontoRecibido, @GerenteId)");
-                datos.setearParametro("@PedidoId", venta.PedidoId);
+                datos.setearParametro("@PedidoId", venta.Pedido.PedidoId);
                 datos.setearParametro("@FechaVenta", venta.FechaVenta);
                 datos.setearParametro("@MontoTotal", venta.MontoTotal);
                 datos.setearParametro("@MetodoPago", venta.MetodoPago);
                 datos.setearParametro("@MontoRecibido", venta.MontoRecibido.HasValue ? (object)venta.MontoRecibido.Value : DBNull.Value);
-                datos.setearParametro("@GerenteId", venta.GerenteId.HasValue ? (object)venta.GerenteId.Value : DBNull.Value);
+                datos.setearParametro("@GerenteId", venta.Gerente?.GerenteId ?? (object)DBNull.Value);
 
                 object resultado = datos.ejecutarScalar();
                 return Convert.ToInt32(resultado);

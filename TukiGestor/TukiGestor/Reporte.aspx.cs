@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using dominio;
 using Service;
+using Newtonsoft.Json;
 
 namespace TukiGestor
 {
@@ -194,6 +195,8 @@ namespace TukiGestor
             MostrarTab("mesas");
             ocultarTablas();
             OcultarMensaje();
+            LimpiarFiltrosMesas();
+            CargarMesasIniciales();
         }
 
         protected void btnTabMeseros_Click(object sender, EventArgs e)
@@ -201,15 +204,17 @@ namespace TukiGestor
             MostrarTab("meseros");
             ocultarTablas();
             OcultarMensaje();
-
+            LimpiarFiltrosMeseros();
+            CargarMeserosIniciales();
         }
 
         protected void btnTabProductos_Click(object sender, EventArgs e)
         {
             MostrarTab("productos");
             ocultarTablas();
-
             OcultarMensaje();
+            LimpiarFiltrosProductos();
+            CargarProductosIniciales();
         }
 
         protected void btnTabVentas_Click(object sender, EventArgs e)
@@ -217,7 +222,8 @@ namespace TukiGestor
             MostrarTab("ventas");
             ocultarTablas();
             OcultarMensaje();
-
+            LimpiarFiltrosVentas();
+            CargarVentasIniciales();
         }
 
         protected void btnTabBalance_Click(object sender, EventArgs e)
@@ -225,7 +231,7 @@ namespace TukiGestor
             MostrarTab("balance");
             ocultarTablas();
             OcultarMensaje();
-
+            CargarBalanceInicial();
         }
 
 
@@ -234,9 +240,11 @@ namespace TukiGestor
             pnlResultadoMesas.Visible = false;
             PnlResultadoMeseros.Visible = false;
             pnlResultadosProductos.Visible = false;
+            pnlResultadosVentas.Visible = false;
             gvMesas.DataSource = null;
             gvMeseros.DataSource = null;
             gvProductos.DataSource = null;
+            gvVentas.DataSource = null;
         }
         private void MostrarTab(string tab)
         {
@@ -285,7 +293,7 @@ namespace TukiGestor
         }
 
         protected void btnBuscarProductos_Click(object sender, EventArgs e)
-        {            
+        {
 
             ReporteService reporteService = new ReporteService();
 
@@ -297,7 +305,7 @@ namespace TukiGestor
                 (DateTime fechaInicio, DateTime fechaFin) = obtenerRango(rangoFecha);
 
                 string ubicacion = ddlUbicacionProductos.SelectedValue ?? "Todos";
-                int? cantidadProductos = int.Parse(ddlCantidadProductos.SelectedValue); 
+                int? cantidadProductos = int.Parse(ddlCantidadProductos.SelectedValue);
                 string criterioOrdenProductos = ddlCriterioOrdenProductos.SelectedValue ?? "Mas";
                 string criterioBusquedaProductos = ddlCriterioBusquedaProductos.SelectedValue ?? "Facturacion";
                 string categoriaProducto = ddlCategoriaProductos.SelectedValue ?? "Todos";
@@ -306,7 +314,7 @@ namespace TukiGestor
                     string.IsNullOrEmpty(ubicacion) ||
                     cantidadProductos == null ||
                     string.IsNullOrEmpty(criterioOrdenProductos) ||
-                    string.IsNullOrEmpty(criterioBusquedaProductos) || 
+                    string.IsNullOrEmpty(criterioBusquedaProductos) ||
                     string.IsNullOrEmpty(categoriaProducto))
                 {
                     throw new Exception("Todos los criterios de bùsqueda deben ser completados");
@@ -327,6 +335,350 @@ namespace TukiGestor
 
         }
 
-        
+        protected void btnBuscarVentas_Click(object sender, EventArgs e)
+        {
+            pnlResultadosVentas.Visible = false;
+            gvVentas.DataSource = null;
+            OcultarMensaje();
+
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                string turno = ddlTurno.SelectedValue ?? "Todos";
+                string rangoFecha = ddlRango.SelectedValue;
+
+                (DateTime fechaInicio, DateTime fechaFin) = obtenerRango(rangoFecha);
+
+                // Si el valor está vacío (disabled item seleccionado), usar "Todos"
+                string ubicacion = string.IsNullOrEmpty(ddlUbicacionVentas.SelectedValue) ? "Todos" : ddlUbicacionVentas.SelectedValue;
+                string tipoPago = string.IsNullOrEmpty(ddlTipoPagoVentas.SelectedValue) ? "Todos" : ddlTipoPagoVentas.SelectedValue;
+
+                List<VentaReporte> ventaReporte = reporteService.BuscarVentas(turno, ubicacion, fechaInicio, fechaFin, tipoPago);
+
+                gvVentas.DataSource = ventaReporte;
+                gvVentas.DataBind();
+                pnlResultadosVentas.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
+
+        // Métodos para Mesas
+        private void LimpiarFiltrosMesas()
+        {
+            // Establecer filtros globales a valores por defecto
+            ddlTurno.SelectedValue = "Todos";
+            ddlRango.SelectedValue = "Hoy";
+            txtFechaDesde.Text = string.Empty;
+            txtFechaHasta.Text = string.Empty;
+
+            // Establecer filtros específicos de mesas
+            ddlUbicacionMesas.SelectedValue = "Todos";
+            ddlCriterioOrdenMesas.SelectedValue = "Mas";
+            ddlTipoBusqueda.SelectedValue = "Facturacion";
+        }
+
+        private void CargarMesasIniciales()
+        {
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                string turno = "Todos";
+                DateTime fechaInicio = DateTime.Now;
+                DateTime fechaFin = DateTime.Now;
+                string ubicacion = "Todos";
+                string criterioOrdenMesas = "Mas";
+                string criterioBusquedaMesas = "Facturacion";
+
+                List<MesaReporte> mesaReporte = reporteService.BuscarMesas(turno, ubicacion, fechaInicio, fechaFin, criterioOrdenMesas, criterioBusquedaMesas);
+
+                gvMesas.DataSource = mesaReporte;
+                gvMesas.DataBind();
+                pnlResultadoMesas.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
+
+        // Métodos para Meseros
+        private void LimpiarFiltrosMeseros()
+        {
+            // Establecer filtros globales a valores por defecto
+            ddlTurno.SelectedValue = "Todos";
+            ddlRango.SelectedValue = "Hoy";
+            txtFechaDesde.Text = string.Empty;
+            txtFechaHasta.Text = string.Empty;
+
+            // Establecer filtros específicos de meseros
+            ddlUbicacionMeseros.SelectedValue = "Todos";
+            ddlCriterioOrdenMeseros.SelectedValue = "Mas";
+            ddlCriterioBusquedaMeseros.SelectedValue = "Facturacion";
+        }
+
+        private void CargarMeserosIniciales()
+        {
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                string turno = "Todos";
+                DateTime fechaInicio = DateTime.Now;
+                DateTime fechaFin = DateTime.Now;
+                string ubicacion = "Todos";
+                string criterioOrdenMeseros = "Mas";
+                string criterioBusquedaMeseros = "Facturacion";
+
+                List<MeseroReporte> meserosReporte = reporteService.BuscarMeseros(turno, ubicacion, fechaInicio, fechaFin, criterioOrdenMeseros, criterioBusquedaMeseros);
+
+                gvMeseros.DataSource = meserosReporte;
+                gvMeseros.DataBind();
+                PnlResultadoMeseros.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
+
+        // Métodos para Productos
+        private void LimpiarFiltrosProductos()
+        {
+            // Establecer filtros globales a valores por defecto
+            ddlTurno.SelectedValue = "Todos";
+            ddlRango.SelectedValue = "Hoy";
+            txtFechaDesde.Text = string.Empty;
+            txtFechaHasta.Text = string.Empty;
+
+            // Establecer filtros específicos de productos
+            ddlUbicacionProductos.SelectedValue = "Todos";
+            ddlCantidadProductos.SelectedValue = "10";
+            ddlCriterioOrdenProductos.SelectedValue = "Mas";
+            ddlCriterioBusquedaProductos.SelectedValue = "Facturacion";
+            ddlCategoriaProductos.SelectedValue = "Todos";
+        }
+
+        private void CargarProductosIniciales()
+        {
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                string turno = "Todos";
+                DateTime fechaInicio = DateTime.Now;
+                DateTime fechaFin = DateTime.Now;
+                string ubicacion = "Todos";
+                int? cantidadProductos = 10;
+                string criterioOrdenProductos = "Mas";
+                string criterioBusquedaProductos = "Facturacion";
+                string categoriaProducto = "Todos";
+
+                List<ProductoReporte> productoReporte = reporteService.BuscarProductos(turno, ubicacion, fechaInicio, fechaFin, cantidadProductos, criterioOrdenProductos, criterioBusquedaProductos, categoriaProducto);
+
+                gvProductos.DataSource = productoReporte;
+                gvProductos.DataBind();
+                pnlResultadosProductos.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
+
+        // Métodos para Ventas
+        private void LimpiarFiltrosVentas()
+        {
+            // Establecer filtros globales a valores por defecto
+            ddlTurno.SelectedValue = "Todos";
+            ddlRango.SelectedValue = "Hoy";
+            txtFechaDesde.Text = string.Empty;
+            txtFechaHasta.Text = string.Empty;
+
+            // Establecer filtros específicos de ventas a "Todos"
+            ddlUbicacionVentas.SelectedValue = "Todos";
+            ddlTipoPagoVentas.SelectedValue = "Todos";
+        }
+
+        private void CargarVentasIniciales()
+        {
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                // Cargar todas las ventas de hoy por defecto
+                string turno = "Todos";
+                DateTime fechaInicio = DateTime.Now;
+                DateTime fechaFin = DateTime.Now;
+                string ubicacion = "Todos";
+                string tipoPago = "Todos";
+
+                List<VentaReporte> ventaReporte = reporteService.BuscarVentas(turno, ubicacion, fechaInicio, fechaFin, tipoPago);
+
+                gvVentas.DataSource = ventaReporte;
+                gvVentas.DataBind();
+                pnlResultadosVentas.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
+
+        protected void btnBuscarBalance_Click(object sender, EventArgs e)
+        {
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                string turno = ddlTurno.SelectedValue ?? "Todos";
+                string rangoFecha = ddlRango.SelectedValue;
+
+                (DateTime fechaInicio, DateTime fechaFin) = obtenerRango(rangoFecha);
+
+                string ubicacion = "Todos"; // Balance muestra resumen general
+
+                // Obtener datos del balance
+                BalanceReporte balance = reporteService.ObtenerBalance(turno, ubicacion, fechaInicio, fechaFin);
+
+                // Obtener datos de ventas por forma de pago
+                List<VentaPorFormaPago> ventasPorFormaPago = reporteService.ObtenerVentasPorFormaPago(turno, ubicacion, fechaInicio, fechaFin);
+
+                // Poblar las métricas principales
+                lblTotalVentas.Text = balance.TotalVentas.ToString("C", new System.Globalization.CultureInfo("es-AR"));
+                lblCantidadVentas.Text = balance.CantidadVentas.ToString();
+                lblCantidadClientes.Text = balance.CantidadClientes.ToString();
+                lblTicketPromedio.Text = balance.TicketPromedio.ToString("C", new System.Globalization.CultureInfo("es-AR"));
+                lblProductosVendidos.Text = balance.ProductosVendidos.ToString();
+
+                // Poblar el GridView con ventas por forma de pago
+                gvFormaPago.DataSource = ventasPorFormaPago;
+                gvFormaPago.DataBind();
+
+                // Preparar datos para el gráfico
+                if (ventasPorFormaPago != null && ventasPorFormaPago.Count > 0)
+                {
+                    var labels = new List<string>();
+                    var datos = new List<decimal>();
+                    var colores = new List<string>();
+
+                    // Definir colores para cada forma de pago
+                    var coloresPorFormaPago = new Dictionary<string, string>
+                    {
+                        { "Efectivo", "#28a745" },
+                        { "Crédito", "#007bff" },
+                        { "Débito", "#17a2b8" },
+                        { "Transferencia", "#ffc107" },
+                        { "MercadoPago", "#00b8d4" },
+                        { "Otros", "#6c757d" }
+                    };
+
+                    foreach (var venta in ventasPorFormaPago)
+                    {
+                        labels.Add(venta.FormaPago);
+                        datos.Add(venta.Monto);
+
+                        // Asignar color según la forma de pago
+                        if (coloresPorFormaPago.ContainsKey(venta.FormaPago))
+                        {
+                            colores.Add(coloresPorFormaPago[venta.FormaPago]);
+                        }
+                        else
+                        {
+                            colores.Add("#6c757d"); // Color por defecto
+                        }
+                    }
+
+                    // Convertir a JSON para JavaScript
+                    hfFormaPagoLabels.Value = JsonConvert.SerializeObject(labels);
+                    hfFormaPagoData.Value = JsonConvert.SerializeObject(datos);
+                    hfFormaPagoColors.Value = JsonConvert.SerializeObject(colores);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
+
+        private void CargarBalanceInicial()
+        {
+            ReporteService reporteService = new ReporteService();
+
+            try
+            {
+                // Cargar balance de hoy por defecto
+                string turno = "Todos";
+                DateTime fechaInicio = DateTime.Now;
+                DateTime fechaFin = DateTime.Now;
+                string ubicacion = "Todos";
+
+                // Obtener datos del balance
+                BalanceReporte balance = reporteService.ObtenerBalance(turno, ubicacion, fechaInicio, fechaFin);
+
+                // Obtener datos de ventas por forma de pago
+                List<VentaPorFormaPago> ventasPorFormaPago = reporteService.ObtenerVentasPorFormaPago(turno, ubicacion, fechaInicio, fechaFin);
+
+                // Poblar las métricas principales
+                lblTotalVentas.Text = balance.TotalVentas.ToString("C", new System.Globalization.CultureInfo("es-AR"));
+                lblCantidadVentas.Text = balance.CantidadVentas.ToString();
+                lblCantidadClientes.Text = balance.CantidadClientes.ToString();
+                lblTicketPromedio.Text = balance.TicketPromedio.ToString("C", new System.Globalization.CultureInfo("es-AR"));
+                lblProductosVendidos.Text = balance.ProductosVendidos.ToString();
+
+                // Poblar el GridView con ventas por forma de pago
+                gvFormaPago.DataSource = ventasPorFormaPago;
+                gvFormaPago.DataBind();
+
+                // Preparar datos para el gráfico
+                if (ventasPorFormaPago != null && ventasPorFormaPago.Count > 0)
+                {
+                    var labels = new List<string>();
+                    var datos = new List<decimal>();
+                    var colores = new List<string>();
+
+                    // Definir colores para cada forma de pago
+                    var coloresPorFormaPago = new Dictionary<string, string>
+                    {
+                        { "Efectivo", "#28a745" },
+                        { "Crédito", "#007bff" },
+                        { "Débito", "#17a2b8" },
+                        { "Transferencia", "#ffc107" },
+                        { "MercadoPago", "#00b8d4" },
+                        { "Otros", "#6c757d" }
+                    };
+
+                    foreach (var venta in ventasPorFormaPago)
+                    {
+                        labels.Add(venta.FormaPago);
+                        datos.Add(venta.Monto);
+
+                        // Asignar color según la forma de pago
+                        if (coloresPorFormaPago.ContainsKey(venta.FormaPago))
+                        {
+                            colores.Add(coloresPorFormaPago[venta.FormaPago]);
+                        }
+                        else
+                        {
+                            colores.Add("#6c757d"); // Color por defecto
+                        }
+                    }
+
+                    // Convertir a JSON para JavaScript
+                    hfFormaPagoLabels.Value = JsonConvert.SerializeObject(labels);
+                    hfFormaPagoData.Value = JsonConvert.SerializeObject(datos);
+                    hfFormaPagoColors.Value = JsonConvert.SerializeObject(colores);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.MostrarMensaje(ex.Message, "error");
+            }
+        }
+
     }
 }

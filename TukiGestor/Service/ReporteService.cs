@@ -151,6 +151,117 @@ namespace Service
                 datos.cerrarConexion();
             }
         }
+
+        public List<VentaReporte> BuscarVentas(string turno, string ubicacion, DateTime fechaInicio, DateTime fechaFin, string tipoPago)
+        {
+            try
+            {
+                List<VentaReporte> ventaReporte = new List<VentaReporte>();
+
+                datos.SetearStoredProcedure("sp_ReporteVentas");
+                datos.setearParametro("@Turno", turno);
+                datos.setearParametro("@FechaDesde", fechaInicio);
+                datos.setearParametro("@FechaHasta", fechaFin);
+                datos.setearParametro("@Ubicacion", ubicacion);
+                datos.setearParametro("@TipoPago", tipoPago);
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    VentaReporte venta = new VentaReporte();
+
+                    venta.VentaId = (int)datos.Lector["VentaId"];
+                    venta.Fecha = (DateTime)datos.Lector["Fecha"];
+                    venta.NumeroMesa = (string)datos.Lector["NumeroMesa"];
+                    venta.Mesero = (string)datos.Lector["Mesero"];
+                    venta.TipoPago = (string)datos.Lector["TipoPago"];
+                    venta.MontoTotal = (decimal)datos.Lector["MontoTotal"];
+                    venta.Turno = (string)datos.Lector["Turno"];
+
+                    ventaReporte.Add(venta);
+                }
+
+                return ventaReporte;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Fallo la busqueda por ventas: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public BalanceReporte ObtenerBalance(string turno, string ubicacion, DateTime fechaInicio, DateTime fechaFin)
+        {
+            try
+            {
+                BalanceReporte balance = new BalanceReporte();
+
+                datos.SetearStoredProcedure("sp_ReporteBalance");
+                datos.setearParametro("@Turno", turno);
+                datos.setearParametro("@FechaDesde", fechaInicio);
+                datos.setearParametro("@FechaHasta", fechaFin);
+                datos.setearParametro("@Ubicacion", ubicacion);
+                datos.ejecutarLectura();
+
+                if (datos.Lector.Read())
+                {
+                    balance.TotalVentas = (decimal)datos.Lector["TotalVentas"];
+                    balance.CantidadVentas = (int)datos.Lector["CantidadVentas"];
+                    balance.CantidadClientes = (int)datos.Lector["CantidadClientes"];
+                    balance.TicketPromedio = (decimal)datos.Lector["TicketPromedio"];
+                    balance.ProductosVendidos = (int)datos.Lector["ProductosVendidos"];
+                }
+
+                return balance;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Fallo al obtener balance: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public List<VentaPorFormaPago> ObtenerVentasPorFormaPago(string turno, string ubicacion, DateTime fechaInicio, DateTime fechaFin)
+        {
+            try
+            {
+                List<VentaPorFormaPago> ventas = new List<VentaPorFormaPago>();
+
+                datos.SetearStoredProcedure("sp_ReporteVentasPorFormaPago");
+                datos.setearParametro("@Turno", turno);
+                datos.setearParametro("@FechaDesde", fechaInicio);
+                datos.setearParametro("@FechaHasta", fechaFin);
+                datos.setearParametro("@Ubicacion", ubicacion);
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    VentaPorFormaPago venta = new VentaPorFormaPago();
+                    venta.FormaPago = (string)datos.Lector["FormaPago"];
+                    venta.Monto = (decimal)datos.Lector["Monto"];
+                    venta.Cantidad = (int)datos.Lector["Cantidad"];
+                    venta.Porcentaje = (decimal)datos.Lector["Porcentaje"];
+
+                    ventas.Add(venta);
+                }
+
+                return ventas;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Fallo al obtener ventas por forma de pago: " + ex.Message);
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
     }
 }
  

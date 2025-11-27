@@ -42,10 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsignacionMesa.cs" />
+    <Compile Include="BalanceReporte.cs" />
     <Compile Include="Categoria.cs" />
     <Compile Include="ProductoReporte.cs" />
     <Compile Include="MesaReporte.cs" />
     <Compile Include="MeseroReporte.cs" />
+    <Compile Include="VentaReporte.cs" />
     <Compile Include="Usuario.cs" />
     <Compile Include="DetallePedido.cs" />
     <Compile Include="Gerente.cs" />

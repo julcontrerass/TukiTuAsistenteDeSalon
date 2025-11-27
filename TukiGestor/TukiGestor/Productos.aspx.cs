@@ -178,7 +178,7 @@ namespace TukiGestor
                     Stock = cantidad,
                     Precio = precio,
                     Disponible = true,
-                    CategoriaId = categoriaId
+                    Categoria = new Categoria { CategoriaId = categoriaId }
                 };
 
                 service.Agregar(nuevo);
@@ -242,7 +242,7 @@ namespace TukiGestor
                     Nombre = nombre,
                     Stock = cantidad,
                     Precio = precio,
-                    CategoriaId = categoriaId,
+                    Categoria = new Categoria { CategoriaId = categoriaId },
                     Disponible = true
                 };
 
@@ -287,6 +287,62 @@ namespace TukiGestor
 
 
  
+        protected void RepeaterProductos_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "ConfirmarEliminarProducto")
+            {
+                hfIdEliminar.Value = e.CommandArgument.ToString();
+                hfTipoEliminar.Value = "producto";
+                lblConfirmarMensaje.Text = "¿Seguro que desea eliminar este producto?";
+                pnlConfirmarEliminar.Visible = true;
+            }
+            else if (e.CommandName == "Eliminar")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    ProductoService service = new ProductoService();
+                    service.Eliminar(id);
+                    CargarProductos();
+                    MostrarMensaje("Producto eliminado correctamente", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al eliminar producto: " + ex.Message, "error");
+                }
+            }
+            else if (e.CommandName == "Editar")
+            {
+                try
+                {
+                    int id = int.Parse(e.CommandArgument.ToString());
+                    ProductoService service = new ProductoService();
+                    List<Producto> productos = service.Listar();
+                    Producto producto = productos.FirstOrDefault(p => p.ProductoId == id);
+
+                    if (producto != null)
+                    {
+                        CargarCategoriasEditar();
+
+                        hfProductoId.Value = producto.ProductoId.ToString();
+                        txtNombreEditar.Text = producto.Nombre;
+                        txtCantidadEditar.Text = producto.Stock.ToString();
+                        txtPrecioEditar.Text = producto.Precio.ToString();
+                        ddlCategoriasEditar.SelectedValue = producto.Categoria.CategoriaId.ToString();
+
+                        MostrarTab("editar");
+                        OcultarMensaje();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al cargar producto: " + ex.Message, "error");
+                }
+            }
+        }
+
+
+
         protected void btnGuardarCategoria_Click(object sender, EventArgs e)
         {
             try

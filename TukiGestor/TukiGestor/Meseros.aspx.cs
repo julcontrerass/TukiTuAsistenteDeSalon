@@ -313,6 +313,18 @@ namespace TukiGestor
                 }
                 // Si llegamos acá, todo está bien
                 servicio.Agregar(nuevo);
+                // Enviamos email al nuevo mesero
+                try
+                {
+                    EmailService emailService = new EmailService();
+                    emailService.EnviarEmailNuevoMesero(nuevo.Email, nuevo.Nombre, nuevo.Apellido, nuevo.NombreUsuario, nuevo.Contraseña);
+                }
+                catch (Exception ex)
+                {
+                    lblMensaje.Text = "El mesero fue creado, pero no se pudo enviar el email: " + ex.Message;
+                    lblMensaje.CssClass = "text-warning fw-bold";
+                }
+
                 // Limpiamos los campos
                 txtNombreUsuario.Text = "";
                 txtContrasenia.Text = "";
