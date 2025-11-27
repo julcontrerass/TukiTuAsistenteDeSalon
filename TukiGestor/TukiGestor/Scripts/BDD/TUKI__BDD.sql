@@ -149,6 +149,9 @@ INSERT INTO USUARIO (NombreUsuario, Contrasenia, Email, Rol) VALUES
 ('carlosrodriguez', '$2a$11$0kkzDpSQj.xF8uAZrbouZOeUTVG6kzUBRo5nbrEkD.mJaZXz8Gzxa', 'carlosrodriguez@tuki.com', 'mesero'),
 ('anamartinez', '$2a$11$QgWTq.SD.CWmWFYJycD0ruVoveb440XtFqHF97VlhTpFJjjPOuHye', 'anamartinez@tuki.com', 'mesero')
 GO
+INSERT INTO GERENTE (Nombre, Apellido, Activo, UsuarioId) VALUES
+('admin' , 'admin', 1, 1)
+GO
 
 INSERT INTO MESERO (Nombre, Apellido, Activo, UsuarioId) VALUES
 ('Juan', 'Perez', 1, 2),
