@@ -14,6 +14,20 @@ namespace TukiGestor
         {
             if (!IsPostBack)
             {
+                if (Session["usuarioLoggeado"] == null)
+                {
+                    Response.Redirect("~/Login.aspx");
+                    return;
+                }
+
+                Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];
+                bool esMesero = usuarioLoggeado.Rol == "mesero";
+
+                if (esMesero)
+                {
+                    Response.Redirect("~/Home.aspx");
+                }
+
                 CargarMeseros();
                 CargarMeserosInactivos();
             }

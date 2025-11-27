@@ -15,8 +15,11 @@ namespace TukiGestor
 
         protected void Page_Load(object sender, EventArgs e)
         {
-                  
 
+            if (Session["usuarioLoggeado"] != null)
+            {
+                Response.Redirect("~/Home.aspx");
+            }
 
         }
 

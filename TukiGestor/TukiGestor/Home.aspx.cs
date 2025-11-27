@@ -15,6 +15,13 @@ namespace TukiGestor
         {
             if (!IsPostBack)
             {
+                if (Session["usuarioLoggeado"] == null)
+                {
+                    Response.Redirect("~/Login.aspx");
+                    return;
+                }
+
+                Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];
                 CargarAlertasStockBajo();
 
             }

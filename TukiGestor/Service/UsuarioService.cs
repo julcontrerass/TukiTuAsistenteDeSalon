@@ -30,7 +30,7 @@ namespace Service
 
             try
             {
-                datos.SetearConsulta("SELECT TOP(1) NombreUsuario, Contrasenia from USUARIO where NombreUsuario = @usuario");
+                datos.SetearConsulta("SELECT TOP(1) NombreUsuario, Contrasenia from USUARIO where NombreUsuario = @usuario COLLATE Latin1_General_CS_AS;");
                 datos.setearParametro("@usuario", usuario);
                 datos.ejecutarLectura();
 
@@ -72,7 +72,7 @@ namespace Service
 
             try
             {
-                datos.SetearConsulta("SELECT TOP(1) NombreUsuario, Contrasenia, Email, Rol from USUARIO where NombreUsuario = @usuario");
+                datos.SetearConsulta("SELECT TOP(1) NombreUsuario, Contrasenia, Email, Rol from USUARIO where NombreUsuario = @usuario COLLATE Latin1_General_CS_AS;");
                 datos.setearParametro("@usuario", nombreUsuario);
                 datos.ejecutarLectura();
 

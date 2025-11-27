@@ -19,6 +19,7 @@ CREATE TABLE USUARIO(
     UsuarioId INT IDENTITY(1,1) PRIMARY KEY,
     NombreUsuario VARCHAR(50) NOT NULL,
     Contrasenia VARCHAR(100) NOT NULL,
+    Rol VARCHAR(20) NOT NULL,
     Email VARCHAR(50)
 );
 
@@ -140,12 +141,12 @@ INSERT INTO PRODUCTO (Nombre, Precio, Stock, Disponible, CategoriaId) VALUES
 ('Cheesecake', 950.00, 25, 1, 3);
 GO
 
-INSERT INTO USUARIO (NombreUsuario, Contrasenia, Email) VALUES
-('robertocarlos', '123456', 'robertocarlos@tuki.com'),
-('cacho', '123456', 'cacho@tuki.com'),
-('ruperto', '123456', 'ruperto@tuki.com'),
-('alla', '123456', 'alla@tuki.com'),
-('aca', '123456', 'aca@tuki.com');
+INSERT INTO USUARIO (NombreUsuario, Contrasenia, Email, Rol) VALUES
+('robertocarlos', '123456', 'robertocarlos@tuki.com', 'gerente'),
+('cacho', '123456', 'cacho@tuki.com', 'gerente'),
+('ruperto', '123456', 'ruperto@tuki.com', 'gerente'),
+('alla', '123456', 'alla@tuki.com', 'gerente'),
+('aca', '123456', 'aca@tuki.com', 'gerente');
 GO
 
 INSERT INTO MESERO (Nombre, Apellido, Activo, UsuarioId) VALUES
@@ -347,25 +348,154 @@ BEGIN
 END;
 GO
 
-------------------------------------------------
--- CONSULTAS DE VERIFICACION
-------------------------------------------------
-/*
-SELECT * FROM ASIGNACIONMESA
-SELECT * FROM CATEGORIA
-SELECT * FROM DETALLEPEDIDO
-SELECT * FROM GERENTE
-SELECT * FROM MESA
-SELECT * FROM MESERO
-SELECT * FROM PEDIDO
-SELECT * FROM PRODUCTO
-SELECT * FROM USUARIO
-*/
+-- Reporte de Ventas
+CREATE PROCEDURE sp_ReporteVentas(
+    @Turno VARCHAR(20) = 'Todos',
+    @FechaDesde DATE,
+    @FechaHasta DATE,
+    @Ubicacion VARCHAR(20) = 'Todos',
+    @TipoPago VARCHAR(50) = 'Todos'
+)
+AS
+BEGIN
+    IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena')
+        OR @FechaDesde IS NULL
+        OR @FechaHasta IS NULL
+        OR @Ubicacion NOT IN('Todos', 'Salon', 'Patio')
+        OR @TipoPago IS NULL)
+    BEGIN
+        RAISERROR('Faltan parámetros obligatorios', 16, 1);
+        RETURN;
+    END
 
+    SELECT
+        V.VentaId,
+        V.FechaVenta AS Fecha,
+        M.NumeroMesa,
+        ME.Nombre + ' ' + ME.Apellido AS Mesero,
+        V.MetodoPago AS TipoPago,
+        V.MontoTotal,
+        dbo.fn_CalcularTurno(V.FechaVenta) AS Turno
+    FROM VENTA V
+    INNER JOIN PEDIDO PE ON V.PedidoId = PE.PedidoId
+    INNER JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    INNER JOIN MESA M ON AM.MesaId = M.MesaId
+    INNER JOIN MESERO ME ON AM.MeseroId = ME.MeseroId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion)
+        AND (@TipoPago = 'Todos' OR V.MetodoPago = @TipoPago)
+    ORDER BY V.FechaVenta DESC;
+END;
+GO
 
-ALTER TABLE USUARIO
-ALTER COLUMN Contrasenia VARCHAR(100) NOT NULL;
+-- Reporte de Balance General
+CREATE PROCEDURE sp_ReporteBalance(
+    @Turno VARCHAR(20) = 'Todos',
+    @FechaDesde DATE,
+    @FechaHasta DATE,
+    @Ubicacion VARCHAR(20) = 'Todos'
+)
+AS
+BEGIN
+    IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena')
+        OR @FechaDesde IS NULL
+        OR @FechaHasta IS NULL
+        OR @Ubicacion NOT IN('Todos', 'Salon', 'Patio'))
+    BEGIN
+        RAISERROR('Faltan parámetros obligatorios', 16, 1);
+        RETURN;
+    END
 
-select * from USUARIO
+    -- Total de ventas y cantidad
+    DECLARE @TotalVentas DECIMAL(18,2);
+    DECLARE @CantidadVentas INT;
+    DECLARE @CantidadClientes INT;
+    DECLARE @ProductosVendidos INT;
 
-select top(1) NombreUsuario, Contrasenia, Email from USUARIO where NombreUsuario = 'AlejandroMadero'
+    SELECT
+        @TotalVentas = ISNULL(SUM(V.MontoTotal), 0),
+        @CantidadVentas = COUNT(DISTINCT V.VentaId),
+        @CantidadClientes = COUNT(DISTINCT PE.AsignacionId)
+    FROM VENTA V
+    INNER JOIN PEDIDO PE ON V.PedidoId = PE.PedidoId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion OR PE.EsMostrador = 1);
+
+    -- Total de productos vendidos
+    SELECT @ProductosVendidos = ISNULL(SUM(DP.Cantidad), 0)
+    FROM DETALLEPEDIDO DP
+    INNER JOIN PEDIDO PE ON DP.PedidoId = PE.PedidoId
+    INNER JOIN VENTA V ON V.PedidoId = PE.PedidoId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion OR PE.EsMostrador = 1);
+
+    -- Resultado
+    SELECT
+        @TotalVentas AS TotalVentas,
+        @CantidadVentas AS CantidadVentas,
+        @CantidadClientes AS CantidadClientes,
+        CASE WHEN @CantidadVentas > 0 THEN @TotalVentas / @CantidadVentas ELSE 0 END AS TicketPromedio,
+        @ProductosVendidos AS ProductosVendidos;
+END;
+GO
+
+-- Reporte de Ventas por Forma de Pago
+CREATE PROCEDURE sp_ReporteVentasPorFormaPago(
+    @Turno VARCHAR(20) = 'Todos',
+    @FechaDesde DATE,
+    @FechaHasta DATE,
+    @Ubicacion VARCHAR(20) = 'Todos'
+)
+AS
+BEGIN
+    IF (@Turno NOT IN ('Todos', 'Almuerzo', 'Cena')
+        OR @FechaDesde IS NULL
+        OR @FechaHasta IS NULL
+        OR @Ubicacion NOT IN('Todos', 'Salon', 'Patio'))
+    BEGIN
+        RAISERROR('Faltan parámetros obligatorios', 16, 1);
+        RETURN;
+    END
+
+    DECLARE @TotalGeneral DECIMAL(18,2);
+
+    SELECT @TotalGeneral = ISNULL(SUM(V.MontoTotal), 0)
+    FROM VENTA V
+    INNER JOIN PEDIDO PE ON V.PedidoId = PE.PedidoId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion OR PE.EsMostrador = 1);
+
+    SELECT
+        V.MetodoPago AS FormaPago,
+        SUM(V.MontoTotal) AS Monto,
+        COUNT(*) AS Cantidad,
+        CASE WHEN @TotalGeneral > 0
+            THEN (SUM(V.MontoTotal) * 100.0 / @TotalGeneral)
+            ELSE 0
+        END AS Porcentaje
+    FROM VENTA V
+    INNER JOIN PEDIDO PE ON V.PedidoId = PE.PedidoId
+    LEFT JOIN ASIGNACIONMESA AM ON PE.AsignacionId = AM.AsignacionId
+    LEFT JOIN MESA M ON AM.MesaId = M.MesaId
+    WHERE V.FechaVenta >= @FechaDesde
+        AND V.FechaVenta < DATEADD(DAY, 1, @FechaHasta)
+        AND (@Turno = 'Todos' OR dbo.fn_CalcularTurno(V.FechaVenta) = @Turno)
+        AND (@Ubicacion = 'Todos' OR M.Ubicacion = @Ubicacion OR PE.EsMostrador = 1)
+    GROUP BY V.MetodoPago
+    ORDER BY Monto DESC;
+END;
+GO
