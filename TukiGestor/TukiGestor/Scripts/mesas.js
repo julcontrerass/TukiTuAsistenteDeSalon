@@ -12,6 +12,18 @@ let isDragging = false;
 // ===== FUNCIONES DE UTILIDAD =====
 const formatearPrecio = (num) => '$' + Math.round(num).toLocaleString('es-AR');
 
+// Mostrar mensaje en modal
+function mostrarMensaje(titulo, mensaje) {
+    const modalTitulo = document.getElementById('modalMensajeTitulo');
+    const modalTexto = document.getElementById('modalMensajeTexto');
+
+    if (modalTitulo) modalTitulo.textContent = titulo;
+    if (modalTexto) modalTexto.textContent = mensaje;
+
+    const modal = new bootstrap.Modal(document.getElementById('modalMensajeAdvertencia'));
+    modal.show();
+}
+
 // ===== DRAG & DROP PARA MESAS =====
 function initDragDrop() {
     const canvases = document.querySelectorAll('.mesas-canvas');
@@ -291,7 +303,8 @@ function actualizarResumenOrden() {
 }
 
 function confirmarOrden() {
-    const productos = Array.from(document.querySelectorAll('.producto-item'))
+    // Recolectar productos nuevos (los que están en el modal de productos)
+    const productosNuevos = Array.from(document.querySelectorAll('.producto-item'))
         .map(p => {
             const cantidad = parseInt(p.querySelector('input[type="number"]').value) || 0;
             return cantidad > 0 ? {
@@ -303,12 +316,19 @@ function confirmarOrden() {
         })
         .filter(p => p !== null);
 
-    if (productos.length === 0) {
-        alert('Por favor selecciona al menos un producto');
+    // Verificar si hay productos existentes en la orden
+    const productosExistentes = window.productosExistentesOrden || [];
+    const tieneProductosExistentes = productosExistentes.length > 0;
+
+    // Validar: debe haber al menos productos nuevos O productos existentes
+    if (productosNuevos.length === 0 && !tieneProductosExistentes) {
+        mostrarMensaje('Productos requeridos', 'Por favor selecciona al menos un producto para continuar con la orden.');
         return;
     }
 
-    document.getElementById(window.hdnProductosOrdenId).value = JSON.stringify(productos);
+    // Solo enviar los productos nuevos al servidor
+    // Los productos existentes ya están en la base de datos
+    document.getElementById(window.hdnProductosOrdenId).value = JSON.stringify(productosNuevos);
     window.postbackConfirmarOrden();
 }
 
@@ -385,12 +405,12 @@ function confirmarPago() {
         const montoRecibido = parseFloat(document.getElementById('txtMontoRecibido').value) || 0;
 
         if (montoRecibido <= 0) {
-            alert('Por favor ingrese el monto recibido');
+            mostrarMensaje('Monto requerido', 'Por favor ingrese el monto recibido del cliente.');
             return;
         }
 
         if (montoRecibido < totalPagar) {
-            alert('El monto recibido es menor al total a pagar');
+            mostrarMensaje('Monto insuficiente', 'El monto recibido es menor al total a pagar. Por favor verifique el monto ingresado.');
             return;
         }
 

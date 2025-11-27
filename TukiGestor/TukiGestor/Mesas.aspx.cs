@@ -378,7 +378,8 @@ namespace TukiGestor
         public List<Producto> ObtenerProductosPorCategoria(int categoriaId)
         {
             if (Productos == null) return new List<Producto>();
-            return Productos.Where(p => p.Categoria.CategoriaId == categoriaId).ToList();
+            // Solo mostrar productos con stock disponible
+            return Productos.Where(p => p.Categoria.CategoriaId == categoriaId && p.Stock > 0).ToList();
         }
 
         // Método para generar HTML de productos por categoría
@@ -1050,10 +1051,18 @@ namespace TukiGestor
                 return "<div style='text-align: center; padding: 40px; color: #999;'><i class='bi bi-search' style='font-size: 3rem;'></i><p style='margin-top: 20px;'>No se encontraron productos</p></div>";
             }
 
+            // Filtrar solo productos con stock disponible
+            var productosConStock = Productos.Where(p => p.Stock > 0).ToList();
+
+            if (productosConStock.Count == 0)
+            {
+                return "<div style='text-align: center; padding: 40px; color: #999;'><i class='bi bi-inbox' style='font-size: 3rem;'></i><p style='margin-top: 20px;'>No hay productos con stock disponible</p></div>";
+            }
+
             System.Text.StringBuilder html = new System.Text.StringBuilder();
             html.Append("<div class='productos-busqueda' style='display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 10px;'>");
 
-            foreach (var prod in Productos)
+            foreach (var prod in productosConStock)
             {
                 html.AppendFormat(@"
                     <div class='producto-item' data-nombre='{0}' data-precio='{1}' data-productoid='{3}'>
@@ -1079,6 +1088,19 @@ namespace TukiGestor
             try
             {
                 string productosJson = HdnProductosOrden.Value;
+
+                // Si no hay productos nuevos PERO hay un pedido activo, mostrar resumen directamente
+                if ((string.IsNullOrEmpty(productosJson) || productosJson == "[]") &&
+                    !string.IsNullOrEmpty(HdnPedidoIdActual.Value))
+                {
+                    int pedidoIdExistente = int.Parse(HdnPedidoIdActual.Value);
+                    string numeroMesaExistente = ViewState["NumeroMesaSeleccionada"]?.ToString() ?? "Mostrador";
+                    string ubicacionExistente = ViewState["UbicacionSeleccionada"]?.ToString() ?? "salon";
+
+                    MostrarResumenPedido(pedidoIdExistente, numeroMesaExistente, ubicacionExistente);
+                    return;
+                }
+
                 if (string.IsNullOrEmpty(productosJson))
                 {
                     MostrarMensaje("No se recibieron productos en la orden", "warning");

@@ -624,6 +624,29 @@
         </div>
     </div>
 
+    <!-- Modal Mensaje de Advertencia -->
+    <div class="modal fade" id="modalMensajeAdvertencia" tabindex="-1" aria-labelledby="modalMensajeAdvertenciaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px; overflow: hidden; border: 2px solid #E7D9C2;">
+                <div class="modal-header" style="background: #E7D9C2; border: none; padding: 20px;">
+                    <h5 class="modal-title" id="modalMensajeAdvertenciaLabel" style="color: #333;">
+                        <i class="bi bi-exclamation-triangle-fill"></i> <span id="modalMensajeTitulo">Advertencia</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4" style="background: #F6EFE0;">
+                    <i class="bi bi-exclamation-circle" style="font-size: 48px; color: #C19A6B;"></i>
+                    <p class="mt-3 mb-0" style="font-size: 16px; color: #333;" id="modalMensajeTexto"></p>
+                </div>
+                <div class="modal-footer justify-content-center" style="background: #F6EFE0; border-top: 1px solid #E7D9C2;">
+                    <button type="button" class="btn px-4" data-bs-dismiss="modal" style="background: #E7D9C2; color: #333; font-weight: 600; border: none;">
+                        <i class="bi bi-check-circle"></i> Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <asp:Button ID="BtnConfirmarPagoHidden" runat="server" Style="display:none;" OnClick="ConfirmarPago_Click" />
 
     <!-- Script externo para funcionalidad de mesas -->

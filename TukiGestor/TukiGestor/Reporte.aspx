@@ -107,6 +107,14 @@
                     </div>
                 </div>
 
+                <!-- Botón Generar Balance (solo visible en pestaña Balance) -->
+                <asp:Button ID="btnBuscarBalance" runat="server"
+                    CssClass="btn btn-primary btn-lg px-4 boton-generar-balance"
+                    Text="Generar Balance"
+                    OnClick="btnBuscarBalance_Click"
+                    ClientIDMode="Static"
+                    Style="display: none; margin-left: auto;" />
+
             </div>
 
 
@@ -354,15 +362,6 @@
 
                         <asp:Panel ID="pnlBalance" runat="server" CssClass="tab-pane fade">
                             <div class="balance-container-scroll">
-
-                                <!-- Botón de búsqueda -->
-                                <div class="mb-4 text-end">
-                                    <asp:Button ID="btnBuscarBalance" runat="server"
-                                        CssClass="btn btn-primary btn-lg px-4"
-                                        Text="Generar Balance"
-                                        OnClick="btnBuscarBalance_Click"
-                                        ClientIDMode="Static" />
-                                </div>
 
                                 <!-- Tarjetas de métricas principales -->
                                 <div class="row g-4 mb-4">
@@ -666,13 +665,13 @@
 
 
         document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-            tab.addEventListener("shown.bs.tab", ()=> {
+            tab.addEventListener("shown.bs.tab", (event)=> {
                 // Oculta todos los resultados de reportes
-                document.getElementById("pnlResultadoMesas").style.display = "none";                
+                document.getElementById("pnlResultadoMesas").style.display = "none";
                 //document.getElementById("panelMeseros").style.display = "none";
                 //document.getElementById("panelProductos").style.display = "none";
                 //document.getElementById("panelVentas").style.display = "none";
-                //document.getElementById("panelBalance").style.display = "none";       
+                //document.getElementById("panelBalance").style.display = "none";
 
                 const panel = document.getElementById("pnlMensaje");
                 if (panel) {
@@ -680,8 +679,33 @@
                     panel.classList.remove("alert-show");
                 }
 
+                // Mostrar/ocultar botón Generar Balance según la pestaña activa
+                const botonBalance = document.getElementById("btnBuscarBalance");
+                if (botonBalance) {
+                    // Verificar si el tab activo es el de Balance
+                    const tabId = event.target.id || event.target.getAttribute('id');
+                    if (tabId && tabId.includes('Balance')) {
+                        botonBalance.style.display = "block";
+                    } else {
+                        botonBalance.style.display = "none";
+                    }
+                }
 
             });
+        });
+
+        // Verificar pestaña activa al cargar la página
+        window.addEventListener('DOMContentLoaded', function() {
+            const botonBalance = document.getElementById("btnBuscarBalance");
+            if (botonBalance) {
+                // Verificar qué tab está activo
+                const activeTab = document.querySelector('.nav-link.active');
+                if (activeTab && activeTab.id && activeTab.id.includes('Balance')) {
+                    botonBalance.style.display = "block";
+                } else {
+                    botonBalance.style.display = "none";
+                }
+            }
         });
 
 
