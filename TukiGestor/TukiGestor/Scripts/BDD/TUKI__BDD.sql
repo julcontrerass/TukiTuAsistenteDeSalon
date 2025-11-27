@@ -141,22 +141,22 @@ INSERT INTO PRODUCTO (Nombre, Precio, Stock, Disponible, CategoriaId) VALUES
 ('Cheesecake', 950.00, 25, 1, 3);
 GO
 
+
 INSERT INTO USUARIO (NombreUsuario, Contrasenia, Email, Rol) VALUES
-('robertocarlos', '123456', 'robertocarlos@tuki.com', 'gerente'),
-('cacho', '123456', 'cacho@tuki.com', 'gerente'),
-('ruperto', '123456', 'ruperto@tuki.com', 'gerente'),
-('alla', '123456', 'alla@tuki.com', 'gerente'),
-('aca', '123456', 'aca@tuki.com', 'gerente');
+('admin', '$2a$11$hAspyF47MuqRuHfd5Dupl.pj6bS8IoxVUvlqRLwIwG2iU6zCt8o9i', 'admin@tuki.com', 'gerente'),
+('juanperez', '$2a$11$qzTwKKGw74c9OvPQJCYKO.Vs/dxqh5UNHKGAE7Cva0GIzCMHP7uj2', 'juanperez@tuki.com', 'mesero'),
+('mariagonzalez', '$2a$11$FedSDRp/VEJSdMT9YwlshO7HBR9HDUeZufXa9WqZPjosrrGYscgYS', 'mariagonzalez@tuki.com', 'mesero'),
+('carlosrodriguez', '$2a$11$0kkzDpSQj.xF8uAZrbouZOeUTVG6kzUBRo5nbrEkD.mJaZXz8Gzxa', 'carlosrodriguez@tuki.com', 'mesero'),
+('anamartinez', '$2a$11$QgWTq.SD.CWmWFYJycD0ruVoveb440XtFqHF97VlhTpFJjjPOuHye', 'anamartinez@tuki.com', 'mesero')
 GO
 
 INSERT INTO MESERO (Nombre, Apellido, Activo, UsuarioId) VALUES
-('Juan', 'Perez', 1, 1),
-('Maria', 'Gonzalez', 1, 2),
-('Carlos', 'Rodriguez', 1, 3),
-('Ana', 'Martinez', 1, 4),
-('Luis', 'Fernandez', 1, 5);
+('Juan', 'Perez', 1, 2),
+('Maria', 'Gonzalez', 1, 3),
+('Carlos', 'Rodriguez', 1, 4),
+('Ana', 'Martinez', 1, 5)
 GO
-
+select * from USUARIO
 INSERT INTO MESA (NumeroMesa, Ubicacion, Estado, PosicionX, PosicionY) VALUES
 ('1', 'salon', 'libre', 20, 20),
 ('2', 'salon', 'libre', 190, 20),
