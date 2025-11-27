@@ -145,7 +145,7 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             List<Gerente> lista = new List<Gerente>();
 
-            datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, G.NombreUsuario, G.Email " + "FROM GERENTE G INNER JOIN Usuario u ON G.UsuarioId = u.UsuarioId " + "WHERE G.Activo = 0");
+            datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, U.NombreUsuario, U.Email " + "FROM GERENTE G INNER JOIN Usuario u ON G.UsuarioId = u.UsuarioId " + "WHERE G.Activo = 0");
             datos.ejecutarLectura();
             while (datos.Lector.Read())
             {
@@ -201,13 +201,46 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, G.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " + "FROM GERENTE G " + "INNER JOIN USUARIO U ON U.UsuarioId = G.UsuarioId " + "WHERE G.GerenteId = @id");
+                datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, G.Activo, U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email FROM GERENTE G INNER JOIN USUARIO U ON U.UsuarioId = G.UsuarioId WHERE G.GerenteId = @id");
                 datos.setearParametro("@id", gerenteId);
                 datos.ejecutarLectura();
                 if (datos.Lector.Read())
                 {
                     Gerente gerente = new Gerente();
-                    gerente.GerenteId = (int)datos.Lector["Id"];
+                    gerente.GerenteId = (int)datos.Lector["GerenteId"];
+                    gerente.Nombre = datos.Lector["Nombre"].ToString();
+                    gerente.Apellido = datos.Lector["Apellido"].ToString();
+                    gerente.Activo = (bool)datos.Lector["Activo"];
+                    gerente.Id = (int)datos.Lector["UsuarioId"];
+                    gerente.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
+                    gerente.Contraseña = datos.Lector["Contrasenia"].ToString();
+                    gerente.Email = datos.Lector["Email"].ToString();
+                    return gerente;
+                }
+                return null;
+            }catch(Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+
+        public Gerente BuscarPorUsuarioId(int usuarioId)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, G.Activo, U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email FROM GERENTE G INNER JOIN USUARIO U ON U.UsuarioId = G.UsuarioId WHERE G.UsuarioId = @usuarioId");
+                datos.setearParametro("@usuarioId", usuarioId);
+                datos.ejecutarLectura();
+                if (datos.Lector.Read())
+                {
+                    Gerente gerente = new Gerente();
+                    gerente.GerenteId = (int)datos.Lector["GerenteId"];
                     gerente.Nombre = datos.Lector["Nombre"].ToString();
                     gerente.Apellido = datos.Lector["Apellido"].ToString();
                     gerente.Activo = (bool)datos.Lector["Activo"];
@@ -219,11 +252,16 @@ namespace Service
                 }
                 return null;
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
             finally
             {
                 datos.cerrarConexion();
             }
         }
+
 
         // validamos si existe el nombre de usuario (excluyendo el usuario actual)
         public bool ExisteNombreUsuarioParaOtro(string nombreUsuario, int usuarioIdActual)

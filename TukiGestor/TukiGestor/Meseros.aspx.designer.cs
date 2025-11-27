@@ -51,6 +51,15 @@ namespace TukiGestor
         protected global::System.Web.UI.WebControls.LinkButton btnTabListado;
 
         /// <summary>
+        /// btnTabListadoGerentes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnTabListadoGerentes;
+
+        /// <summary>
         /// btnTabNuevo control.
         /// </summary>
         /// <remarks>
@@ -78,6 +87,15 @@ namespace TukiGestor
         protected global::System.Web.UI.WebControls.LinkButton btnTabInactivos;
 
         /// <summary>
+        /// btnTabGerentesInactivos control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnTabGerentesInactivos;
+
+        /// <summary>
         /// UpdatePanelContenido control.
         /// </summary>
         /// <remarks>
@@ -103,6 +121,24 @@ namespace TukiGestor
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater RepeaterMeseros;
+
+        /// <summary>
+        /// PnlListadoGerentes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel PnlListadoGerentes;
+
+        /// <summary>
+        /// RepeaterGerentes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater RepeaterGerentes;
 
         /// <summary>
         /// pnlNuevo control.
@@ -409,5 +445,23 @@ namespace TukiGestor
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater RepeaterMeserosInactivos;
+
+        /// <summary>
+        /// PnlGerentesInactivos control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel PnlGerentesInactivos;
+
+        /// <summary>
+        /// RepeaterGerentesInactivos control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater RepeaterGerentesInactivos;
     }
 }

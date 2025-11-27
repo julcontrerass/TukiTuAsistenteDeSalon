@@ -73,10 +73,11 @@ namespace Service
             try
             {
                 // insertamos Usuario
-                datos.SetearConsulta("INSERT INTO USUARIO (NombreUsuario, Contrasenia, Email) " + "OUTPUT INSERTED.UsuarioId " + "VALUES (@user, @pass, @mail)");
+                datos.SetearConsulta("INSERT INTO USUARIO (NombreUsuario, Contrasenia, Email, Rol) " + "OUTPUT INSERTED.UsuarioId " + "VALUES (@user, @pass, @mail, @rol)");
                 datos.setearParametro("@user", nuevo.NombreUsuario);
                 datos.setearParametro("@pass", nuevo.Contraseña);
                 datos.setearParametro("@mail", nuevo.Email);
+                datos.setearParametro("@rol", nuevo.Rol);
                 int nuevoUsuarioId = (int)datos.ejecutarScalar();
                 // insert Mesero
                 datos.SetearConsulta("INSERT INTO MESERO (Nombre, Apellido, Activo, UsuarioId) " + "VALUES (@nom, @ape, 1, @uid)");
@@ -218,6 +219,38 @@ namespace Service
                 datos.cerrarConexion();
             }
         }
+
+
+        public Mesero BuscarPorUsuarioId(int usuarioId)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.SetearConsulta("SELECT M.MeseroId, M.Nombre, M.Apellido, M.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " + "FROM MESERO M " + "INNER JOIN USUARIO U ON U.UsuarioId = M.UsuarioId " + "WHERE M.UsuarioId = @usuarioId");
+                datos.setearParametro("@usuarioId", usuarioId);
+                datos.ejecutarLectura();
+                if (datos.Lector.Read())
+                {
+                    Mesero mesero = new Mesero();
+                    mesero.MeseroId = (int)datos.Lector["MeseroId"];
+                    mesero.Nombre = datos.Lector["Nombre"].ToString();
+                    mesero.Apellido = datos.Lector["Apellido"].ToString();
+                    mesero.Activo = (bool)datos.Lector["Activo"];
+                    mesero.Id = (int)datos.Lector["UsuarioId"];
+                    mesero.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
+                    mesero.Contraseña = datos.Lector["Contrasenia"].ToString();
+                    mesero.Email = datos.Lector["Email"].ToString();
+                    return mesero;
+                }
+                return null;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+
 
         // validamos si existe el nombre de usuario (excluyendo el usuario actual)
         public bool ExisteNombreUsuarioParaOtro(string nombreUsuario, int usuarioIdActual)
