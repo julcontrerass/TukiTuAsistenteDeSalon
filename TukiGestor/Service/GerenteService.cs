@@ -1,25 +1,30 @@
-﻿using dominio;
-using accesoDatos;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using dominio;
+using accesoDatos;
 
 namespace Service
 {
-    public class MeseroService
+    public class GerenteService
     {
-        public List<Mesero> ListarActivos()
+
+
+        public List<Gerente> ListarActivos()
         {
-            List<Mesero> lista = new List<Mesero>();
+            List<Gerente> lista = new List<Gerente>();
             AccesoDatos datos = new AccesoDatos();
 
             try
             {
-                datos.SetearConsulta("SELECT M.MeseroId, M.Nombre, M.Apellido, M.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " + "FROM MESERO M " + "INNER JOIN USUARIO U ON U.UsuarioId = M.UsuarioId " + "WHERE M.Activo = 1");
+                datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, G.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " + "FROM GERENTE G " + "INNER JOIN USUARIO U ON U.UsuarioId = G.UsuarioId " + "WHERE G.Activo = 1");
                 datos.ejecutarLectura();
                 while (datos.Lector.Read())
                 {
-                    Mesero aux = new Mesero();
-                    aux.MeseroId = (int)datos.Lector["MeseroId"];
+                    Gerente aux = new Gerente();
+                    aux.GerenteId = (int)datos.Lector["GerenteId"];
                     aux.Nombre = datos.Lector["Nombre"].ToString();
                     aux.Apellido = datos.Lector["Apellido"].ToString();
                     aux.Activo = (bool)datos.Lector["Activo"];
@@ -38,18 +43,18 @@ namespace Service
             }
         }
 
-        public List<Mesero> ListarEliminados()
+        public List<Gerente> ListarEliminados()
         {
-            List<Mesero> lista = new List<Mesero>();
+            List<Gerente> lista = new List<Gerente>();
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("SELECT M.MeseroId, M.Nombre, M.Apellido, M.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " +  "FROM MESERO M " + "INNER JOIN USUARIO U ON U.UsuarioId = M.UsuarioId " + "WHERE M.Activo = 0");
+                datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, G.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " + "FROM GERENTE G " + "INNER JOIN USUARIO U ON U.UsuarioId = G.UsuarioId " + "WHERE G.Activo = 0");
                 datos.ejecutarLectura();
                 while (datos.Lector.Read())
                 {
-                    Mesero aux = new Mesero();
-                    aux.MeseroId = (int)datos.Lector["MeseroId"];
+                    Gerente aux = new Gerente();
+                    aux.GerenteId = (int)datos.Lector["GerenteId"];
                     aux.Nombre = datos.Lector["Nombre"].ToString();
                     aux.Apellido = datos.Lector["Apellido"].ToString();
                     aux.Activo = (bool)datos.Lector["Activo"];
@@ -67,7 +72,7 @@ namespace Service
             }
         }
 
-        public void Agregar(Mesero nuevo)
+        public void Agregar(Gerente nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
             try
@@ -79,8 +84,8 @@ namespace Service
                 datos.setearParametro("@mail", nuevo.Email);
                 datos.setearParametro("@rol", nuevo.Rol);
                 int nuevoUsuarioId = (int)datos.ejecutarScalar();
-                // insert Mesero
-                datos.SetearConsulta("INSERT INTO MESERO (Nombre, Apellido, Activo, UsuarioId) " + "VALUES (@nom, @ape, 1, @uid)");
+
+                datos.SetearConsulta("INSERT INTO GERENTE (Nombre, Apellido, Activo, UsuarioId) " + "VALUES (@nom, @ape, 1, @uid)");
                 datos.setearParametro("@nom", nuevo.Nombre);
                 datos.setearParametro("@ape", nuevo.Apellido);
                 datos.setearParametro("@uid", nuevoUsuarioId);
@@ -93,13 +98,13 @@ namespace Service
         }
 
 
-        public void Desactivar(int meseroId)
+        public void Desactivar(int gerenteId)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("UPDATE Mesero SET Activo = 0 WHERE MeseroId = @id");
-                datos.setearParametro("@id", meseroId);
+                datos.SetearConsulta("UPDATE Gerente SET Activo = 0 WHERE GerenteId = @id");
+                datos.setearParametro("@id", gerenteId);
                 datos.ejecutarAccion();
             }
             catch (Exception ex)
@@ -114,14 +119,14 @@ namespace Service
 
 
 
-        public void Reactivar(int meseroId)
+        public void Reactivar(int gerenteId)
         {
             AccesoDatos datos = new AccesoDatos();
 
             try
             {
-                datos.SetearConsulta("UPDATE Mesero SET Activo = 1 WHERE MeseroId = @id");
-                datos.setearParametro("@id", meseroId);
+                datos.SetearConsulta("UPDATE GERENTE SET Activo = 1 WHERE GerenteId = @id");
+                datos.setearParametro("@id", gerenteId);
                 datos.ejecutarAccion();
             }
             catch (Exception ex)
@@ -135,17 +140,17 @@ namespace Service
         }
 
 
-        public List<Mesero> ListarInactivos()
+        public List<Gerente> ListarInactivos()
         {
             AccesoDatos datos = new AccesoDatos();
-            List<Mesero> lista = new List<Mesero>();
+            List<Gerente> lista = new List<Gerente>();
 
-            datos.SetearConsulta("SELECT m.MeseroId, m.Nombre, m.Apellido, u.NombreUsuario, u.Email " + "FROM Mesero m INNER JOIN Usuario u ON m.UsuarioId = u.UsuarioId " + "WHERE m.Activo = 0");
+            datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, U.NombreUsuario, U.Email " + "FROM GERENTE G INNER JOIN Usuario u ON G.UsuarioId = u.UsuarioId " + "WHERE G.Activo = 0");
             datos.ejecutarLectura();
             while (datos.Lector.Read())
             {
-                Mesero aux = new Mesero();
-                aux.MeseroId = (int)datos.Lector["MeseroId"];
+                Gerente aux = new Gerente();
+                aux.GerenteId = (int)datos.Lector["GerenteId"];
                 aux.Nombre = datos.Lector["Nombre"].ToString();
                 aux.Apellido = datos.Lector["Apellido"].ToString();
                 aux.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
@@ -191,28 +196,31 @@ namespace Service
 
 
 
-        public Mesero ObtenerPorId(int meseroId)
+        public Gerente ObtenerPorId(int gerenteId)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("SELECT M.MeseroId, M.Nombre, M.Apellido, M.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " + "FROM MESERO M " + "INNER JOIN USUARIO U ON U.UsuarioId = M.UsuarioId " + "WHERE M.MeseroId = @id");
-                datos.setearParametro("@id", meseroId);
+                datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, G.Activo, U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email FROM GERENTE G INNER JOIN USUARIO U ON U.UsuarioId = G.UsuarioId WHERE G.GerenteId = @id");
+                datos.setearParametro("@id", gerenteId);
                 datos.ejecutarLectura();
                 if (datos.Lector.Read())
                 {
-                    Mesero mesero = new Mesero();
-                    mesero.MeseroId = (int)datos.Lector["MeseroId"];
-                    mesero.Nombre = datos.Lector["Nombre"].ToString();
-                    mesero.Apellido = datos.Lector["Apellido"].ToString();
-                    mesero.Activo = (bool)datos.Lector["Activo"];
-                    mesero.Id = (int)datos.Lector["UsuarioId"];
-                    mesero.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
-                    mesero.Contraseña = datos.Lector["Contrasenia"].ToString();
-                    mesero.Email = datos.Lector["Email"].ToString();
-                    return mesero;
+                    Gerente gerente = new Gerente();
+                    gerente.GerenteId = (int)datos.Lector["GerenteId"];
+                    gerente.Nombre = datos.Lector["Nombre"].ToString();
+                    gerente.Apellido = datos.Lector["Apellido"].ToString();
+                    gerente.Activo = (bool)datos.Lector["Activo"];
+                    gerente.Id = (int)datos.Lector["UsuarioId"];
+                    gerente.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
+                    gerente.Contraseña = datos.Lector["Contrasenia"].ToString();
+                    gerente.Email = datos.Lector["Email"].ToString();
+                    return gerente;
                 }
                 return null;
+            }catch(Exception ex)
+            {
+                throw ex;
             }
             finally
             {
@@ -221,35 +229,38 @@ namespace Service
         }
 
 
-        public Mesero BuscarPorUsuarioId(int usuarioId)
+        public Gerente BuscarPorUsuarioId(int usuarioId)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.SetearConsulta("SELECT M.MeseroId, M.Nombre, M.Apellido, M.Activo, " + "U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email " + "FROM MESERO M " + "INNER JOIN USUARIO U ON U.UsuarioId = M.UsuarioId " + "WHERE M.UsuarioId = @usuarioId");
+                datos.SetearConsulta("SELECT G.GerenteId, G.Nombre, G.Apellido, G.Activo, U.UsuarioId, U.NombreUsuario, U.Contrasenia, U.Email FROM GERENTE G INNER JOIN USUARIO U ON U.UsuarioId = G.UsuarioId WHERE G.UsuarioId = @usuarioId");
                 datos.setearParametro("@usuarioId", usuarioId);
                 datos.ejecutarLectura();
                 if (datos.Lector.Read())
                 {
-                    Mesero mesero = new Mesero();
-                    mesero.MeseroId = (int)datos.Lector["MeseroId"];
-                    mesero.Nombre = datos.Lector["Nombre"].ToString();
-                    mesero.Apellido = datos.Lector["Apellido"].ToString();
-                    mesero.Activo = (bool)datos.Lector["Activo"];
-                    mesero.Id = (int)datos.Lector["UsuarioId"];
-                    mesero.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
-                    mesero.Contraseña = datos.Lector["Contrasenia"].ToString();
-                    mesero.Email = datos.Lector["Email"].ToString();
-                    return mesero;
+                    Gerente gerente = new Gerente();
+                    gerente.GerenteId = (int)datos.Lector["GerenteId"];
+                    gerente.Nombre = datos.Lector["Nombre"].ToString();
+                    gerente.Apellido = datos.Lector["Apellido"].ToString();
+                    gerente.Activo = (bool)datos.Lector["Activo"];
+                    gerente.Id = (int)datos.Lector["UsuarioId"];
+                    gerente.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
+                    gerente.Contraseña = datos.Lector["Contrasenia"].ToString();
+                    gerente.Email = datos.Lector["Email"].ToString();
+                    return gerente;
                 }
                 return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {
                 datos.cerrarConexion();
             }
         }
-
 
 
         // validamos si existe el nombre de usuario (excluyendo el usuario actual)
@@ -288,8 +299,7 @@ namespace Service
             }
         }
 
-        // Actualizar mesero
-        public void Modificar(Mesero mesero, bool cambiarContrasenia)
+        public void Modificar(Gerente gerente, bool cambiarContrasenia)
         {
             AccesoDatos datos = new AccesoDatos();
             try
@@ -298,21 +308,21 @@ namespace Service
                 if (cambiarContrasenia)
                 {
                     datos.SetearConsulta("UPDATE USUARIO SET NombreUsuario = @user, Contrasenia = @pass, Email = @mail " + "WHERE UsuarioId = @id");
-                    datos.setearParametro("@pass", mesero.Contraseña);
+                    datos.setearParametro("@pass", gerente.Contraseña);
                 }
                 else
                 {
                     datos.SetearConsulta("UPDATE USUARIO SET NombreUsuario = @user, Email = @mail " + "WHERE UsuarioId = @id");
                 }
-                datos.setearParametro("@user", mesero.NombreUsuario);
-                datos.setearParametro("@mail", mesero.Email);
-                datos.setearParametro("@id", mesero.Id);
+                datos.setearParametro("@user", gerente.NombreUsuario);
+                datos.setearParametro("@mail", gerente.Email);
+                datos.setearParametro("@id", gerente.Id);
                 datos.ejecutarAccion();
-                // Actualizar Mesero
-                datos.SetearConsulta("UPDATE MESERO SET Nombre = @nom, Apellido = @ape " + "WHERE MeseroId = @meseroId");
-                datos.setearParametro("@nom", mesero.Nombre);
-                datos.setearParametro("@ape", mesero.Apellido);
-                datos.setearParametro("@meseroId", mesero.MeseroId);
+                // Actualizar gerente
+                datos.SetearConsulta("UPDATE GERENTE SET Nombre = @nom, Apellido = @ape " + "WHERE GerenteId = @gerenteId");
+                datos.setearParametro("@nom", gerente.Nombre);
+                datos.setearParametro("@ape", gerente.Apellido);
+                datos.setearParametro("@gerenteId", gerente.GerenteId);
                 datos.ejecutarAccion();
             }
             finally
@@ -322,4 +332,7 @@ namespace Service
         }
 
     }
+
+
 }
+

@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> TIKI</title>
+    <title><%: Page.Title %> TUKI</title>
 
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/bundles/modernizr") %>
@@ -219,7 +219,7 @@
 
         .user-name {
             flex: 1;
-            text-align: left;
+            text-align: center;
             color: #333;
             font-weight: 500;
             font-size: 1rem;
@@ -242,7 +242,9 @@
         }
 
         .sidebar.collapsed .user-name,
-        .sidebar.collapsed .chevron-icon {
+        .sidebar.collapsed .chevron-icon,
+        .sidebar.collapsed .rol-tipo,
+        .sidebar.collapsed .container-datosusuario {
             display: none;
         }
 
@@ -337,9 +339,10 @@
         .container-datosusuario {
             display: flex;
             flex-direction: column;
+            min-width: 150px;
         }
 
-        .rol-tipo{
+        .rol-tipo {
             font-weight: 300;
         }
     </style>
@@ -382,7 +385,7 @@
                 <li><a runat="server" id="linkInicio" href="~/Home.aspx"><i class="bi bi-house-door"></i><span>Inicio</span></a></li>
                 <li><a runat="server" id="linkMesas" href="~/Mesas.aspx"><i class="bi bi-grid-3x3"></i><span>Mesas</span></a></li>
                 <li><a runat="server" id="linkStock" href="~/Productos.aspx"><i class="bi bi-box-seam"></i><span>Productos</span></a></li>
-                <li><a runat="server" id="linkMeseros" href="~/Meseros.aspx"><i class="bi bi-person"></i><span>Meseros</span></a></li>
+                <li><a runat="server" id="linkMeseros" href="~/Meseros.aspx"><i class="bi bi-person"></i><span>Usuarios</span></a></li>
                 <li><a runat="server" id="linkReporte" href="~/Reporte.aspx"><i class="bi bi-graph-up"></i><span>Reporte</span></a></li>
             </ul>
 
@@ -397,18 +400,22 @@
 
                 </button>
                 <div class="user-dropdown" id="userDropdown">
-                    <a runat="server" id="linkConfiguracion" href="~/Configuracion.aspx" class="user-dropdown-item">
-                        <i class="bi bi-gear"></i>
-                        <span>Configuración</span>
-                    </a><a href="#" class="user-dropdown-item"><i class="bi bi-person"></i><span>Perfil</span></a>
+                    <asp:LinkButton
+                        ID="btnModificarPerfil"
+                        runat="server"
+                        CssClass="user-dropdown-item"
+                        OnClick="btnModificarPerfil_Click">
+<i class="bi bi-person"></i><span>Perfil</span>
+                    </asp:LinkButton>
+
                     <hr class="user-dropdown-divider" />
-                    <asp:LinkButton 
-    ID="btnCerrarSesion" 
-    runat="server" 
-    CssClass="user-dropdown-item"
-   onclick="btnCerrarSesion_Click">
+                    <asp:LinkButton
+                        ID="btnCerrarSesion"
+                        runat="server"
+                        CssClass="user-dropdown-item"
+                        OnClick="btnCerrarSesion_Click">
     <i class="bi bi-box-arrow-right"></i><span>Cerrar sesión</span>
-</asp:LinkButton>
+                    </asp:LinkButton>
                 </div>
             </div>
         </div>

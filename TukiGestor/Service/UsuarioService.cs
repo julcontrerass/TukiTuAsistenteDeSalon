@@ -72,7 +72,7 @@ namespace Service
 
             try
             {
-                datos.SetearConsulta("SELECT TOP(1) NombreUsuario, Contrasenia, Email, Rol from USUARIO where NombreUsuario = @usuario COLLATE Latin1_General_CS_AS;");
+                datos.SetearConsulta("SELECT TOP(1) UsuarioId, NombreUsuario, Contrasenia, Email, Rol from USUARIO where NombreUsuario = @usuario COLLATE Latin1_General_CS_AS;");
                 datos.setearParametro("@usuario", nombreUsuario);
                 datos.ejecutarLectura();
 
@@ -81,7 +81,7 @@ namespace Service
                 }
 
                 Usuario usuario = new Usuario();
-
+                usuario.Id = (int)datos.Lector["UsuarioId"];
                 usuario.NombreUsuario = (string)datos.Lector["NombreUsuario"];
                 usuario.Contraseña = (string)datos.Lector["Contrasenia"];
                 usuario.Rol = (string)datos.Lector["Rol"];

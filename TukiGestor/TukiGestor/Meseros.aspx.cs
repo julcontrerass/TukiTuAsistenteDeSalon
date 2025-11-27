@@ -9,7 +9,7 @@ namespace TukiGestor
     public partial class Meseros : System.Web.UI.Page
     {
         MeseroService meseroService = new MeseroService();
-
+        GerenteService gerenteService = new GerenteService();
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -30,6 +30,8 @@ namespace TukiGestor
 
                 CargarMeseros();
                 CargarMeserosInactivos();
+                CargarGerentes();
+                CargarGerentesInactivos();
             }
         }
 
@@ -75,26 +77,39 @@ namespace TukiGestor
             OcultarMensaje();
         }
 
-        
+        protected void btnTabListadoGerentes_Click(object sender, EventArgs e)
+        {
+            MostrarTab("listadoGerentes");
+            OcultarMensaje();
+        }
+
 
         private void MostrarTab(string tab)
         {
             // ocultamos todos los paneles
             pnlListado.CssClass = "tab-pane fade";
+            PnlListadoGerentes.CssClass = "tab-pane fade";
             pnlNuevo.CssClass = "tab-pane fade";
             pnlModificar.CssClass = "tab-pane fade";
             pnlInactivos.CssClass = "tab-pane fade";
+            PnlGerentesInactivos.CssClass = "tab-pane fade";
             // reseteamos las clases de los botones
             btnTabListado.CssClass = "nav-link";
+            btnTabListadoGerentes.CssClass = "nav-link";
             btnTabNuevo.CssClass = "nav-link";
             btnTabModificar.CssClass = "nav-link";
             btnTabInactivos.CssClass = "nav-link";
+            btnTabGerentesInactivos.CssClass = "nav-link";
             // mostramos el panel correspondiente
             switch (tab)
             {
                 case "listado":
                     pnlListado.CssClass = "tab-pane fade active show";
                     btnTabListado.CssClass = "nav-link active";
+                    break;
+                case "listadoGerentes":
+                    PnlListadoGerentes.CssClass = "tab-pane fade active show";
+                    btnTabListadoGerentes.CssClass= "nav-link active";
                     break;
                 case "nuevo":
                     pnlNuevo.CssClass = "tab-pane fade active show";
@@ -108,6 +123,10 @@ namespace TukiGestor
                 case "inactivos":
                     pnlInactivos.CssClass = "tab-pane fade active show";
                     btnTabInactivos.CssClass = "nav-link active";
+                    break;
+                case "gerentes-inactivos":
+                    PnlGerentesInactivos.CssClass = "tab-pane fade active show";
+                    btnTabGerentesInactivos.CssClass= "nav-link active";
                     break;
             }
 
@@ -183,55 +202,91 @@ namespace TukiGestor
             }
             try
             {
-                int meseroId = int.Parse(hfMeseroId.Value);
+
+                UsuarioService service = new UsuarioService();
+
+                int meseroOGerenteId = int.Parse(hfMeseroId.Value);
                 int usuarioId = int.Parse(hfUsuarioId.Value);
+                string nombreUsuario = txtNombreUsuarioMod.Text.Trim();
+                string email = txtEmailMod.Text.Trim().ToLower();
+                string nombre = txtNombreMeseroMod.Text.Trim();
+                string apellido = txtApellidoMeseroMod.Text.Trim();
+                string contraseña = txtContraseniaMod.Text;
+                Usuario usuario = service.buscarUsuario(nombreUsuario);
+                string rol = usuario.Rol;
                 Mesero mesero = new Mesero();
-                mesero.MeseroId = meseroId;
-                mesero.Id = usuarioId;
-                mesero.NombreUsuario = txtNombreUsuarioMod.Text.Trim();
-                mesero.Email = txtEmailMod.Text.Trim().ToLower();
-                mesero.Nombre = txtNombreMeseroMod.Text.Trim();
-                mesero.Apellido = txtApellidoMeseroMod.Text.Trim();
-                mesero.Contraseña = txtContraseniaMod.Text;
+                Gerente gerente = new Gerente();
+            
                 // validaciones
-                if (string.IsNullOrEmpty(mesero.NombreUsuario) || string.IsNullOrEmpty(mesero.Email) || string.IsNullOrEmpty(mesero.Nombre) || string.IsNullOrEmpty(mesero.Apellido))
+                if (string.IsNullOrEmpty(nombreUsuario) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(apellido))
                 {
                     MostrarMensaje("Por favor complete todos los campos obligatorios.", "warning");
                     return;
                 }
                 // Validamos el formato de email
-                if (!System.Text.RegularExpressions.Regex.IsMatch(mesero.Email, @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
+                if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
                 {
                     MostrarMensaje("El formato del email no es válido.", "warning");
                     return;
                 }
                 // Validamos si el nombre de usuario ya existe para otro usuario
-                if (meseroService.ExisteNombreUsuarioParaOtro(mesero.NombreUsuario, usuarioId))
+                if (meseroService.ExisteNombreUsuarioParaOtro(nombreUsuario, usuarioId))
                 {
-                    MostrarMensaje("El nombre de usuario ya está en uso por otro mesero.", "warning");
+                    MostrarMensaje("El nombre de usuario ya está en uso por otro usuario.", "warning");
                     return;
                 }
                 // Validar si el email ya existe para otro usuario
-                if (meseroService.ExisteEmailParaOtro(mesero.Email, usuarioId))
+                if (meseroService.ExisteEmailParaOtro(email, usuarioId))
                 {
                     MostrarMensaje("El email ya está registrado por otro mesero.", "warning");
                     return;
                 }
                 // validamos contraseña si se ingresó una nueva
-                bool cambiarContrasenia = !string.IsNullOrEmpty(mesero.Contraseña);
-                if (cambiarContrasenia && mesero.Contraseña.Length < 6)
+                bool cambiarContrasenia = !string.IsNullOrEmpty(contraseña);
+                if (cambiarContrasenia && contraseña.Length < 6)
                 {
                     MostrarMensaje("La contraseña debe tener al menos 6 caracteres.", "warning");
                     return;
                 }
-                // actualizamos
-                meseroService.Modificar(mesero, cambiarContrasenia);
-                // recargamos y volvemos al listado
+
+                if(rol == "gerente")
+                {
+                    gerente.Id = usuarioId;
+                    gerente.GerenteId = meseroOGerenteId;
+                    gerente.NombreUsuario = nombreUsuario;
+                    gerente.Nombre = nombre;
+                    gerente.Apellido = apellido;
+                    gerente.Email = email;
+                    gerente.Contraseña = service.hashearContraseña(contraseña);
+                    gerente.Rol = rol;
+                    gerenteService.Modificar(gerente, cambiarContrasenia);
+
+                    CargarGerentes();
+                    MostrarTab("listado-gerentes");
+                    btnTabModificar.Visible = false;
+                    MostrarMensaje($"Gerente '{gerente.Nombre} {gerente.Apellido}' actualizado correctamente.", "success");
+                }
+                else
+                {
+                    mesero.Id = usuarioId;
+                    mesero.MeseroId = meseroOGerenteId;
+                    mesero.NombreUsuario = nombreUsuario;
+                    mesero.Nombre = nombre;
+                    mesero.Apellido = apellido;
+                    mesero.Email = email;
+                    mesero.Contraseña = service.hashearContraseña(contraseña);
+                    mesero.Rol = rol;
+                    // actualizamos
+                    meseroService.Modificar(mesero, cambiarContrasenia);
+                    // recargamos y volvemos al listado
                 CargarMeseros();
                 MostrarTab("listado");
                 btnTabModificar.Visible = false;
-
                 MostrarMensaje($"Mesero '{mesero.Nombre} {mesero.Apellido}' actualizado correctamente.", "success");
+                }
+
+
+
             }
             catch (Exception ex)
             {
@@ -249,8 +304,8 @@ namespace TukiGestor
 
         private void CargarMeseros()
         {
-            List<Mesero> lista = meseroService.ListarActivos();
-            RepeaterMeseros.DataSource = lista;
+            List<Mesero> listaMeseros = meseroService.ListarActivos();
+            RepeaterMeseros.DataSource = listaMeseros;
             RepeaterMeseros.DataBind();
         }
 
@@ -262,67 +317,118 @@ namespace TukiGestor
             {
                 return;
             }
-            UsuarioService usuarioService = new UsuarioService();
-            MeseroService servicio = new MeseroService();
-            Mesero nuevo = new Mesero();
+                        
+            UsuarioService usuarioService = new UsuarioService();            
+            MeseroService servicioMesero = new MeseroService();
+            GerenteService servicioGerente = new GerenteService();
+            Mesero nuevoMesero = new Mesero();
+            Gerente nuevoGerente = new Gerente();
 
             try
             {
-                // Capturamos y limpiamos los datos
-                nuevo.NombreUsuario = txtNombreUsuario.Text.Trim();                
-                string contraseñahash = usuarioService.hashearContraseña(txtContrasenia.Text);
-                nuevo.Contraseña = contraseñahash;
-                nuevo.Email = txtEmail.Text.Trim().ToLower(); // email en minúsculas
-                nuevo.Nombre = txtNombreMesero.Text.Trim();
-                nuevo.Apellido = txtApellidoMesero.Text.Trim();
-                // Validación de campos vacíos
-                if (string.IsNullOrEmpty(nuevo.NombreUsuario) ||
-                    string.IsNullOrEmpty(nuevo.Contraseña) ||
-                    string.IsNullOrEmpty(nuevo.Email) ||
-                    string.IsNullOrEmpty(nuevo.Nombre) ||
-                    string.IsNullOrEmpty(nuevo.Apellido))
+                string contraseñaPlana = txtContrasenia.Text.Trim();
+                string nombreUsuario = txtNombreUsuario.Text.Trim();
+                string email = txtEmail.Text.Trim().ToLower();
+                string nombre = txtNombreMesero.Text.Trim();
+                string apellido = txtApellidoMesero.Text.Trim();    
+                string rol = ddlFiltroRol.SelectedValue.ToLower();
+
+                if (rol == "gerente")
+                {
+                    nuevoGerente.NombreUsuario = nombreUsuario;
+                    string contraseñahash = usuarioService.hashearContraseña(contraseñaPlana);
+                    nuevoGerente.Contraseña = contraseñahash;                    
+                    nuevoGerente.Email = email; // email en minúsculas
+                    nuevoGerente.Nombre = nombre;
+                    nuevoGerente.Apellido = apellido;
+                    nuevoGerente.Rol = rol;
+
+                }
+                else
+                {
+                    nuevoMesero.NombreUsuario = nombreUsuario;
+                    string contraseñahash = usuarioService.hashearContraseña(contraseñaPlana);
+                    nuevoMesero.Contraseña = contraseñahash;
+                    nuevoMesero.Email = email; // email en minúsculas
+                    nuevoMesero.Nombre = nombre;
+                    nuevoMesero.Apellido = apellido;
+                    nuevoMesero.Rol = rol;
+                }
+
+                    // Validación de campos vacíos
+
+                    if (string.IsNullOrEmpty(nombreUsuario) ||
+                    string.IsNullOrEmpty(contraseñaPlana) ||
+                    string.IsNullOrEmpty(email) ||
+                    string.IsNullOrEmpty(nombre) ||
+                    string.IsNullOrEmpty(apellido) ||
+                    string.IsNullOrEmpty(rol))
                 {
                     MostrarMensaje("Por favor complete todos los campos obligatorios.", "warning");
                     return;
                 }
+                
+
                 // Validación de longitud de contraseña
-                if (nuevo.Contraseña.Length < 6)
+                if (contraseñaPlana.Length < 6 )
                 {
                     MostrarMensaje("La contraseña debe tener al menos 6 caracteres.", "warning");
                     return;
                 }
 
                 // Validación de formato de email
-                if (!System.Text.RegularExpressions.Regex.IsMatch(nuevo.Email,
-                    @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
-                {
-                    MostrarMensaje("El formato del email no es válido.", "warning");
-                    return;
-                }
+
+              
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(email,
+                   @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
+                    {
+                        MostrarMensaje("El formato del email no es válido.", "warning");
+                        return;
+                    }
+                
+               
                 // Validación de nombre de usuario existente
-                if (servicio.ExisteNombreUsuario(nuevo.NombreUsuario))
+                if (servicioMesero.ExisteNombreUsuario(nombre))
                 {
                     MostrarMensaje("El nombre de usuario ya está en uso. Por favor elija otro.", "warning");
                     return;
                 }
                 // Validación de email existente
-                if (servicio.ExisteEmail(nuevo.Email))
+                if (servicioMesero.ExisteEmail(email))
                 {
                     MostrarMensaje("El email ya está registrado. Por favor use otro.", "warning");
                     return;
                 }
                 // Si llegamos acá, todo está bien
-                servicio.Agregar(nuevo);
+                if(rol == "gerente")
+                {
+                    servicioGerente.Agregar(nuevoGerente);
+                }
+                else
+                {
+                    servicioMesero.Agregar(nuevoMesero);
+
+                }
+                               
                 // Enviamos email al nuevo mesero
                 try
                 {
                     EmailService emailService = new EmailService();
-                    emailService.EnviarEmailNuevoMesero(nuevo.Email, nuevo.Nombre, nuevo.Apellido, nuevo.NombreUsuario, nuevo.Contraseña);
+                    emailService.EnviarEmailNuevoMesero(email, nombre, apellido, nombreUsuario, contraseñaPlana);
                 }
                 catch (Exception ex)
                 {
+                    if(rol == "gerente")
+                    {
+                        lblMensaje.Text = "El gerente fue creado, pero no se pudo enviar el email: " + ex.Message;
+                    }
+                    else
+                    {
                     lblMensaje.Text = "El mesero fue creado, pero no se pudo enviar el email: " + ex.Message;
-                    lblMensaje.CssClass = "text-warning fw-bold";
+
+                    }
+
+                        lblMensaje.CssClass = "text-warning fw-bold";
                 }
 
                 // Limpiamos los campos
@@ -334,11 +440,22 @@ namespace TukiGestor
                 // Recargamos listado
                 CargarMeseros();
                 // Mostramos mensaje de éxito
-                MostrarMensaje($"Mesero '{nuevo.Nombre} {nuevo.Apellido}' creado correctamente.", "success");
+                if(rol == "gerente")
+                {
+                    MostrarMensaje($"Gerente '{nombre} {apellido}' creado correctamente.", "success");
+
+                }
+                else
+                {
+
+                MostrarMensaje($"Mesero '{nombre} {apellido}' creado correctamente.", "success");
+                }
+
             }
             catch (Exception ex)
             {
-                MostrarMensaje("Error al crear el mesero: " + ex.Message, "error");
+                
+                MostrarMensaje("Error al crear el usuario: " + ex.Message, "error");
             }
         }
 
@@ -370,9 +487,98 @@ namespace TukiGestor
             }
         }
 
-       
 
+        private void CargarGerentesInactivos()
+        {
+            List<Gerente> lista = gerenteService.ListarInactivos();
+            RepeaterGerentesInactivos.DataSource = lista;
+            RepeaterGerentesInactivos.DataBind();
+        }
 
+        private void CargarDatosGerenteParaEditar(int gerenteId)
+        {
+            Gerente gerente = gerenteService.ObtenerPorId(gerenteId);
 
+            if (gerente != null)
+            {
+                hfMeseroId.Value = gerente.GerenteId.ToString();
+                hfUsuarioId.Value = gerente.Id.ToString();
+                lblMeseroIdMod.Text = gerente.GerenteId.ToString();
+                txtNombreUsuarioMod.Text = gerente.NombreUsuario;
+                txtEmailMod.Text = gerente.Email;
+                txtNombreMeseroMod.Text = gerente.Nombre;
+                txtApellidoMeseroMod.Text = gerente.Apellido;
+                txtContraseniaMod.Text = ""; // No mostramos la contraseña actual
+            }
+        }
+
+        private void CargarGerentes()
+        {
+            List<Gerente> listaGerentes = gerenteService.ListarActivos();
+            RepeaterGerentes.DataSource = listaGerentes;
+            RepeaterGerentes.DataBind();
+        }
+
+        protected void RepeaterGerentes_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "Editar")
+            {
+                try
+                {
+                    int gerenteId = int.Parse(e.CommandArgument.ToString());
+                    CargarDatosGerenteParaEditar(gerenteId);
+                    MostrarTab("modificar");
+                    OcultarMensaje();
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al cargar gerente: " + ex.Message, "error");
+                }
+            }
+            else if (e.CommandName == "Desactivar")
+            {
+                try
+                {
+                    int gerenteId = int.Parse(e.CommandArgument.ToString());
+                    gerenteService.Desactivar(gerenteId);
+                    // recargamos ambas listas
+                    CargarGerentes();
+                    CargarGerentesInactivos();
+                    MostrarMensaje("Gerente desactivado correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al desactivar mesero: " + ex.Message, "error");
+                }
+            }
+        }
+
+        protected void RepeaterGerentesInactivos_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "Reactivar")
+            {
+                try
+                {
+                    int idgerente = int.Parse(e.CommandArgument.ToString());
+                    gerenteService.Reactivar(idgerente);
+                    // recargamos las listas
+                    CargarGerentes();
+                    CargarGerentesInactivos();
+                 
+                    MostrarMensaje("Gerente reactivado correctamente.", "success");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al reactivar mesero: " + ex.Message, "error");
+                }
+            }
+        }
+
+        protected void btnTabGerentesInactivos_Click(object sender, EventArgs e)
+        {
+            CargarGerentesInactivos();
+            MostrarTab("gerentes-inactivos");
+            OcultarMensaje();
+        }
     }
 }

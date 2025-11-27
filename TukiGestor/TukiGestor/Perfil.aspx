@@ -30,11 +30,10 @@
             margin-bottom: 30px;
         }
 
-        .options-container{
-
+        .options-container {
             padding-top: 2rem;
-
         }
+
         .config-option {
             display: flex;
             justify-content: space-between;
@@ -122,43 +121,77 @@
             input:checked + .slider:before {
                 transform: translateX(24px);
             }
+
+
+        .alert-custom {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
     </style>
 
     <div class="config-container">
         <div class="config-box">
-            <h2 class="config-title"><i class="bi bi-gear"></i>Configuración</h2>
+            <h2 class="mb-4" style="color: #333; font-weight: bold;">
+                <i class="bi bi-person-circle"></i>
+                Perfil de usuario
+            </h2>
 
-            <div class="options-container">
-            <!-- Modo claro / oscuro -->
-            <div class="config-option">
-                <div class="config-label">
-                    <i class="bi bi-moon"></i>Modo oscuro
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="modoOscuro">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <!-- Idioma -->
-            <div class="config-option">
-                <div class="config-label">
-                    <i class="bi bi-translate"></i>Idioma
-                </div>
-                <select id="idiomaSelect" class="config-select">
-                    <option value="es">Español</option>
-                    <option value="en">Inglés</option>
-                </select>
-            </div>
 
-            <!-- IVA -->
-            <div class="config-option">
-                <div class="config-label">
-                    <i class="bi bi-percent"></i>IVA
+            <div class="p-4">
+                <asp:Panel ID="pnlMensaje" runat="server" Visible="false" CssClass="alert-custom">
+
+                    <asp:Label ID="lblMensaje" runat="server"></asp:Label>
+                </asp:Panel>
+
+                <h4 class="mb-3">Editar</h4>
+                <asp:HiddenField ID="hfProductoId" runat="server" />
+                <div class="mb-3">
+                    <label for="lnbNombreUsuario" class="form-label">Nombre de Usuario</label>
+                    <asp:TextBox ID="txtNombreUsuario" runat="server" CssClass="form-control"></asp:TextBox>
                 </div>
-                <input type="number" id="ivaInput" class="config-input" value="21" min="0" max="50">
-                %
+                <div class="mb-3">
+                    <label for="lnlNombre" class="form-label">Nombre</label>
+                    <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control"></asp:TextBox>
+                </div>
+                <div class="mb-3">
+                    <label for="lnbApellido" class="form-label">Apellido</label>
+                    <asp:TextBox ID="txtApellido" runat="server" CssClass="form-control"></asp:TextBox>
+                </div>
+                <div class="mb-3">
+                    <label for="lblEmail" class="form-label">Email</label>
+                    <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control"></asp:TextBox>
+                </div>
+                <div class="mb-3">
+                    <label for="lblContraseña" class="form-label">Contraseña</label>
+                    <asp:TextBox ID="txtContraseña" TextMode="Password" runat="server" CssClass="form-control"></asp:TextBox>
+                    <small class="text-muted">Si no desea cambiar la contraseña, deje este campo vacío.</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <asp:Button ID="Button1" runat="server" Text="Actualizar" CssClass="btn btn-custom mt-3" OnClick="btnActualizarMesero_Click" />
+                    <asp:Button ID="btnCancelarEditar" runat="server" Text="Cancelar" CssClass="btn btn-secondary mt-3" OnClick="btnCancelarActualizarMesero_Click" />
+                </div>
             </div>
-                </div>
 
         </div>
     </div>

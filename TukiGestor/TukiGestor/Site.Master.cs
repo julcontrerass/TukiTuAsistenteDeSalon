@@ -75,5 +75,12 @@ namespace TukiGestor
             Session.Abandon();
             Response.Redirect("~/Login.aspx");
         }
+
+      
+
+        protected void btnModificarPerfil_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Perfil.aspx");
+        }
     }
 }
