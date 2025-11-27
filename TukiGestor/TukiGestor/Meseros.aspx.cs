@@ -35,7 +35,6 @@ namespace TukiGestor
             }
         }
 
-        // ========== Manejo de mensajes ==========
         private void MostrarMensaje(string mensaje, string tipo)
         {
             pnlMensaje.Visible = true;
@@ -57,7 +56,6 @@ namespace TukiGestor
             pnlMensaje.Visible = false;
         }
 
-        // ========== Manejo de solapas ==========
         protected void btnTabListado_Click(object sender, EventArgs e)
         {
             MostrarTab("listado");
@@ -133,14 +131,12 @@ namespace TukiGestor
             UpdatePanelContenido.Update();
         }
 
-        // Evento click de la solapa modificar
         protected void btnTabModificar_Click(object sender, EventArgs e)
         {
             MostrarTab("modificar");
             OcultarMensaje();
         }
 
-        // Modificar el RepeaterMeseros_ItemCommand para agregar el caso "Editar"
         protected void RepeaterMeseros_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName == "Editar")
@@ -175,7 +171,6 @@ namespace TukiGestor
             }
         }
 
-        // cargar datos del mesero en el formulario de edición
         private void CargarDatosMeseroParaEditar(int meseroId)
         {
             Mesero mesero = meseroService.ObtenerPorId(meseroId);
@@ -193,7 +188,6 @@ namespace TukiGestor
             }
         }
 
-        // botón de actualizar mesero
         protected void btnActualizarMesero_Click(object sender, EventArgs e)
         {
             if (!Page.IsValid)
@@ -312,7 +306,6 @@ namespace TukiGestor
 
         protected void btnGuardarMesero_Click(object sender, EventArgs e)
         {
-            // Validación de servidor (por si acaso se bypasea el cliente)
             if (!Page.IsValid)
             {
                 return;
@@ -338,7 +331,7 @@ namespace TukiGestor
                     nuevoGerente.NombreUsuario = nombreUsuario;
                     string contraseñahash = usuarioService.hashearContraseña(contraseñaPlana);
                     nuevoGerente.Contraseña = contraseñahash;                    
-                    nuevoGerente.Email = email; // email en minúsculas
+                    nuevoGerente.Email = email; 
                     nuevoGerente.Nombre = nombre;
                     nuevoGerente.Apellido = apellido;
                     nuevoGerente.Rol = rol;
@@ -349,13 +342,11 @@ namespace TukiGestor
                     nuevoMesero.NombreUsuario = nombreUsuario;
                     string contraseñahash = usuarioService.hashearContraseña(contraseñaPlana);
                     nuevoMesero.Contraseña = contraseñahash;
-                    nuevoMesero.Email = email; // email en minúsculas
+                    nuevoMesero.Email = email; 
                     nuevoMesero.Nombre = nombre;
                     nuevoMesero.Apellido = apellido;
                     nuevoMesero.Rol = rol;
                 }
-
-                    // Validación de campos vacíos
 
                     if (string.IsNullOrEmpty(nombreUsuario) ||
                     string.IsNullOrEmpty(contraseñaPlana) ||
@@ -369,7 +360,6 @@ namespace TukiGestor
                 }
                 
 
-                // Validación de longitud de contraseña
                 if (contraseñaPlana.Length < 6 )
                 {
                     MostrarMensaje("La contraseña debe tener al menos 6 caracteres.", "warning");
@@ -443,18 +433,15 @@ namespace TukiGestor
                 if(rol == "gerente")
                 {
                     MostrarMensaje($"Gerente '{nombre} {apellido}' creado correctamente.", "success");
-
                 }
                 else
                 {
-
-                MostrarMensaje($"Mesero '{nombre} {apellido}' creado correctamente.", "success");
+                    MostrarMensaje($"Mesero '{nombre} {apellido}' creado correctamente.", "success");
                 }
 
             }
             catch (Exception ex)
-            {
-                
+            {                
                 MostrarMensaje("Error al crear el usuario: " + ex.Message, "error");
             }
         }

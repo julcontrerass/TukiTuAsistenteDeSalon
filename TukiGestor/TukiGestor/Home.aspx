@@ -42,7 +42,7 @@
         </div>
     </asp:Panel>
 
-    <!-- CONTENEDOR FIJO SUPERIOR DERECHA (RELOJ + ALERTAS) -->
+    <!-- CONTENEDOR FIJO SUPERIOR DERECHA (RELOJ y ALERTAS) -->
     <div class="panel-superior-derecha">
 
         <!-- RELOJ -->

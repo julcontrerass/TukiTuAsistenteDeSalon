@@ -273,46 +273,46 @@
                         </asp:Panel>
 
 
-                            <!-- gerentes inactivos -->
-    <asp:Panel ID="PnlGerentesInactivos" runat="server" CssClass="tab-pane fade">
-        <div class="p-4">
-            <h4 class="mb-3 text-center">Gerentes Inactivos</h4>
-            <asp:Repeater ID="RepeaterGerentesInactivos" runat="server" onitemcommand="RepeaterGerentesInactivos_ItemCommand">
-                <HeaderTemplate>
-                    <div class="tabla-scroll">
-                        <table class="table table-striped table-hover text-center shadow-lg">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre Completo</th>
-                                    <th>Usuario</th>
-                                    <th>Email</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                </HeaderTemplate>
-                <ItemTemplate>
-                    <tr>
-                        <td><%# Eval("GerenteId") %></td>
-                        <td><%# Eval("Nombre") + " " + Eval("Apellido") %></td>
-                        <td><%# Eval("NombreUsuario") %></td>
-                        <td><%# Eval("Email") %></td>
-                        <td>
-                            <asp:LinkButton runat="server" CssClass="btn btn-link text-success" CommandName="Reactivar" CommandArgument='<%# Eval("GerenteId") %>' ToolTip="Reactivar mesero">
+                        <!-- gerentes inactivos -->
+                        <asp:Panel ID="PnlGerentesInactivos" runat="server" CssClass="tab-pane fade">
+                            <div class="p-4">
+                                <h4 class="mb-3 text-center">Gerentes Inactivos</h4>
+                                <asp:Repeater ID="RepeaterGerentesInactivos" runat="server" OnItemCommand="RepeaterGerentesInactivos_ItemCommand">
+                                    <HeaderTemplate>
+                                        <div class="tabla-scroll">
+                                            <table class="table table-striped table-hover text-center shadow-lg">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Nombre Completo</th>
+                                                        <th>Usuario</th>
+                                                        <th>Email</th>
+                                                        <th>Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <tr>
+                                            <td><%# Eval("GerenteId") %></td>
+                                            <td><%# Eval("Nombre") + " " + Eval("Apellido") %></td>
+                                            <td><%# Eval("NombreUsuario") %></td>
+                                            <td><%# Eval("Email") %></td>
+                                            <td>
+                                                <asp:LinkButton runat="server" CssClass="btn btn-link text-success" CommandName="Reactivar" CommandArgument='<%# Eval("GerenteId") %>' ToolTip="Reactivar mesero">
                                 <i class="bi bi-arrow-clockwise"></i> Reactivar
-                            </asp:LinkButton>
-                        </td>
-                    </tr>
-                </ItemTemplate>
-                <FooterTemplate>
-                    </tbody>
+                                                </asp:LinkButton>
+                                            </td>
+                                        </tr>
+                                    </ItemTemplate>
+                                    <FooterTemplate>
+                                        </tbody>
                         </table>
                     </div>
-                </FooterTemplate>
-            </asp:Repeater>
-        </div>
-    </asp:Panel>
+                                    </FooterTemplate>
+                                </asp:Repeater>
+                            </div>
+                        </asp:Panel>
                     </div>
                 </ContentTemplate>
             </asp:UpdatePanel>

@@ -12,21 +12,6 @@ namespace TukiGestor
     public partial class Stock : System.Web.UI.Page
     {
         
-
-        /* private void CargarProductos()
-         {
-             ProductoService productoService = new ProductoService();
-             List<Producto> listaProductos = productoService.Listar();
-             RepeaterProductos.DataSource = listaProductos;
-             RepeaterProductos.DataBind();
-         }
-        */
-        
-
-       
-        
-
-
         private void CargarCategorias()
         {
 
@@ -73,7 +58,6 @@ namespace TukiGestor
             }
         }
 
-        // ========== mensajes ==========
         private void MostrarMensaje(string mensaje, string tipo)
         {
             pnlMensaje.Visible = true;
@@ -641,14 +625,6 @@ namespace TukiGestor
             CargarProductos();
         }
 
-        
-
-
-
-
-
-
-
         private void CargarFiltroCategoria()
         {
             CategoriaService categoriaService = new CategoriaService();
@@ -697,10 +673,6 @@ namespace TukiGestor
             int categoriaId = int.Parse(ddlFiltroCategoria.SelectedValue);
 
             Usuario usuarioLoggeado = (Usuario)Session["usuarioLoggeado"];
-
-           
-
-
             List<Producto> listaProductos = productoService.BuscarYFiltrar(textoBusqueda, ordenamiento, categoriaId);
             RepeaterProductos.DataSource = listaProductos;
 

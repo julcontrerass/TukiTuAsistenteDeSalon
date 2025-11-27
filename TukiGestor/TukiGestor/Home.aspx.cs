@@ -39,7 +39,6 @@ namespace TukiGestor
 
             if (pedidos.Count > 0)
             {
-                // Armar un pequeño resumen por pedido con información adicional
                 var pedidosConInfo = new List<object>();
 
                 foreach (var p in pedidos)
@@ -49,7 +48,6 @@ namespace TukiGestor
                     string resumen = string.Join(", ",
                         detalles.Select(d => d.NombreProducto + " x" + d.Cantidad));
 
-                    // Si es muy largo, lo recortamos
                     if (resumen.Length > 60)
                         resumen = resumen.Substring(0, 60) + "...";
 
@@ -63,12 +61,10 @@ namespace TukiGestor
                     }
                     else if (p.AsignacionMesa != null && p.AsignacionMesa.AsignacionId > 0)
                     {
-                        // Obtener la asignación completa desde la base de datos
                         AsignacionMesa asignacion = asignacionService.ObtenerAsignacionPorId(p.AsignacionMesa.AsignacionId);
 
                         if (asignacion != null)
                         {
-                            // Obtener la mesa
                             if (asignacion.Mesa != null)
                             {
                                 Mesa mesa = mesaService.ObtenerMesaPorId(asignacion.Mesa.MesaId);
@@ -78,7 +74,6 @@ namespace TukiGestor
                                 }
                             }
 
-                            // Obtener el mesero
                             if (asignacion.Mesero != null)
                             {
                                 Mesero meseroObj = meseroService.ObtenerPorId(asignacion.Mesero.MeseroId);
@@ -118,7 +113,6 @@ namespace TukiGestor
         private void CargarAlertasStockBajo()
         {
             ProductoService service = new ProductoService();
-            // Límite de alerta <= 20
             List<Producto> alertas = service.ListarStockBajo(20);
             if (alertas != null && alertas.Count > 0)
             {

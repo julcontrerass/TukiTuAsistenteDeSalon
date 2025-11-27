@@ -19,18 +19,15 @@ namespace TukiGestor
         private MeseroService meseroService = new MeseroService();
         private VentaService ventaService = new VentaService();
 
-        // Listas públicas para binding
         public List<Categoria> Categorias { get; set; }
         public List<Producto> Productos { get; set; }
 
-        // Propiedad para controlar si hay búsqueda activa
         public bool HayBusquedaActiva
         {
             get { return ViewState["HayBusquedaActiva"] != null && (bool)ViewState["HayBusquedaActiva"]; }
             set { ViewState["HayBusquedaActiva"] = value; }
         }
 
-        // Propiedades para controlar modales
         public string MostrarModalAbrirMesa
         {
             get { return ViewState["MostrarModalAbrirMesa"] != null ? ViewState["MostrarModalAbrirMesa"].ToString() : "false"; }
@@ -51,10 +48,6 @@ namespace TukiGestor
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            // SIEMPRE cargar desde la base de datos (incluso en postbacks y refresh)
-            // Esto asegura que los datos estén actualizados en todo momento
-
-            // Detectar postback de guardar posiciones
             if (IsPostBack)
             {
                
@@ -67,32 +60,26 @@ namespace TukiGestor
                     GuardarPosicionesMesas();
                     Session["MensajeExito"] = "Posiciones de mesas guardadas exitosamente";
 
-                    // Guardar tab activo en Session antes del redirect
                     if (!string.IsNullOrEmpty(HdnTabActivo.Value))
                     {
                         Session["TabActivo"] = HdnTabActivo.Value;
                     }
 
-                    // Redirigir para refrescar y salir del modo edicion
                     Response.Redirect(Request.Url.AbsolutePath, false);
                     Context.ApplicationInstance.CompleteRequest();
                     return;
                 }
                 else if (!string.IsNullOrEmpty(HdnPosicionesMesas.Value))
                 {
-                    // Guardado automático legacy (por si acaso)
                     GuardarPosicionesMesas();
                 }
             }
 
-            // Sincronizar el estado de las mesas con los pedidos activos
             mesaService.SincronizarEstadoMesasConPedidos();
 
             CargarMesasEnRepeaters();
             CargarCategoriasYProductos();
 
-            // Solo cargar meseros en la primera carga, no en postbacks
-            // para no perder la selección del usuario
             if (!IsPostBack)
             {
                 if (Session["usuarioLoggeado"] == null)
@@ -114,26 +101,22 @@ namespace TukiGestor
 
             CargarOrdenesActivas();
 
-            // Manejar mensajes del patrón Post-Redirect-Get
             if (!IsPostBack && Session["MensajeExito"] != null)
             {
                 MostrarMensaje(Session["MensajeExito"].ToString(), "success");
                 Session.Remove("MensajeExito");
             }
 
-            // Restaurar tab activo desde Session
             if (!IsPostBack && Session["TabActivo"] != null)
             {
                 HdnTabActivo.Value = Session["TabActivo"].ToString();
                 Session.Remove("TabActivo");
             }
 
-            // Restaurar modo edicion desde Session
             if (!IsPostBack && Session["ModoEdicionActivo"] != null)
             {
                 string ubicacion = Session["ModoEdicionActivo"].ToString();
 
-                // Registrar script para activar modo edicion
                 string script = $@"
                     window.addEventListener('DOMContentLoaded', function() {{
                         setTimeout(function() {{
@@ -146,22 +129,17 @@ namespace TukiGestor
                 Session.Remove("ModoEdicionActivo");
             }
 
-            // Si el HdnTabActivo tiene un valor, asegurarse de que se use ese tab
-            // Esto es importante después de postbacks para mantener el tab activo
             if (!string.IsNullOrEmpty(HdnTabActivo.Value))
             {
-                // El tab activo se mantendrá por el JavaScript, pero registramos el valor en el servidor
                 System.Diagnostics.Debug.WriteLine($"Tab activo en Page_Load: {HdnTabActivo.Value}");
             }
 
-            // Abrir modal de orden si se acaba de abrir una mesa
             if (!IsPostBack && Session["MesaAbrir"] != null)
             {
                 string numeroMesa = Session["MesaAbrir"].ToString();
                 int meseroId = 0;
                 string nombreMesero = "";
 
-                // IMPORTANTE: Restaurar TODOS los datos de la mesa desde Session al ViewState
                 if (Session["MesaIdAbrir"] != null)
                 {
                     ViewState["MesaIdSeleccionada"] = (int)Session["MesaIdAbrir"];
@@ -181,7 +159,6 @@ namespace TukiGestor
                     }
                 }
 
-                // Obtener nombre del mesero
                 if (meseroId > 0)
                 {
                     Mesero mesero = meseroService.ObtenerPorId(meseroId);
@@ -191,7 +168,6 @@ namespace TukiGestor
                     }
                 }
 
-                // Limpiar Session después de restaurar
                 Session.Remove("MesaAbrir");
                 Session.Remove("MesaIdAbrir");
                 Session.Remove("AsignacionIdAbrir");
@@ -209,12 +185,10 @@ namespace TukiGestor
                 // Obtener todas las órdenes activas
                 List<Pedido> ordenesActivas = pedidoService.ObtenerPedidosActivos();
 
-                // Filtrar SOLO las órdenes de mostrador (EsMostrador = true)
                 var ordenesParaMostrador = new List<object>();
 
                 foreach (var orden in ordenesActivas)
                 {
-                    // SOLO agregar si es orden de mostrador
                     if (orden.EsMostrador)
                     {
                         ordenesParaMostrador.Add(new
@@ -276,19 +250,15 @@ namespace TukiGestor
                 string numeroMesa = args[1];
                 string ubicacion = args[2];
 
-                // LIMPIAR ViewState antes de establecer nuevos valores para evitar contaminacion cruzada
                 LimpiarViewState();
 
-                // Establecer contexto de mostrador
                 ViewState["EsMostrador"] = true;
                 ViewState["MesaIdSeleccionada"] = null;
                 ViewState["NumeroMesaSeleccionada"] = "Mostrador";
                 ViewState["UbicacionSeleccionada"] = "mostrador";
 
-                // IMPORTANTE: Guardar tab activo como "mostrador"
                 HdnTabActivo.Value = "mostrador";
 
-                // Mostrar resumen del pedido - siempre usar "mostrador" como ubicacion
                 MostrarResumenPedido(pedidoId, numeroMesa, "mostrador");
             }
             catch (Exception ex)
@@ -301,12 +271,10 @@ namespace TukiGestor
         {
             try
             {
-                // Cargar mesas del salón
                 List<Mesa> mesasSalon = mesaService.ListarMesasPorUbicacion("salon");
                 RepMesasSalon.DataSource = mesasSalon;
                 RepMesasSalon.DataBind();
 
-                // Cargar mesas del patio
                 List<Mesa> mesasPatio = mesaService.ListarMesasPorUbicacion("patio");
                 RepMesasPatio.DataSource = mesasPatio;
                 RepMesasPatio.DataBind();
@@ -344,17 +312,13 @@ namespace TukiGestor
         {
             try
             {
-                // Cargar categorías desde la base de datos
                 Categorias = categoriaService.Listar();
 
-                // Cargar todos los productos (búsqueda se hace en JavaScript)
                 Productos = productoService.Listar();
 
-                // Bind a los repeaters de tabs
                 RepCategorias.DataSource = Categorias;
                 RepCategorias.DataBind();
 
-                // Bind al repeater de contenido
                 RepCategoriasContenido.DataSource = Categorias;
                 RepCategoriasContenido.DataBind();
             }
@@ -368,16 +332,12 @@ namespace TukiGestor
         {
             try
             {
-                // Cargar meseros activos desde la base de datos
                 List<Mesero> meseros = meseroService.ListarActivos();
 
-                // Limpiar el dropdown
                 DdlCamarero.Items.Clear();
 
-                // Agregar opción por defecto
                 DdlCamarero.Items.Add(new ListItem("Seleccione un camarero", ""));
 
-                // Agregar los meseros activos
                 foreach (var mesero in meseros)
                 {
                     string nombreCompleto = mesero.Nombre + " " + mesero.Apellido;
@@ -390,15 +350,12 @@ namespace TukiGestor
             }
         }
 
-        // Método auxiliar para obtener productos de una categoría específica
         public List<Producto> ObtenerProductosPorCategoria(int categoriaId)
         {
             if (Productos == null) return new List<Producto>();
-            // Solo mostrar productos con stock disponible
             return Productos.Where(p => p.Categoria.CategoriaId == categoriaId && p.Stock > 0).ToList();
         }
 
-        // Método para generar HTML de productos por categoría
         protected string GenerarProductosCategoria(int categoriaId)
         {
             var productos = ObtenerProductosPorCategoria(categoriaId);
