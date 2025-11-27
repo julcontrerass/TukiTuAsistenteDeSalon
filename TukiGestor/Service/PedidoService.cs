@@ -61,13 +61,11 @@ namespace Service
         {
             try
             {
-                // Actualizar el estado del pedido a 0 (cerrado)
                 datos.SetearConsulta(@"UPDATE PEDIDO SET Estado = 0, FechaCierre = @FechaCierre WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@FechaCierre", DateTime.Now);
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
 
-                // Actualizar el estado de todos los detalles del pedido a 0 (cerrado)
                 datos.SetearConsulta(@"UPDATE DETALLEPEDIDO SET Estado = 0 WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
@@ -82,13 +80,11 @@ namespace Service
         {
             try
             {
-                // Actualizar el estado del pedido a 0 (cancelado)
                 datos.SetearConsulta(@"UPDATE PEDIDO SET Estado = 0, FechaCierre = @FechaCierre WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@FechaCierre", DateTime.Now);
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
 
-                // Actualizar el estado de todos los detalles del pedido a 0 (cancelado)
                 datos.SetearConsulta(@"UPDATE DETALLEPEDIDO SET Estado = 0 WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();

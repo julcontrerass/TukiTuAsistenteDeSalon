@@ -10,8 +10,8 @@ namespace dominio
     {
         public int MesaId { get; set; }
         public string NumeroMesa { get; set; }
-        public string Ubicacion { get; set; } // 'salon' o 'patio'
-        public string Estado { get; set; } // 'libre' o 'ocupada'
+        public string Ubicacion { get; set; }
+        public string Estado { get; set; }
         public int PosicionX { get; set; } 
         public int PosicionY { get; set; } 
         public bool Activo { get; set; } 

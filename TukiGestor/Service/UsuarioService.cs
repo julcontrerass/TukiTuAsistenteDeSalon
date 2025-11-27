@@ -18,10 +18,7 @@ namespace Service
         public UsuarioService() { }
         public string hashearContraseña(string password)
         {
-
-
             return BCrypt.Net.BCrypt.HashPassword(password);
-
         }
 
 
@@ -33,17 +30,13 @@ namespace Service
                 datos.SetearConsulta("SELECT TOP(1) NombreUsuario, Contrasenia from USUARIO where NombreUsuario = @usuario COLLATE Latin1_General_CS_AS;");
                 datos.setearParametro("@usuario", usuario);
                 datos.ejecutarLectura();
-
                 if (!datos.Lector.Read())
                 {
                     mensajeError = "El usuario ingresado no existe";
                     return false;
                 }
-
-
                 string user = (string)datos.Lector["NombreUsuario"];
                 string passwordHash = (string)datos.Lector["Contrasenia"];
-
                 bool passwordCorrecto = BCrypt.Net.BCrypt.Verify(password, passwordHash);
 
                 if (!passwordCorrecto)
@@ -57,7 +50,6 @@ namespace Service
             }
             catch (Exception ex)
             {
-
                 throw new Exception("No se pudo obtener los datos del usuario ingresado, intentelo nuevamente" + ex.Message);
             }
             finally

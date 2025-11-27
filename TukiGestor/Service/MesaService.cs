@@ -157,23 +157,19 @@ namespace Service
         {
             try
             {
-                // Obtener el siguiente número de mesa disponible para la ubicación (solo activas)
-                datos.SetearConsulta(@"SELECT ISNULL(MAX(CAST(NumeroMesa AS INT)), 0) + 1 AS ProximoNumero
-                                      FROM MESA
-                                      WHERE Ubicacion = @ubicacion AND Activo = 1");
+                // obtenemos el siguiente numero de mesa
+                datos.SetearConsulta(@"SELECT ISNULL(MAX(CAST(NumeroMesa AS INT)), 0) + 1 AS ProximoNumero FROM MESA WHERE Ubicacion = @ubicacion AND Activo = 1");
                 datos.setearParametro("@ubicacion", mesa.Ubicacion);
 
                 object resultado = datos.ejecutarScalar();
                 int proximoNumero = Convert.ToInt32(resultado);
                 mesa.NumeroMesa = proximoNumero.ToString();
 
-                // Calcular posición inicial para la nueva mesa (evitar solapamiento)
-                // 150px de ancho + 20px de gap = 170px de separación
-                // 4 mesas por fila
+                // Calcular posición de la mesa
                 int posicionX = 20 + ((proximoNumero - 1) % 4) * 170;
                 int posicionY = 20 + ((proximoNumero - 1) / 4) * 170;
 
-                // Insertar la nueva mesa
+                // insertamos la nueva mesa
                 datos.SetearConsulta("INSERT INTO MESA (NumeroMesa, Ubicacion, Estado, PosicionX, PosicionY, Activo) VALUES (@numeroMesa, @ubicacion, @estado, @posicionX, @posicionY, 1)");
                 datos.setearParametro("@numeroMesa", mesa.NumeroMesa);
                 datos.setearParametro("@ubicacion", mesa.Ubicacion);
@@ -193,20 +189,17 @@ namespace Service
         {
             try
             {
-                // Primero obtener la mesa para saber su ubicación y número
                 Mesa mesaEliminar = ObtenerMesaPorId(mesaId);
                 if (mesaEliminar == null)
                 {
                     throw new Exception("No se encontro la mesa a eliminar");
                 }
 
-                // Verificar si la mesa está ocupada (tiene pedidos activos)
                 if (mesaEliminar.Estado.ToLower() == "ocupada")
                 {
                     throw new Exception("No se puede eliminar una mesa ocupada. Por favor, cierre primero todos los pedidos activos.");
                 }
 
-                // Eliminación lógica: marcar como inactiva
                 datos.SetearConsulta("UPDATE MESA SET Activo = 0 WHERE MesaId = @mesaId");
                 datos.setearParametro("@mesaId", mesaId);
                 datos.ejecutarAccion();
@@ -239,21 +232,10 @@ namespace Service
         {
             try
             {
-                // Primero, marcar todas las mesas como libres
                 datos.SetearConsulta("UPDATE MESA SET Estado = 'libre'");
                 datos.ejecutarAccion();
 
-                // Luego, marcar como ocupadas las mesas que tienen asignaciones activas
-                // (independientemente de si tienen pedidos o no, porque la mesa se ocupa al asignar mesero)
-                datos.SetearConsulta(@"
-                    UPDATE MESA
-                    SET Estado = 'ocupada'
-                    WHERE MesaId IN (
-                        SELECT DISTINCT MesaId
-                        FROM ASIGNACIONMESA
-                        WHERE Activa = 1
-                    )
-                ");
+                datos.SetearConsulta(@" UPDATE MESA SET Estado = 'ocupada' WHERE MesaId IN (SELECT DISTINCT MesaId FROM ASIGNACIONMESA WHERE Activa = 1 ) ");
                 datos.ejecutarAccion();
             }
             catch (Exception ex)

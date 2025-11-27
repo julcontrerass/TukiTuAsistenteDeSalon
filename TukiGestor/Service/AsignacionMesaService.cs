@@ -21,14 +21,11 @@ namespace Service
         {
             try
             {
-                datos.SetearConsulta(@"INSERT INTO ASIGNACIONMESA (FechaAsignacion, MeseroId, MesaId, Activa)
-                                      OUTPUT INSERTED.AsignacionId
-                                      VALUES (@FechaAsignacion, @MeseroId, @MesaId, @Activa)");
+                datos.SetearConsulta(@"INSERT INTO ASIGNACIONMESA (FechaAsignacion, MeseroId, MesaId, Activa) OUTPUT INSERTED.AsignacionId  VALUES (@FechaAsignacion, @MeseroId, @MesaId, @Activa)");
                 datos.setearParametro("@FechaAsignacion", asignacion.FechaAsignacion);
                 datos.setearParametro("@MeseroId", asignacion.Mesero.MeseroId);
                 datos.setearParametro("@MesaId", asignacion.Mesa.MesaId);
                 datos.setearParametro("@Activa", asignacion.Activa);
-
                 object resultado = datos.ejecutarScalar();
                 return Convert.ToInt32(resultado);
             }
@@ -57,10 +54,7 @@ namespace Service
             AsignacionMesa asignacion = null;
             try
             {
-                datos.SetearConsulta(@"SELECT TOP 1 AsignacionId, FechaAsignacion, MeseroId, MesaId, Activa
-                                      FROM ASIGNACIONMESA
-                                      WHERE MesaId = @MesaId AND Activa = 1
-                                      ORDER BY FechaAsignacion DESC");
+                datos.SetearConsulta(@"SELECT TOP 1 AsignacionId, FechaAsignacion, MeseroId, MesaId, Activa FROM ASIGNACIONMESA  WHERE MesaId = @MesaId AND Activa = 1  ORDER BY FechaAsignacion DESC");
                 datos.setearParametro("@MesaId", mesaId);
                 datos.ejecutarLectura();
 
@@ -92,9 +86,7 @@ namespace Service
             AsignacionMesa asignacion = null;
             try
             {
-                datos.SetearConsulta(@"SELECT AsignacionId, FechaAsignacion, MeseroId, MesaId, Activa
-                                      FROM ASIGNACIONMESA
-                                      WHERE AsignacionId = @AsignacionId");
+                datos.SetearConsulta(@"SELECT AsignacionId, FechaAsignacion, MeseroId, MesaId, Activa  FROM ASIGNACIONMESA WHERE AsignacionId = @AsignacionId");
                 datos.setearParametro("@AsignacionId", asignacionId);
                 datos.ejecutarLectura();
 

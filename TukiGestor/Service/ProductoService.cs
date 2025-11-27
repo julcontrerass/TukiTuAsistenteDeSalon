@@ -127,7 +127,6 @@ namespace Service
                 datos.cerrarConexion();
             }
         }
-        // listamos productos eliminados
         public List<Producto> ListarEliminados()
         {
             List<Producto> lista = new List<Producto>();
@@ -159,7 +158,6 @@ namespace Service
             }
         }
 
-        // reactivamos un producto eliminado
         public void Reactivar(int id)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -298,7 +296,6 @@ namespace Service
                 {
                     consulta += " AND Nombre LIKE @texto";
                 }
-                //orden
                 switch (ordenamiento)
                 {
                     case "reciente":
@@ -394,23 +391,17 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                string consulta = @"SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock 
-                           FROM PRODUCTO 
-                           WHERE Disponible = 1";
-
+                string consulta = @"SELECT ProductoId, Nombre, Precio, Disponible, CategoriaId, Stock  FROM PRODUCTO  WHERE Disponible = 1";
                 // Filtro por búsqueda de texto
                 if (!string.IsNullOrWhiteSpace(textoBusqueda))
                 {
                     consulta += " AND Nombre LIKE @texto";
                 }
-
                 // Filtro por categoría
                 if (categoriaId > 0)
                 {
                     consulta += " AND CategoriaId = @categoriaId";
                 }
-
-                // Orden
                 switch (ordenamiento)
                 {
                     case "reciente":
@@ -438,22 +429,16 @@ namespace Service
                         consulta += " ORDER BY Nombre ASC";
                         break;
                 }
-
                 datos.SetearConsulta(consulta);
-
-                // Setear parámetros
                 if (!string.IsNullOrWhiteSpace(textoBusqueda))
                 {
                     datos.setearParametro("@texto", "%" + textoBusqueda + "%");
                 }
-
                 if (categoriaId > 0)
                 {
                     datos.setearParametro("@categoriaId", categoriaId);
                 }
-
                 datos.ejecutarLectura();
-
                 while (datos.Lector.Read())
                 {
                     Producto prod = new Producto();
@@ -465,7 +450,6 @@ namespace Service
                     prod.Stock = (int)datos.Lector["Stock"];
                     lista.Add(prod);
                 }
-
                 return lista;
             }
             catch (Exception ex)

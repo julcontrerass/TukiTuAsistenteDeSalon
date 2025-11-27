@@ -21,9 +21,7 @@ namespace Service
         {
             try
             {
-                datos.SetearConsulta(@"INSERT INTO VENTA (PedidoId, FechaVenta, MontoTotal, MetodoPago, MontoRecibido, GerenteId)
-                                      OUTPUT INSERTED.VentaId
-                                      VALUES (@PedidoId, @FechaVenta, @MontoTotal, @MetodoPago, @MontoRecibido, @GerenteId)");
+                datos.SetearConsulta(@"INSERT INTO VENTA (PedidoId, FechaVenta, MontoTotal, MetodoPago, MontoRecibido, GerenteId) OUTPUT INSERTED.VentaId VALUES (@PedidoId, @FechaVenta, @MontoTotal, @MetodoPago, @MontoRecibido, @GerenteId)");
                 datos.setearParametro("@PedidoId", venta.Pedido.PedidoId);
                 datos.setearParametro("@FechaVenta", venta.FechaVenta);
                 datos.setearParametro("@MontoTotal", venta.MontoTotal);
@@ -48,10 +46,7 @@ namespace Service
         {
             try
             {
-                datos.SetearConsulta(@"
-                    SELECT V.VentaId, V.PedidoId, V.FechaVenta, V.MontoTotal, V.MetodoPago, V.MontoRecibido, V.GerenteId
-                    FROM VENTA V
-                    WHERE V.VentaId = @VentaId");
+                datos.SetearConsulta(@" SELECT V.VentaId, V.PedidoId, V.FechaVenta, V.MontoTotal, V.MetodoPago, V.MontoRecibido, V.GerenteId FROM VENTA V WHERE V.VentaId = @VentaId");
                 datos.setearParametro("@VentaId", ventaId);
                 datos.ejecutarLectura();
 

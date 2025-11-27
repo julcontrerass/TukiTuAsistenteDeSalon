@@ -23,7 +23,6 @@ namespace Service
                     aux.Nombre = datos.Lector["Nombre"].ToString();
                     aux.Apellido = datos.Lector["Apellido"].ToString();
                     aux.Activo = (bool)datos.Lector["Activo"];
-                    // Datos del usuario
                     aux.Id = (int)datos.Lector["UsuarioId"];
                     aux.NombreUsuario = datos.Lector["NombreUsuario"].ToString();
                     aux.Contraseña = datos.Lector["Contrasenia"].ToString();
@@ -79,7 +78,6 @@ namespace Service
                 datos.setearParametro("@mail", nuevo.Email);
                 datos.setearParametro("@rol", nuevo.Rol);
                 int nuevoUsuarioId = (int)datos.ejecutarScalar();
-                // insert Mesero
                 datos.SetearConsulta("INSERT INTO MESERO (Nombre, Apellido, Activo, UsuarioId) " + "VALUES (@nom, @ape, 1, @uid)");
                 datos.setearParametro("@nom", nuevo.Nombre);
                 datos.setearParametro("@ape", nuevo.Apellido);
@@ -252,7 +250,6 @@ namespace Service
 
 
 
-        // validamos si existe el nombre de usuario (excluyendo el usuario actual)
         public bool ExisteNombreUsuarioParaOtro(string nombreUsuario, int usuarioIdActual)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -270,7 +267,6 @@ namespace Service
             }
         }
 
-        // validamos si existe el email (excluyendo el usuario actual)
         public bool ExisteEmailParaOtro(string email, int usuarioIdActual)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -288,13 +284,11 @@ namespace Service
             }
         }
 
-        // Actualizar mesero
         public void Modificar(Mesero mesero, bool cambiarContrasenia)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                // Actualizar Usuario
                 if (cambiarContrasenia)
                 {
                     datos.SetearConsulta("UPDATE USUARIO SET NombreUsuario = @user, Contrasenia = @pass, Email = @mail " + "WHERE UsuarioId = @id");
@@ -308,7 +302,6 @@ namespace Service
                 datos.setearParametro("@mail", mesero.Email);
                 datos.setearParametro("@id", mesero.Id);
                 datos.ejecutarAccion();
-                // Actualizar Mesero
                 datos.SetearConsulta("UPDATE MESERO SET Nombre = @nom, Apellido = @ape " + "WHERE MeseroId = @meseroId");
                 datos.setearParametro("@nom", mesero.Nombre);
                 datos.setearParametro("@ape", mesero.Apellido);

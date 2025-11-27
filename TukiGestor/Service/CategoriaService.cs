@@ -104,7 +104,6 @@ namespace Service
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                // Siempre hacer baja lógica
                 datos.SetearConsulta("UPDATE CATEGORIA SET Activa = 0 WHERE CategoriaId = @id");
                 datos.setearParametro("@id", id);
                 datos.ejecutarAccion();
