@@ -9,8 +9,8 @@ namespace dominio
     public class Gerente:Usuario
     {
         public int GerenteId { get; set; }
-        public string NombreGerente { get; set; }
-        public string ApellidoGerente { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
         public bool Activo { get; set; }
     }
 }

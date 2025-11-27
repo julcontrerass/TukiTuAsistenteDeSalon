@@ -262,67 +262,118 @@ namespace TukiGestor
             {
                 return;
             }
-            UsuarioService usuarioService = new UsuarioService();
-            MeseroService servicio = new MeseroService();
-            Mesero nuevo = new Mesero();
+                        
+            UsuarioService usuarioService = new UsuarioService();            
+            MeseroService servicioMesero = new MeseroService();
+            GerenteService servicioGerente = new GerenteService();
+            Mesero nuevoMesero = new Mesero();
+            Gerente nuevoGerente = new Gerente();
 
             try
             {
-                // Capturamos y limpiamos los datos
-                nuevo.NombreUsuario = txtNombreUsuario.Text.Trim();                
-                string contraseñahash = usuarioService.hashearContraseña(txtContrasenia.Text);
-                nuevo.Contraseña = contraseñahash;
-                nuevo.Email = txtEmail.Text.Trim().ToLower(); // email en minúsculas
-                nuevo.Nombre = txtNombreMesero.Text.Trim();
-                nuevo.Apellido = txtApellidoMesero.Text.Trim();
-                // Validación de campos vacíos
-                if (string.IsNullOrEmpty(nuevo.NombreUsuario) ||
-                    string.IsNullOrEmpty(nuevo.Contraseña) ||
-                    string.IsNullOrEmpty(nuevo.Email) ||
-                    string.IsNullOrEmpty(nuevo.Nombre) ||
-                    string.IsNullOrEmpty(nuevo.Apellido))
+                string contraseñaPlana = txtContrasenia.Text.Trim();
+                string nombreUsuario = txtNombreUsuario.Text.Trim();
+                string email = txtEmail.Text.Trim().ToLower();
+                string nombre = txtNombreMesero.Text.Trim();
+                string apellido = txtApellidoMesero.Text.Trim();    
+                string rol = ddlFiltroRol.SelectedValue.ToLower();
+
+                if (rol == "gerente")
+                {
+                    nuevoGerente.NombreUsuario = nombreUsuario;
+                    string contraseñahash = usuarioService.hashearContraseña(contraseñaPlana);
+                    nuevoGerente.Contraseña = contraseñahash;                    
+                    nuevoGerente.Email = email; // email en minúsculas
+                    nuevoGerente.Nombre = nombre;
+                    nuevoGerente.Apellido = apellido;
+                    nuevoGerente.Rol = rol;
+
+                }
+                else
+                {
+                    nuevoMesero.NombreUsuario = nombreUsuario;
+                    string contraseñahash = usuarioService.hashearContraseña(contraseñaPlana);
+                    nuevoMesero.Contraseña = contraseñahash;
+                    nuevoMesero.Email = email; // email en minúsculas
+                    nuevoMesero.Nombre = nombre;
+                    nuevoMesero.Apellido = apellido;
+                    nuevoMesero.Rol = rol;
+                }
+
+                    // Validación de campos vacíos
+
+                    if (string.IsNullOrEmpty(nuevoGerente.NombreUsuario) ||
+                    string.IsNullOrEmpty(contraseñaPlana) ||
+                    string.IsNullOrEmpty(nuevoGerente.Email) ||
+                    string.IsNullOrEmpty(nuevoGerente.Nombre) ||
+                    string.IsNullOrEmpty(nuevoGerente.Apellido) ||
+                    string.IsNullOrEmpty(rol))
                 {
                     MostrarMensaje("Por favor complete todos los campos obligatorios.", "warning");
                     return;
                 }
+                
+
                 // Validación de longitud de contraseña
-                if (nuevo.Contraseña.Length < 6)
+                if (contraseñaPlana.Length < 6 )
                 {
                     MostrarMensaje("La contraseña debe tener al menos 6 caracteres.", "warning");
                     return;
                 }
 
                 // Validación de formato de email
-                if (!System.Text.RegularExpressions.Regex.IsMatch(nuevo.Email,
-                    @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
-                {
-                    MostrarMensaje("El formato del email no es válido.", "warning");
-                    return;
-                }
+
+              
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(email,
+                   @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
+                    {
+                        MostrarMensaje("El formato del email no es válido.", "warning");
+                        return;
+                    }
+                
+               
                 // Validación de nombre de usuario existente
-                if (servicio.ExisteNombreUsuario(nuevo.NombreUsuario))
+                if (servicioMesero.ExisteNombreUsuario(nombre))
                 {
                     MostrarMensaje("El nombre de usuario ya está en uso. Por favor elija otro.", "warning");
                     return;
                 }
                 // Validación de email existente
-                if (servicio.ExisteEmail(nuevo.Email))
+                if (servicioMesero.ExisteEmail(email))
                 {
                     MostrarMensaje("El email ya está registrado. Por favor use otro.", "warning");
                     return;
                 }
                 // Si llegamos acá, todo está bien
-                servicio.Agregar(nuevo);
+                if(rol == "gerente")
+                {
+                    servicioGerente.Agregar(nuevoGerente);
+                }
+                else
+                {
+                    servicioMesero.Agregar(nuevoMesero);
+
+                }
+                               
                 // Enviamos email al nuevo mesero
                 try
                 {
                     EmailService emailService = new EmailService();
-                    emailService.EnviarEmailNuevoMesero(nuevo.Email, nuevo.Nombre, nuevo.Apellido, nuevo.NombreUsuario, nuevo.Contraseña);
+                    emailService.EnviarEmailNuevoMesero(email, nombre, apellido, nombreUsuario, contraseñaPlana);
                 }
                 catch (Exception ex)
                 {
+                    if(rol == "gerente")
+                    {
+                        lblMensaje.Text = "El gerente fue creado, pero no se pudo enviar el email: " + ex.Message;
+                    }
+                    else
+                    {
                     lblMensaje.Text = "El mesero fue creado, pero no se pudo enviar el email: " + ex.Message;
-                    lblMensaje.CssClass = "text-warning fw-bold";
+
+                    }
+
+                        lblMensaje.CssClass = "text-warning fw-bold";
                 }
 
                 // Limpiamos los campos
@@ -334,11 +385,22 @@ namespace TukiGestor
                 // Recargamos listado
                 CargarMeseros();
                 // Mostramos mensaje de éxito
-                MostrarMensaje($"Mesero '{nuevo.Nombre} {nuevo.Apellido}' creado correctamente.", "success");
+                if(rol == "gerente")
+                {
+                    MostrarMensaje($"Gerente '{nombre} {apellido}' creado correctamente.", "success");
+
+                }
+                else
+                {
+
+                MostrarMensaje($"Mesero '{nombre} {apellido}' creado correctamente.", "success");
+                }
+
             }
             catch (Exception ex)
             {
-                MostrarMensaje("Error al crear el mesero: " + ex.Message, "error");
+                
+                MostrarMensaje("Error al crear el usuario: " + ex.Message, "error");
             }
         }
 

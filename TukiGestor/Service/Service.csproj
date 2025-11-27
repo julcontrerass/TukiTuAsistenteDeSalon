@@ -60,6 +60,7 @@
     <Compile Include="AsignacionMesaService.cs" />
     <Compile Include="CategoriaService.cs" />
     <Compile Include="EmailService.cs" />
+    <Compile Include="GerenteService.cs" />
     <Compile Include="MesaService.cs" />
     <Compile Include="MeseroService.cs" />
     <Compile Include="PedidoService.cs" />

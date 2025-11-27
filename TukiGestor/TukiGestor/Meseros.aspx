@@ -7,7 +7,7 @@
     <div class="productos-container">
         <div class="tabs-container">
             <h2 class="mb-4" style="color: #333; font-weight: bold;">
-                <i class="bi bi-people-fill"></i> Gestión de Meseros
+                <i class="bi bi-people-fill"></i> Gestión de Usuarios
             </h2>
 
             <asp:UpdatePanel ID="UpdatePanelMensajes" runat="server" UpdateMode="Conditional">
@@ -22,22 +22,22 @@
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
                     <asp:LinkButton ID="btnTabListado" runat="server" CssClass="nav-link active" OnClick="btnTabListado_Click">
-                        <i class="bi bi-list-ul"></i> Meseros Activos
+                        <i class="bi bi-list-ul"></i> Usuarios Activos
                     </asp:LinkButton>
                 </li>
                 <li class="nav-item">
                     <asp:LinkButton ID="btnTabNuevo" runat="server" CssClass="nav-link" OnClick="btnTabNuevo_Click">
-                        <i class="bi bi-plus-circle"></i> Nuevo Mesero
+                        <i class="bi bi-plus-circle"></i> Nuevo Usuario
                     </asp:LinkButton>
                 </li>
                 <li class="nav-item">
                     <asp:LinkButton ID="btnTabModificar" runat="server" CssClass="nav-link" OnClick="btnTabModificar_Click" Visible="false">
-                        <i class="bi bi-pencil-square"></i> Modificar Mesero
+                        <i class="bi bi-pencil-square"></i> Modificar Usuario
                     </asp:LinkButton>
                 </li>
                 <li class="nav-item">
                     <asp:LinkButton ID="btnTabInactivos" runat="server" CssClass="nav-link" OnClick="btnTabInactivos_Click">
-                        <i class="bi bi-archive"></i> Meseros Inactivos
+                        <i class="bi bi-archive"></i> Usuarios Inactivos
                     </asp:LinkButton>
                 </li>
             </ul>
@@ -89,7 +89,7 @@
                         <!-- nuevo mesero -->
                         <asp:Panel ID="pnlNuevo" runat="server" CssClass="tab-pane fade">
                             <div class="p-4">
-                                <h4 class="mb-3">Agregar nuevo mesero</h4>
+                                <h4 class="mb-3">Agregar nuevo usuario</h4>
                                 <div class="mb-3">
                                     <label for="txtNombreUsuario" class="form-label">Nombre de Usuario *</label>
                                     <asp:TextBox ID="txtNombreUsuario" runat="server" CssClass="form-control"></asp:TextBox>
@@ -116,6 +116,13 @@
                                     <label for="txtApellidoMesero" class="form-label">Apellido *</label>
                                     <asp:TextBox ID="txtApellidoMesero" runat="server" CssClass="form-control" placeholder="Ej: Pérez"></asp:TextBox>
                                     <asp:RequiredFieldValidator ID="rfvApellidoMesero" runat="server" ControlToValidate="txtApellidoMesero" ErrorMessage="El apellido es obligatorio." CssClass="text-danger small" Display="Dynamic" ValidationGroup="NuevoMesero"> </asp:RequiredFieldValidator>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="txtRol" class="form-label">Rol *</label>
+                                    <asp:DropDownList ID="ddlFiltroRol" runat="server" CssClass="form-select" AutoPostBack="true">
+                                        <asp:ListItem Text="Gerente" Value="gerente"></asp:ListItem>
+                                        <asp:ListItem Text="Mesero" Value="mesero"></asp:ListItem>
+                                    </asp:DropDownList>
                                 </div>
                                 <asp:Button ID="btnGuardarMesero" runat="server" Text="Guardar" CssClass="btn btn-custom mt-3" OnClick="btnGuardarMesero_Click" ValidationGroup="NuevoMesero" />
                             </div>
