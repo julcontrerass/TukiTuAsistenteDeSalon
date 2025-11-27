@@ -248,15 +248,16 @@ namespace TukiGestor
             {
                 return;
             }
-
+            UsuarioService usuarioService = new UsuarioService();
             MeseroService servicio = new MeseroService();
             Mesero nuevo = new Mesero();
 
             try
             {
                 // Capturamos y limpiamos los datos
-                nuevo.NombreUsuario = txtNombreUsuario.Text.Trim();
-                nuevo.Contraseña = txtContrasenia.Text;
+                nuevo.NombreUsuario = txtNombreUsuario.Text.Trim();                
+                string contraseñahash = usuarioService.hashearContraseña(txtContrasenia.Text);
+                nuevo.Contraseña = contraseñahash;
                 nuevo.Email = txtEmail.Text.Trim().ToLower(); // email en minúsculas
                 nuevo.Nombre = txtNombreMesero.Text.Trim();
                 nuevo.Apellido = txtApellidoMesero.Text.Trim();

@@ -18,7 +18,7 @@ GO
 CREATE TABLE USUARIO(
     UsuarioId INT IDENTITY(1,1) PRIMARY KEY,
     NombreUsuario VARCHAR(50) NOT NULL,
-    Contrasenia VARCHAR(50) NOT NULL,
+    Contrasenia VARCHAR(100) NOT NULL,
     Email VARCHAR(50)
 );
 
@@ -361,3 +361,11 @@ SELECT * FROM PEDIDO
 SELECT * FROM PRODUCTO
 SELECT * FROM USUARIO
 */
+
+
+ALTER TABLE USUARIO
+ALTER COLUMN Contrasenia VARCHAR(100) NOT NULL;
+
+select * from USUARIO
+
+select top(1) NombreUsuario, Contrasenia, Email from USUARIO where NombreUsuario = 'AlejandroMadero'
