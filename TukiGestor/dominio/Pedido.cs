@@ -15,5 +15,7 @@ namespace dominio
         public decimal Total { get; set; }
         public AsignacionMesa AsignacionMesa { get; set; }
         public bool EsMostrador { get; set; }
+        public string DescripcionResumen { get; set; }
+
     }
 }

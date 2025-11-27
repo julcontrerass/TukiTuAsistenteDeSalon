@@ -21,9 +21,7 @@ namespace Service
         {
             try
             {
-                datos.SetearConsulta(@"INSERT INTO PEDIDO (FechaApertura, Estado, Total, AsignacionId, CantidadPersonas, EsMostrador)
-                                      OUTPUT INSERTED.PedidoId
-                                      VALUES (@FechaApertura, @Estado, @Total, @AsignacionId, @CantidadPersonas, @EsMostrador)");
+                datos.SetearConsulta(@"INSERT INTO PEDIDO (FechaApertura, Estado, Total, AsignacionId, CantidadPersonas, EsMostrador) OUTPUT INSERTED.PedidoId  VALUES (@FechaApertura, @Estado, @Total, @AsignacionId, @CantidadPersonas, @EsMostrador)");
                 datos.setearParametro("@FechaApertura", pedido.FechaPedido);
                 datos.setearParametro("@Estado", pedido.EstadoPedido);
                 datos.setearParametro("@Total", pedido.Total);
@@ -44,8 +42,7 @@ namespace Service
         {
             try
             {
-                datos.SetearConsulta(@"INSERT INTO DETALLEPEDIDO (PedidoId, ProductoId, Cantidad, PrecioUnitario, Estado, Subtotal)
-                                      VALUES (@PedidoId, @ProductoId, @Cantidad, @PrecioUnitario, @Estado, @Subtotal)");
+                datos.SetearConsulta(@"INSERT INTO DETALLEPEDIDO (PedidoId, ProductoId, Cantidad, PrecioUnitario, Estado, Subtotal)  VALUES (@PedidoId, @ProductoId, @Cantidad, @PrecioUnitario, @Estado, @Subtotal)");
                 datos.setearParametro("@PedidoId", detalle.Pedido.PedidoId);
                 datos.setearParametro("@ProductoId", detalle.Producto.ProductoId);
                 datos.setearParametro("@Cantidad", detalle.Cantidad);
@@ -65,17 +62,13 @@ namespace Service
             try
             {
                 // Actualizar el estado del pedido a 0 (cerrado)
-                datos.SetearConsulta(@"UPDATE PEDIDO
-                                      SET Estado = 0, FechaCierre = @FechaCierre
-                                      WHERE PedidoId = @PedidoId");
+                datos.SetearConsulta(@"UPDATE PEDIDO SET Estado = 0, FechaCierre = @FechaCierre WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@FechaCierre", DateTime.Now);
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
 
                 // Actualizar el estado de todos los detalles del pedido a 0 (cerrado)
-                datos.SetearConsulta(@"UPDATE DETALLEPEDIDO
-                                      SET Estado = 0
-                                      WHERE PedidoId = @PedidoId");
+                datos.SetearConsulta(@"UPDATE DETALLEPEDIDO SET Estado = 0 WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
             }
@@ -90,17 +83,13 @@ namespace Service
             try
             {
                 // Actualizar el estado del pedido a 0 (cancelado)
-                datos.SetearConsulta(@"UPDATE PEDIDO
-                                      SET Estado = 0, FechaCierre = @FechaCierre
-                                      WHERE PedidoId = @PedidoId");
+                datos.SetearConsulta(@"UPDATE PEDIDO SET Estado = 0, FechaCierre = @FechaCierre WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@FechaCierre", DateTime.Now);
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
 
                 // Actualizar el estado de todos los detalles del pedido a 0 (cancelado)
-                datos.SetearConsulta(@"UPDATE DETALLEPEDIDO
-                                      SET Estado = 0
-                                      WHERE PedidoId = @PedidoId");
+                datos.SetearConsulta(@"UPDATE DETALLEPEDIDO SET Estado = 0 WHERE PedidoId = @PedidoId");
                 datos.setearParametro("@PedidoId", pedidoId);
                 datos.ejecutarAccion();
             }
@@ -115,10 +104,7 @@ namespace Service
             List<Pedido> pedidos = new List<Pedido>();
             try
             {
-                datos.SetearConsulta(@"SELECT PedidoId, FechaApertura, FechaCierre, Estado, Total, AsignacionId, EsMostrador
-                                      FROM PEDIDO
-                                      WHERE Estado = 1
-                                      ORDER BY FechaApertura DESC");
+                datos.SetearConsulta(@"SELECT PedidoId, FechaApertura, FechaCierre, Estado, Total, AsignacionId, EsMostrador FROM PEDIDO WHERE Estado = 1 ORDER BY FechaApertura DESC");
                 datos.ejecutarLectura();
 
                 while (datos.Lector.Read())
@@ -152,10 +138,7 @@ namespace Service
             List<DetallePedido> detalles = new List<DetallePedido>();
             try
             {
-                datos.SetearConsulta(@"SELECT d.DetalleId, d.PedidoId, d.ProductoId, d.Cantidad, d.PrecioUnitario, d.Subtotal, p.Nombre
-                                      FROM DETALLEPEDIDO d
-                                      INNER JOIN PRODUCTO p ON d.ProductoId = p.ProductoId
-                                      WHERE d.PedidoId = @pedidoId");
+                datos.SetearConsulta(@"SELECT d.DetalleId, d.PedidoId, d.ProductoId, d.Cantidad, d.PrecioUnitario, d.Subtotal, p.Nombre  FROM DETALLEPEDIDO d INNER JOIN PRODUCTO p ON d.ProductoId = p.ProductoId  WHERE d.PedidoId = @pedidoId");
                 datos.setearParametro("@pedidoId", pedidoId);
                 datos.ejecutarLectura();
 
@@ -190,9 +173,7 @@ namespace Service
             Pedido pedido = null;
             try
             {
-                datos.SetearConsulta(@"SELECT PedidoId, FechaApertura, FechaCierre, Estado, Total, AsignacionId, CantidadPersonas, EsMostrador
-                                      FROM PEDIDO
-                                      WHERE PedidoId = @pedidoId");
+                datos.SetearConsulta(@"SELECT PedidoId, FechaApertura, FechaCierre, Estado, Total, AsignacionId, CantidadPersonas, EsMostrador FROM PEDIDO  WHERE PedidoId = @pedidoId");
                 datos.setearParametro("@pedidoId", pedidoId);
                 datos.ejecutarLectura();
 
